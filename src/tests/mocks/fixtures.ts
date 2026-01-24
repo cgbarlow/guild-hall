@@ -15,6 +15,14 @@ export const mockUser: User = {
   email: 'adventurer@guildmail.com',
   display_name: 'Test Adventurer',
   avatar_url: 'https://example.com/avatar.jpg',
+  bio: 'A brave adventurer seeking glory',
+  total_points: 1500,
+  quests_completed: 10,
+  privacy_settings: {
+    profile_visibility: true,
+    show_achievements: true,
+    show_on_leaderboard: true,
+  },
   created_at: '2024-01-01T00:00:00.000Z',
   updated_at: '2024-01-01T00:00:00.000Z',
 }
@@ -27,6 +35,34 @@ export const mockGMUser: User = {
   email: 'gamemaster@guildmail.com',
   display_name: 'Game Master',
   avatar_url: 'https://example.com/gm-avatar.jpg',
+  bio: 'The keeper of quests and adventures',
+  total_points: 5000,
+  quests_completed: 50,
+  privacy_settings: {
+    profile_visibility: true,
+    show_achievements: true,
+    show_on_leaderboard: true,
+  },
+  created_at: '2024-01-01T00:00:00.000Z',
+  updated_at: '2024-01-01T00:00:00.000Z',
+}
+
+/**
+ * Mock private user fixture (profile not visible)
+ */
+export const mockPrivateUser: User = {
+  id: 'private-789',
+  email: 'private@guildmail.com',
+  display_name: 'Private User',
+  avatar_url: null,
+  bio: null,
+  total_points: 500,
+  quests_completed: 5,
+  privacy_settings: {
+    profile_visibility: false,
+    show_achievements: false,
+    show_on_leaderboard: false,
+  },
   created_at: '2024-01-01T00:00:00.000Z',
   updated_at: '2024-01-01T00:00:00.000Z',
 }
@@ -191,7 +227,7 @@ export const mockObjective: Objective = {
 /**
  * Collection fixtures for list testing
  */
-export const mockUsers: User[] = [mockUser, mockGMUser]
+export const mockUsers: User[] = [mockUser, mockGMUser, mockPrivateUser]
 
 export const mockQuests: Quest[] = [
   mockQuest,
@@ -279,6 +315,74 @@ export function createMockObjective(overrides: Partial<Objective> = {}): Objecti
   return {
     ...mockObjective,
     id: `objective-${Date.now()}`,
+    ...overrides,
+  }
+}
+
+// Achievement types and fixtures
+type Achievement = Database['public']['Tables']['achievements']['Row']
+type UserAchievement = Database['public']['Tables']['user_achievements']['Row']
+
+/**
+ * Mock achievement fixtures
+ */
+export const mockAchievements: Achievement[] = [
+  {
+    id: 'ach-001',
+    name: 'First Quest',
+    description: 'Complete your first quest',
+    icon: 'trophy',
+    points: 50,
+    created_at: '2024-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'ach-002',
+    name: 'Expert Adventurer',
+    description: 'Complete 10 quests',
+    icon: 'star',
+    points: 200,
+    created_at: '2024-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'ach-003',
+    name: 'Guild Champion',
+    description: 'Earn 1000 points',
+    icon: 'crown',
+    points: 500,
+    created_at: '2024-01-01T00:00:00.000Z',
+  },
+]
+
+/**
+ * Mock user achievements fixtures
+ */
+export const mockUserAchievements: UserAchievement[] = [
+  {
+    id: 'ua-001',
+    user_id: 'user-123',
+    achievement_id: 'ach-001',
+    earned_at: '2024-01-15T00:00:00.000Z',
+  },
+  {
+    id: 'ua-002',
+    user_id: 'user-123',
+    achievement_id: 'ach-002',
+    earned_at: '2024-02-01T00:00:00.000Z',
+  },
+]
+
+export function createMockAchievement(overrides: Partial<Achievement> = {}): Achievement {
+  return {
+    ...mockAchievements[0],
+    id: `ach-${Date.now()}`,
+    ...overrides,
+  }
+}
+
+export function createMockUserAchievement(overrides: Partial<UserAchievement> = {}): UserAchievement {
+  return {
+    ...mockUserAchievements[0],
+    id: `ua-${Date.now()}`,
     ...overrides,
   }
 }
