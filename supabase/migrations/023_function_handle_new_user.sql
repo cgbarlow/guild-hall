@@ -2,11 +2,15 @@
 -- Description: Create handle_new_user function for auto-creating user profile on signup
 -- Specification: SPEC-001-Database-Schema
 
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
   -- Create user profile
-  INSERT INTO users (id, email, display_name)
+  INSERT INTO public.users (id, email, display_name)
   VALUES (
     NEW.id,
     NEW.email,
@@ -14,16 +18,16 @@ BEGIN
   );
 
   -- Create default privacy settings
-  INSERT INTO privacy_settings (user_id)
+  INSERT INTO public.privacy_settings (user_id)
   VALUES (NEW.id);
 
   -- Grant default 'user' role
-  INSERT INTO user_roles (user_id, role)
+  INSERT INTO public.user_roles (user_id, role)
   VALUES (NEW.id, 'user');
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 -- Comment
 COMMENT ON FUNCTION handle_new_user() IS 'Trigger function to create user profile, privacy settings, and default role on signup';

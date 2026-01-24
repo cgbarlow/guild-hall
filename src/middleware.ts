@@ -38,14 +38,11 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    // Check GM role
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', session.user.id)
-      .in('role', ['gm', 'admin'])
+    // Check GM role using has_role function (bypasses RLS issues)
+    const { data: isGM, error: gmError } = await supabase.rpc('has_role', { check_role: 'gm' })
+    const { data: isAdmin, error: adminError } = await supabase.rpc('has_role', { check_role: 'admin' })
 
-    if (!roles || roles.length === 0) {
+    if (!isGM && !isAdmin) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
