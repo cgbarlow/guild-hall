@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EvidenceViewer } from '@/components/gm/review/evidence-viewer'
 import { UserContext } from '@/components/gm/review/user-context'
 import { QuestContext } from '@/components/gm/review/quest-context'
+import { ReviewActions } from '@/components/gm/review/review-actions'
 import { useSubmission, useObjectiveCounts } from '@/lib/hooks/use-submission'
 
 function ReviewDetailSkeleton() {
@@ -96,12 +97,12 @@ export default function ReviewDetailPage() {
             submittedAt={submission.submitted_at}
           />
 
-          {/* Review Actions Placeholder - Will be implemented in 6.3 */}
-          <div className="rounded-lg border bg-muted/30 p-6 text-center">
-            <p className="text-muted-foreground">
-              Review actions will be available here.
-            </p>
-          </div>
+          {/* Review Actions */}
+          <ReviewActions
+            userObjectiveId={submission.id}
+            userName={user?.display_name || undefined}
+            objectiveTitle={objective?.title}
+          />
         </div>
 
         {/* Sidebar */}
