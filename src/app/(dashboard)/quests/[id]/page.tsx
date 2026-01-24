@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation'
 import { QuestDetail } from '@/components/quests/quest-detail'
 import { useQuest } from '@/lib/hooks/use-quest'
-import { createClient } from '@/lib/supabase/client'
+import { useAcceptQuest } from '@/lib/hooks/use-accept-quest'
 import { Loader2 } from 'lucide-react'
 
 function LoadingSkeleton() {
@@ -46,35 +46,18 @@ export default function QuestDetailPage() {
   const questId = params.id as string
 
   const { data: quest, isLoading, error } = useQuest(questId)
+  const acceptQuestMutation = useAcceptQuest({
+    onSuccess: () => {
+      // Refresh the page to show updated status
+      router.refresh()
+    },
+    onError: (error) => {
+      console.error('Failed to accept quest:', error)
+    }
+  })
 
   const handleAcceptQuest = async (id: string) => {
-    const supabase = createClient()
-
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      // Redirect to login if not authenticated
-      router.push('/login')
-      return
-    }
-
-    // Update quest to claimed status
-    const { error: updateError } = await supabase
-      .from('quests')
-      .update({
-        status: 'claimed',
-        claimed_by: user.id,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-
-    if (updateError) {
-      console.error('Failed to accept quest:', updateError)
-      throw updateError
-    }
-
-    // Refresh the page to show updated status
-    router.refresh()
+    await acceptQuestMutation.mutateAsync(id)
   }
 
   if (isLoading) {
@@ -89,11 +72,14 @@ export default function QuestDetailPage() {
     return <ErrorState message="This quest does not exist." />
   }
 
+  // Quest is available if it's published and user hasn't already accepted it
+  const canAccept = quest.status === 'published'
+
   return (
     <QuestDetail
       quest={quest}
       onAccept={handleAcceptQuest}
-      canAccept={quest.status === 'open' && !quest.claimed_by}
+      canAccept={canAccept}
     />
   )
 }

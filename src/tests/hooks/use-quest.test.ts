@@ -3,18 +3,26 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { useQuest } from '@/lib/hooks/use-quest'
 import { createWrapper } from '@/tests/utils/test-utils'
 
-// Mock data for database response
+// Mock data for database response - using new schema
 const mockDbQuest = {
   id: 'quest-1',
-  guild_id: 'guild-1',
   title: 'Defeat the Dragon',
   description: 'A fearsome dragon terrorizes the village. Your task is to defeat it and save the villagers.',
-  status: 'open',
-  xp_reward: 500,
+  category_id: null,
+  points: 500,
+  reward_description: null,
+  acceptance_deadline: null,
+  completion_days: null,
+  status: 'published',
+  is_template: false,
+  template_id: null,
+  narrative_context: null,
+  transformation_goal: null,
   created_by: 'gm-1',
-  claimed_by: null,
   created_at: '2024-01-01T00:00:00.000Z',
   updated_at: '2024-01-01T00:00:00.000Z',
+  published_at: '2024-01-01T00:00:00.000Z',
+  archived_at: null,
 }
 
 // Create a chainable mock builder
@@ -122,7 +130,7 @@ describe('useQuest', () => {
     const quest = result.current.data
     expect(quest?.points).toBe(500)
     expect(quest?.xp_reward).toBe(500)
-    expect(quest?.status).toBe('open')
+    expect(quest?.status).toBe('published')
     expect(quest?.objectives).toEqual([])
   })
 })

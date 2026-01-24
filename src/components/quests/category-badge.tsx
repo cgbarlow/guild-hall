@@ -8,7 +8,12 @@ interface CategoryBadgeProps {
   className?: string
 }
 
+// Default color for categories without a color
+const DEFAULT_COLOR = '#6366f1'
+
 export function CategoryBadge({ category, showIcon = true, className }: CategoryBadgeProps) {
+  const color = category.color || DEFAULT_COLOR
+
   return (
     <span
       className={cn(
@@ -16,12 +21,12 @@ export function CategoryBadge({ category, showIcon = true, className }: Category
         className
       )}
       style={{
-        backgroundColor: `${category.color}20`,
-        color: category.color,
-        borderColor: category.color,
+        backgroundColor: `${color}20`,
+        color: color,
+        borderColor: color,
       }}
     >
-      {showIcon && <CategoryIcon icon={category.icon} className="h-3 w-3" />}
+      {showIcon && category.icon && <CategoryIcon icon={category.icon} className="h-3 w-3" />}
       {category.name}
     </span>
   )

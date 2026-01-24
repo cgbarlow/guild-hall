@@ -10,6 +10,7 @@ interface QuestStatusBadgeProps {
 const statusStyles: Record<QuestStatus, string> = {
   draft: 'bg-gray-100 text-gray-700 border-gray-300',
   published: 'bg-green-100 text-green-700 border-green-300',
+  archived: 'bg-slate-100 text-slate-700 border-slate-300',
   open: 'bg-green-100 text-green-700 border-green-300',
   in_progress: 'bg-blue-100 text-blue-700 border-blue-300',
   completed: 'bg-purple-100 text-purple-700 border-purple-300',

@@ -146,46 +146,70 @@ export type Database = {
       quests: {
         Row: {
           id: string
-          guild_id: string
           title: string
           description: string | null
-          status: 'open' | 'claimed' | 'submitted' | 'approved' | 'rejected'
-          xp_reward: number
+          category_id: string | null
+          points: number
+          reward_description: string | null
+          acceptance_deadline: string | null
+          completion_days: number | null
+          status: 'draft' | 'published' | 'archived'
+          is_template: boolean
+          template_id: string | null
+          narrative_context: string | null
+          transformation_goal: string | null
           created_by: string
-          claimed_by: string | null
           created_at: string
           updated_at: string
+          published_at: string | null
+          archived_at: string | null
         }
         Insert: {
           id?: string
-          guild_id: string
           title: string
           description?: string | null
-          status?: 'open' | 'claimed' | 'submitted' | 'approved' | 'rejected'
-          xp_reward?: number
+          category_id?: string | null
+          points?: number
+          reward_description?: string | null
+          acceptance_deadline?: string | null
+          completion_days?: number | null
+          status?: 'draft' | 'published' | 'archived'
+          is_template?: boolean
+          template_id?: string | null
+          narrative_context?: string | null
+          transformation_goal?: string | null
           created_by: string
-          claimed_by?: string | null
           created_at?: string
           updated_at?: string
+          published_at?: string | null
+          archived_at?: string | null
         }
         Update: {
           id?: string
-          guild_id?: string
           title?: string
           description?: string | null
-          status?: 'open' | 'claimed' | 'submitted' | 'approved' | 'rejected'
-          xp_reward?: number
+          category_id?: string | null
+          points?: number
+          reward_description?: string | null
+          acceptance_deadline?: string | null
+          completion_days?: number | null
+          status?: 'draft' | 'published' | 'archived'
+          is_template?: boolean
+          template_id?: string | null
+          narrative_context?: string | null
+          transformation_goal?: string | null
           created_by?: string
-          claimed_by?: string | null
           created_at?: string
           updated_at?: string
+          published_at?: string | null
+          archived_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'quests_guild_id_fkey'
-            columns: ['guild_id']
+            foreignKeyName: 'quests_category_id_fkey'
+            columns: ['category_id']
             isOneToOne: false
-            referencedRelation: 'guilds'
+            referencedRelation: 'categories'
             referencedColumns: ['id']
           },
           {
@@ -196,10 +220,10 @@ export type Database = {
             referencedColumns: ['id']
           },
           {
-            foreignKeyName: 'quests_claimed_by_fkey'
-            columns: ['claimed_by']
+            foreignKeyName: 'quests_template_id_fkey'
+            columns: ['template_id']
             isOneToOne: false
-            referencedRelation: 'users'
+            referencedRelation: 'quests'
             referencedColumns: ['id']
           }
         ]
@@ -347,6 +371,263 @@ export type Database = {
             foreignKeyName: 'privacy_settings_user_id_fkey'
             columns: ['user_id']
             isOneToOne: true
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      categories: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          icon: string | null
+          display_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          icon?: string | null
+          display_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          icon?: string | null
+          display_order?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      objectives: {
+        Row: {
+          id: string
+          quest_id: string
+          title: string
+          description: string | null
+          points: number
+          display_order: number
+          depends_on_id: string | null
+          evidence_required: boolean
+          evidence_type: 'none' | 'text' | 'link' | 'text_or_link'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          quest_id: string
+          title: string
+          description?: string | null
+          points?: number
+          display_order?: number
+          depends_on_id?: string | null
+          evidence_required?: boolean
+          evidence_type?: 'none' | 'text' | 'link' | 'text_or_link'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          quest_id?: string
+          title?: string
+          description?: string | null
+          points?: number
+          display_order?: number
+          depends_on_id?: string | null
+          evidence_required?: boolean
+          evidence_type?: 'none' | 'text' | 'link' | 'text_or_link'
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'objectives_quest_id_fkey'
+            columns: ['quest_id']
+            isOneToOne: false
+            referencedRelation: 'quests'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'objectives_depends_on_id_fkey'
+            columns: ['depends_on_id']
+            isOneToOne: false
+            referencedRelation: 'objectives'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      user_quests: {
+        Row: {
+          id: string
+          user_id: string
+          quest_id: string
+          status: 'accepted' | 'in_progress' | 'completed' | 'abandoned' | 'expired'
+          accepted_at: string
+          started_at: string | null
+          completed_at: string | null
+          abandoned_at: string | null
+          deadline: string | null
+          extension_requested: boolean
+          extension_requested_at: string | null
+          extension_reason: string | null
+          extension_granted: boolean | null
+          extension_decided_by: string | null
+          extension_decided_at: string | null
+          extended_deadline: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          quest_id: string
+          status?: 'accepted' | 'in_progress' | 'completed' | 'abandoned' | 'expired'
+          accepted_at?: string
+          started_at?: string | null
+          completed_at?: string | null
+          abandoned_at?: string | null
+          deadline?: string | null
+          extension_requested?: boolean
+          extension_requested_at?: string | null
+          extension_reason?: string | null
+          extension_granted?: boolean | null
+          extension_decided_by?: string | null
+          extension_decided_at?: string | null
+          extended_deadline?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          quest_id?: string
+          status?: 'accepted' | 'in_progress' | 'completed' | 'abandoned' | 'expired'
+          accepted_at?: string
+          started_at?: string | null
+          completed_at?: string | null
+          abandoned_at?: string | null
+          deadline?: string | null
+          extension_requested?: boolean
+          extension_requested_at?: string | null
+          extension_reason?: string | null
+          extension_granted?: boolean | null
+          extension_decided_by?: string | null
+          extension_decided_at?: string | null
+          extended_deadline?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'user_quests_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_quests_quest_id_fkey'
+            columns: ['quest_id']
+            isOneToOne: false
+            referencedRelation: 'quests'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      user_objectives: {
+        Row: {
+          id: string
+          user_quest_id: string
+          objective_id: string
+          status: 'locked' | 'available' | 'submitted' | 'approved' | 'rejected'
+          evidence_text: string | null
+          evidence_url: string | null
+          submitted_at: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          feedback: string | null
+        }
+        Insert: {
+          id?: string
+          user_quest_id: string
+          objective_id: string
+          status?: 'locked' | 'available' | 'submitted' | 'approved' | 'rejected'
+          evidence_text?: string | null
+          evidence_url?: string | null
+          submitted_at?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          feedback?: string | null
+        }
+        Update: {
+          id?: string
+          user_quest_id?: string
+          objective_id?: string
+          status?: 'locked' | 'available' | 'submitted' | 'approved' | 'rejected'
+          evidence_text?: string | null
+          evidence_url?: string | null
+          submitted_at?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          feedback?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'user_objectives_user_quest_id_fkey'
+            columns: ['user_quest_id']
+            isOneToOne: false
+            referencedRelation: 'user_quests'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_objectives_objective_id_fkey'
+            columns: ['objective_id']
+            isOneToOne: false
+            referencedRelation: 'objectives'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: string
+          title: string
+          message: string | null
+          reference_type: string | null
+          reference_id: string | null
+          read: boolean
+          read_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: string
+          title: string
+          message?: string | null
+          reference_type?: string | null
+          reference_id?: string | null
+          read?: boolean
+          read_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: string
+          title?: string
+          message?: string | null
+          reference_type?: string | null
+          reference_id?: string | null
+          read?: boolean
+          read_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
             referencedRelation: 'users'
             referencedColumns: ['id']
           }
