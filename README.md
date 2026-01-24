@@ -19,6 +19,32 @@ GMs design quests with objectives, deadlines, and rewards. Users browse the **Bo
 
 ---
 
+## Preview
+
+> *Mockup images to be generated from prompts in `docs/mock-ups/`*
+
+### Bounty Board
+![Bounty Board Mockup](docs/mock-ups/01-bounty-board.jpg)
+*Browse available quests, filter by category and difficulty, see featured challenges.*
+
+### Quest Detail
+![Quest Detail Mockup](docs/mock-ups/02-quest-detail.jpg)
+*Track progress through objectives, submit evidence, earn points.*
+
+### GM Dashboard
+![GM Dashboard Mockup](docs/mock-ups/03-gm-dashboard.jpg)
+*Review submissions, manage quests, monitor guild activity.*
+
+### Leaderboard
+![Leaderboard Mockup](docs/mock-ups/04-leaderboard.jpg)
+*Compete for rankings, track progress, celebrate top questers.*
+
+### Hall of Fame
+![Hall of Fame Mockup](docs/mock-ups/05-hall-of-fame.jpg)
+*Permanent recognition for legendary achievements and quest firsts.*
+
+---
+
 ## V1 Features
 
 ### For Users (Questers)
@@ -96,6 +122,43 @@ See [Architecture Decision Records](docs/adrs/) for detailed rationale.
 | [SPEC-004](docs/specs/SPEC-004-Realtime-Notifications.md) | Real-time notification system |
 | [SPEC-005](docs/specs/SPEC-005-Leaderboard-Privacy-Rules.md) | Leaderboard and privacy rules |
 | [SPEC-006](docs/specs/SPEC-006-Smart-Quest-Creator.md) | Smart Quest Creator (V2) |
+
+---
+
+## Reference Guilds
+
+Guild Hall supports multiple guilds, each with their own themes, quests, and communities. Reference guilds demonstrate quest design patterns and best practices.
+
+### Agentics NZ Guild
+
+The **Agentics NZ Guild** is the first reference implementation, focused on building sovereign AI capability in New Zealand. This guild demonstrates:
+
+- **Difficulty progression**: Apprentice → Journeyman → Master quests
+- **Category variety**: Learning, Challenge, Creative, Community
+- **Objective dependencies**: Linear, parallel, and hybrid structures
+- **Evidence types**: Self-certified, text, links, and demos
+- **NZ-specific context**: Te Tiriti, local industry, regional challenges
+
+| Resource | Description |
+|----------|-------------|
+| [Guild Reference](docs/guilds/agentics-nz/GUILD-REFERENCE.md) | Comprehensive profile for quest design |
+| [Example Quests](docs/guilds/agentics-nz/quests/) | 10 quests spanning all difficulty levels |
+| [Quest Design Spec](docs/specs/SPEC-007-Guild-Reference-Builder.md) | How guild references are built |
+
+#### Example Quest Summary
+
+| Quest | Category | Difficulty | Points |
+|-------|----------|------------|--------|
+| [First Steps in the Realm](docs/guilds/agentics-nz/quests/01-first-steps-in-the-realm.md) | Learning | Apprentice | 25 |
+| [The Prompt Whisperer](docs/guilds/agentics-nz/quests/02-the-prompt-whisperer.md) | Challenge | Apprentice | 50 |
+| [Local Model Liberation](docs/guilds/agentics-nz/quests/03-local-model-liberation.md) | Challenge | Journeyman | 100 |
+| [The GRASP Protocol](docs/guilds/agentics-nz/quests/04-the-grasp-protocol.md) | Learning | Master | 150 |
+| [She'll Be Right Compliance](docs/guilds/agentics-nz/quests/05-shells-be-right-compliance.md) | Creative | Journeyman | 125 |
+| [The Dreaming Machine](docs/guilds/agentics-nz/quests/06-the-dreaming-machine.md) | Challenge | Master | 175 |
+| [Sovereign Data, Sovereign AI](docs/guilds/agentics-nz/quests/07-sovereign-data-sovereign-ai.md) | Learning | Journeyman | 75 |
+| [Agent Swarm Commander](docs/guilds/agentics-nz/quests/08-agent-swarm-commander.md) | Challenge | Master | 200 |
+| [The Mentor's Path](docs/guilds/agentics-nz/quests/09-the-mentors-path.md) | Community | Master | 150 |
+| [Gorse Bot 3000](docs/guilds/agentics-nz/quests/10-gorse-bot-3000.md) | Creative | Master | 200 |
 
 ---
 
