@@ -118,16 +118,17 @@ async function fetchTopUsers(count: number = 5): Promise<LeaderboardEntry[]> {
   const supabase = createClient()
 
   const { data, error } = await supabase
-    .from('leaderboard')
+    .from('leaderboard' as 'users')
     .select('*')
-    .order('rank', { ascending: true })
+    .order('rank' as 'id', { ascending: true })
     .limit(count)
 
   if (error) {
     throw error
   }
 
-  return (data || []).map((entry) => ({
+  const entries = data as unknown as LeaderboardRow[]
+  return (entries || []).map((entry) => ({
     id: entry.id,
     display_name: entry.display_name,
     avatar_url: entry.avatar_url,
