@@ -58,3 +58,5 @@ venv/
 env/
 .Python
 .devcontainer/installation-report.md
+.next
+tsconfig.tsbuildinfo
