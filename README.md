@@ -4,6 +4,30 @@
 
 Guild Hall is a quest-based engagement platform where Game Masters (GMs) create quests for community members to accept and complete. Built on the philosophy that **quests are adventures, not checklists**.
 
+[![Tests](https://img.shields.io/badge/tests-152%20passing-brightgreen)](./src/tests)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](./tsconfig.json)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](./package.json)
+
+---
+
+## Current Status
+
+**V1 Implementation: Complete** (Phases 2-8)
+
+| Feature | Status |
+|---------|--------|
+| Authentication (Email) | ✅ Working |
+| OAuth (Google/Apple) | ⏸️ Coming Soon |
+| Bounty Board | ✅ Working |
+| Quest Management | ✅ Working |
+| Evidence Submission | ✅ Working |
+| GM Review | ✅ Working |
+| Rewards & Leaderboard | ✅ Working |
+| Notifications | ✅ Working |
+| Dark Mode | ✅ Working |
+
+See [Delivery Report](docs/DELIVERY-REPORT.md) for detailed coverage.
+
 ---
 
 ## The Concept
@@ -66,9 +90,9 @@ GMs design quests with objectives, deadlines, and rewards. Users browse the **Bo
 - View all user progress
 
 ### Authentication
-- Email/password
-- Google OAuth
-- Apple OAuth
+- Email/password ✅
+- Google OAuth (Coming Soon)
+- Apple OAuth (Coming Soon)
 
 ---
 
@@ -122,6 +146,9 @@ See [Architecture Decision Records](docs/adrs/) for detailed rationale.
 | [SPEC-004](docs/specs/SPEC-004-Realtime-Notifications.md) | Real-time notification system |
 | [SPEC-005](docs/specs/SPEC-005-Leaderboard-Privacy-Rules.md) | Leaderboard and privacy rules |
 | [SPEC-006](docs/specs/SPEC-006-Smart-Quest-Creator.md) | Smart Quest Creator (V2) |
+| [SPEC-007](docs/specs/SPEC-007-Guild-Reference-Builder.md) | Guild reference building |
+| [SPEC-008](docs/specs/SPEC-008-Theme-System.md) | Dark mode theme system |
+| [SPEC-009](docs/specs/SPEC-009-Seed-Data.md) | Test/seed data management |
 
 ---
 
@@ -203,6 +230,34 @@ npm run dev
 # Open http://localhost:3000
 ```
 
+### Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Type checking
+npm run type-check
+```
+
+**Test Coverage:** 152 tests across 20 test files
+
+### Database Setup
+
+```bash
+# Link to your Supabase project
+npx supabase link --project-ref YOUR_PROJECT_REF
+
+# Push migrations
+npx supabase db push
+
+# (Optional) Load seed data
+# Run SQL files in supabase/seed/ via Supabase dashboard
+```
+
 ### Deployment
 
 The app deploys to Netlify on push to `main`. Configure environment variables in Netlify dashboard.
@@ -213,20 +268,53 @@ The app deploys to Netlify on push to `main`. Configure environment variables in
 
 ```
 guild-hall/
-├── app/                    # Next.js App Router pages
-│   ├── (auth)/            # Authentication pages
-│   ├── (dashboard)/       # User dashboard pages
-│   └── (gm)/              # Game Master pages
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   └── ...               # Feature components
-├── lib/                   # Utilities and configurations
-│   └── supabase/         # Supabase client setup
-├── contexts/              # React contexts
-├── docs/                  # Documentation
-│   ├── adrs/             # Architecture Decision Records
-│   └── specs/            # Technical specifications
-└── supabase/             # Database migrations and seeds
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── (auth)/            # Authentication pages
+│   │   ├── (dashboard)/       # User dashboard pages
+│   │   │   ├── profile/       # User profile
+│   │   │   ├── quests/        # Bounty board
+│   │   │   ├── my-quests/     # User's active quests
+│   │   │   ├── leaderboard/   # Rankings
+│   │   │   ├── notifications/ # Notification history
+│   │   │   └── settings/      # Privacy, appearance, export
+│   │   └── (gm)/              # Game Master pages
+│   │       └── gm/
+│   │           ├── quests/    # Quest management
+│   │           ├── review/    # Evidence review
+│   │           ├── extensions/# Extension requests
+│   │           ├── users/     # User overview
+│   │           └── templates/ # Quest templates
+│   ├── components/            # React components
+│   │   ├── ui/               # shadcn/ui components
+│   │   ├── auth/             # Auth forms
+│   │   ├── quests/           # Quest display
+│   │   ├── my-quests/        # Quest progress
+│   │   ├── profile/          # Profile components
+│   │   ├── achievements/     # Badges, achievements
+│   │   ├── leaderboard/      # Rankings table
+│   │   ├── notifications/    # Bell, dropdown
+│   │   ├── settings/         # Settings forms
+│   │   ├── gm/               # GM dashboard components
+│   │   └── layout/           # Header, navigation
+│   ├── lib/
+│   │   ├── hooks/            # TanStack Query hooks
+│   │   ├── actions/          # Server actions
+│   │   ├── schemas/          # Zod validation
+│   │   ├── types/            # TypeScript types
+│   │   ├── utils/            # Utilities
+│   │   └── supabase/         # Supabase clients
+│   ├── providers/            # React context providers
+│   └── tests/                # Test infrastructure
+│       ├── mocks/            # Supabase mocks, fixtures
+│       ├── hooks/            # Hook tests
+│       └── components/       # Component tests
+├── docs/                      # Documentation
+│   ├── adrs/                 # Architecture Decision Records
+│   └── specs/                # Technical specifications
+└── supabase/
+    ├── migrations/           # 41 database migrations
+    └── seed/                 # Sample data (Agentics-NZ)
 ```
 
 ---
