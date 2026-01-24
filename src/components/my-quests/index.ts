@@ -1,3 +1,6 @@
 export { ProgressBar } from './progress-bar'
 export { QuestProgressCard } from './quest-progress-card'
 export { QuestStatusFilter } from './quest-status-filter'
+export { ObjectiveChecklist } from './objective-checklist'
+export { ObjectiveItem } from './objective-item'
+export { DependencyIndicator } from './dependency-indicator'
