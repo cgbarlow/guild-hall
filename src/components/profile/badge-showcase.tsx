@@ -1,7 +1,25 @@
 'use client'
 
-import { Trophy, Star, Award, Medal, Shield, Zap, Target, Crown } from 'lucide-react'
+import { useState } from 'react'
+import {
+  Trophy,
+  Star,
+  Award,
+  Medal,
+  Shield,
+  Zap,
+  Target,
+  Crown,
+  Flag,
+  Compass,
+  Gem,
+  Diamond,
+  Flame,
+  Calendar,
+  CalendarCheck,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BadgeModal } from '@/components/achievements/badge-modal'
 import type { Achievement } from '@/lib/types/public-profile'
 
 /**
@@ -10,23 +28,34 @@ import type { Achievement } from '@/lib/types/public-profile'
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   trophy: Trophy,
   star: Star,
+  stars: Star,
   award: Award,
   medal: Medal,
   shield: Shield,
   zap: Zap,
   target: Target,
   crown: Crown,
+  flag: Flag,
+  compass: Compass,
+  gem: Gem,
+  diamond: Diamond,
+  fire: Flame,
+  flame: Flame,
+  calendar: Calendar,
+  'calendar-check': CalendarCheck,
+  'calendar-star': CalendarCheck,
 }
 
 interface BadgeProps {
   achievement: Achievement
   size?: 'sm' | 'md' | 'lg'
+  onClick?: () => void
 }
 
 /**
  * Individual badge component displaying an achievement
  */
-function Badge({ achievement, size = 'md' }: BadgeProps) {
+function Badge({ achievement, size = 'md', onClick }: BadgeProps) {
   const IconComponent = iconMap[achievement.icon] ?? Trophy
 
   const sizeClasses = {
@@ -48,7 +77,13 @@ function Badge({ achievement, size = 'md' }: BadgeProps) {
   })
 
   return (
-    <div className="group flex flex-col items-center gap-2">
+    <div
+      className={cn(
+        'group flex flex-col items-center gap-2',
+        onClick && 'cursor-pointer'
+      )}
+      onClick={onClick}
+    >
       <div
         className={cn(
           'flex items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg transition-transform group-hover:scale-110',
@@ -76,6 +111,7 @@ interface BadgeShowcaseProps {
 /**
  * Grid display of achievement badges
  * Shows achievements in a responsive grid layout
+ * Clicking a badge opens a modal with details
  */
 export function BadgeShowcase({
   achievements,
@@ -83,6 +119,8 @@ export function BadgeShowcase({
   maxDisplay,
   className,
 }: BadgeShowcaseProps) {
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null)
+
   const displayedAchievements = maxDisplay
     ? achievements.slice(0, maxDisplay)
     : achievements
@@ -106,7 +144,12 @@ export function BadgeShowcase({
     <div className={cn('space-y-4', className)}>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {displayedAchievements.map((achievement) => (
-          <Badge key={achievement.id} achievement={achievement} size={size} />
+          <Badge
+            key={achievement.id}
+            achievement={achievement}
+            size={size}
+            onClick={() => setSelectedAchievement(achievement)}
+          />
         ))}
       </div>
       {remainingCount > 0 && (
@@ -114,6 +157,13 @@ export function BadgeShowcase({
           +{remainingCount} more achievement{remainingCount !== 1 ? 's' : ''}
         </p>
       )}
+
+      {/* Badge detail modal */}
+      <BadgeModal
+        achievement={selectedAchievement}
+        open={!!selectedAchievement}
+        onClose={() => setSelectedAchievement(null)}
+      />
     </div>
   )
 }
