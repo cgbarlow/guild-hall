@@ -103,8 +103,16 @@ describe('useLeaderboard', () => {
 
   it('should handle error state', async () => {
     const error = new Error('Failed to fetch leaderboard')
-    const queryBuilder = createMockQueryBuilder([])
-    queryBuilder.then = () => Promise.reject(error)
+    const queryBuilder = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null, error }),
+      then: (resolve: (value: { data: null; error: Error }) => void) => {
+        return Promise.resolve({ data: null, error }).then(resolve)
+      },
+    }
     mockFrom.mockReturnValue(queryBuilder)
 
     const { result } = renderHook(() => useLeaderboard(), {
@@ -112,7 +120,7 @@ describe('useLeaderboard', () => {
     })
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
+      expect(result.current.isError).toBe(true)
     })
 
     expect(result.current.error).toBeTruthy()
