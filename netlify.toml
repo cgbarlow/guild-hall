@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Preview deployments for all PRs
+[context.deploy-preview]
+  command = "npm run build"
+
+# Branch deploys (feature branches)
+[context.branch-deploy]
+  command = "npm run build"
