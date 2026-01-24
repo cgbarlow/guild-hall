@@ -25,14 +25,29 @@ const mockDbQuest = {
   archived_at: null,
 }
 
-// Create a chainable mock builder
-function createMockQueryBuilder(data: unknown) {
+// Create a chainable mock builder for single queries
+function createMockSingleBuilder(data: unknown, error: unknown = null) {
+  const builder = {
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data, error }),
+  }
+  return builder
+}
+
+// Create a chainable mock builder for list queries
+function createMockListBuilder(data: unknown[], error: unknown = null) {
   const builder = {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
-    single: vi.fn().mockResolvedValue({ data, error: null }),
   }
+  // Make it thenable
+  Object.defineProperty(builder, 'then', {
+    value: (resolve: (value: { data: unknown[]; error: unknown }) => void) => {
+      return Promise.resolve({ data, error }).then(resolve)
+    },
+  })
   return builder
 }
 
@@ -50,8 +65,16 @@ describe('useQuest', () => {
   })
 
   it('should fetch quest by id successfully', async () => {
-    const questBuilder = createMockQueryBuilder(mockDbQuest)
-    mockFrom.mockReturnValue(questBuilder)
+    // Mock returns for different tables
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'quests') {
+        return createMockSingleBuilder(mockDbQuest)
+      }
+      if (table === 'objectives') {
+        return createMockListBuilder([])
+      }
+      return createMockSingleBuilder(null)
+    })
 
     const { result } = renderHook(() => useQuest('quest-1'), {
       wrapper: createWrapper(),
@@ -70,10 +93,12 @@ describe('useQuest', () => {
 
   it('should handle error when quest not found', async () => {
     const error = { message: 'Quest not found', code: 'PGRST116' }
-    const questBuilder = createMockQueryBuilder(null)
-    questBuilder.single = vi.fn().mockResolvedValue({ data: null, error })
-
-    mockFrom.mockReturnValue(questBuilder)
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'quests') {
+        return createMockSingleBuilder(null, error)
+      }
+      return createMockListBuilder([])
+    })
 
     const { result } = renderHook(() => useQuest('non-existent'), {
       wrapper: createWrapper(),
@@ -87,8 +112,14 @@ describe('useQuest', () => {
   })
 
   it('should call supabase with correct quest id', async () => {
-    const questBuilder = createMockQueryBuilder(mockDbQuest)
-    mockFrom.mockReturnValue(questBuilder)
+    const questBuilder = createMockSingleBuilder(mockDbQuest)
+    const objectivesBuilder = createMockListBuilder([])
+
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'quests') return questBuilder
+      if (table === 'objectives') return objectivesBuilder
+      return createMockSingleBuilder(null)
+    })
 
     const { result } = renderHook(() => useQuest('quest-123'), {
       wrapper: createWrapper(),
@@ -116,8 +147,15 @@ describe('useQuest', () => {
   })
 
   it('should transform quest data to expected format', async () => {
-    const questBuilder = createMockQueryBuilder(mockDbQuest)
-    mockFrom.mockReturnValue(questBuilder)
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'quests') {
+        return createMockSingleBuilder(mockDbQuest)
+      }
+      if (table === 'objectives') {
+        return createMockListBuilder([])
+      }
+      return createMockSingleBuilder(null)
+    })
 
     const { result } = renderHook(() => useQuest('quest-1'), {
       wrapper: createWrapper(),

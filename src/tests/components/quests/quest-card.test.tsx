@@ -6,15 +6,16 @@ import type { Quest } from '@/lib/types/quest'
 describe('QuestCard', () => {
   const mockQuest: Quest = {
     id: 'quest-1',
-    guild_id: 'guild-1',
     title: 'Defeat the Dragon',
     description: 'A fearsome dragon terrorizes the village. Slay it and earn great rewards!',
     short_description: 'Slay the dragon and save the village',
-    status: 'open',
+    status: 'published', // Will display as 'open'
     points: 500,
     xp_reward: 500,
     time_limit_days: 7,
+    completion_days: 7,
     deadline: null,
+    acceptance_deadline: null,
     category_id: 'cat-combat',
     category: {
       id: 'cat-combat',
@@ -22,12 +23,19 @@ describe('QuestCard', () => {
       description: 'Battle quests',
       icon: 'sword',
       color: '#dc2626',
+      display_order: 0,
       created_at: '2024-01-01T00:00:00.000Z',
     },
+    is_template: false,
+    template_id: null,
+    narrative_context: null,
+    transformation_goal: null,
+    reward_description: null,
     created_by: 'gm-1',
-    claimed_by: null,
     created_at: '2024-01-01T00:00:00.000Z',
     updated_at: '2024-01-01T00:00:00.000Z',
+    published_at: '2024-01-01T00:00:00.000Z',
+    archived_at: null,
   }
 
   it('should render quest title', () => {
@@ -68,7 +76,7 @@ describe('QuestCard', () => {
     expect(screen.getByTestId('quest-status-badge')).toBeInTheDocument()
   })
 
-  it('should render open status correctly', () => {
+  it('should render published status as Open', () => {
     render(<QuestCard quest={mockQuest} />)
     expect(screen.getByText(/Open/i)).toBeInTheDocument()
   })

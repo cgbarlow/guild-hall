@@ -26,8 +26,8 @@ describe('Test Infrastructure Smoke Tests', () => {
       expect(mockQuest).toBeDefined()
       expect(mockQuest.id).toBe('quest-001')
       expect(mockQuest.title).toBe('Defeat the Dragon')
-      expect(mockQuest.status).toBe('open')
-      expect(mockQuest.xp_reward).toBe(500)
+      expect(mockQuest.status).toBe('published')
+      expect(mockQuest.points).toBe(500)
     })
 
     it('should have valid mockCategory fixture', () => {
@@ -40,7 +40,7 @@ describe('Test Infrastructure Smoke Tests', () => {
       expect(mockObjective).toBeDefined()
       expect(mockObjective.id).toBe('objective-001')
       expect(mockObjective.quest_id).toBe('quest-001')
-      expect(mockObjective.is_completed).toBe(false)
+      expect(mockObjective.evidence_required).toBe(true)
     })
 
     it('should create custom user with factory function', () => {
@@ -57,13 +57,13 @@ describe('Test Infrastructure Smoke Tests', () => {
     it('should create custom quest with factory function', () => {
       const customQuest = createMockQuest({
         title: 'Custom Quest',
-        status: 'claimed',
-        xp_reward: 1000,
+        status: 'draft',
+        points: 1000,
       })
 
       expect(customQuest.title).toBe('Custom Quest')
-      expect(customQuest.status).toBe('claimed')
-      expect(customQuest.xp_reward).toBe(1000)
+      expect(customQuest.status).toBe('draft')
+      expect(customQuest.points).toBe(1000)
     })
   })
 

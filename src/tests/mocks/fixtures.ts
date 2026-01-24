@@ -1,8 +1,9 @@
 import type { Database } from '@/lib/types/database'
+import type { Category, Objective } from '@/lib/types/quest'
 
 // Type aliases for convenience
 type User = Database['public']['Tables']['users']['Row']
-type Quest = Database['public']['Tables']['quests']['Row']
+type QuestRow = Database['public']['Tables']['quests']['Row']
 type Guild = Database['public']['Tables']['guilds']['Row']
 type GuildMember = Database['public']['Tables']['guild_members']['Row']
 type UserRole = Database['public']['Tables']['user_roles']['Row']
@@ -79,67 +80,99 @@ export const mockGuild: Guild = {
 }
 
 /**
- * Mock quest fixture - Open status
+ * Mock quest fixture - Published status (available for users)
  */
-export const mockQuest: Quest = {
+export const mockQuest: QuestRow = {
   id: 'quest-001',
-  guild_id: 'guild-789',
   title: 'Defeat the Dragon',
   description: 'A fearsome dragon terrorizes the village. Slay it and earn great rewards!',
-  status: 'open',
-  xp_reward: 500,
+  category_id: 'cat-combat',
+  points: 500,
+  reward_description: '500 guild points',
+  acceptance_deadline: null,
+  completion_days: 7,
+  status: 'published',
+  is_template: false,
+  template_id: null,
+  narrative_context: null,
+  transformation_goal: null,
   created_by: 'gm-456',
-  claimed_by: null,
   created_at: '2024-01-15T00:00:00.000Z',
   updated_at: '2024-01-15T00:00:00.000Z',
+  published_at: '2024-01-15T00:00:00.000Z',
+  archived_at: null,
 }
 
 /**
- * Mock claimed quest fixture
+ * Mock draft quest fixture
  */
-export const mockClaimedQuest: Quest = {
+export const mockDraftQuest: QuestRow = {
   id: 'quest-002',
-  guild_id: 'guild-789',
   title: 'Gather Rare Herbs',
   description: 'Collect 10 moonflowers from the enchanted forest',
-  status: 'claimed',
-  xp_reward: 150,
+  category_id: 'cat-gathering',
+  points: 150,
+  reward_description: null,
+  acceptance_deadline: null,
+  completion_days: 3,
+  status: 'draft',
+  is_template: false,
+  template_id: null,
+  narrative_context: null,
+  transformation_goal: null,
   created_by: 'gm-456',
-  claimed_by: 'user-123',
   created_at: '2024-01-10T00:00:00.000Z',
   updated_at: '2024-01-12T00:00:00.000Z',
+  published_at: null,
+  archived_at: null,
 }
 
 /**
- * Mock submitted quest fixture
+ * Mock archived quest fixture
  */
-export const mockSubmittedQuest: Quest = {
+export const mockArchivedQuest: QuestRow = {
   id: 'quest-003',
-  guild_id: 'guild-789',
   title: 'Map the Ancient Ruins',
   description: 'Explore and document the ruins north of the kingdom',
-  status: 'submitted',
-  xp_reward: 300,
+  category_id: 'cat-exploration',
+  points: 300,
+  reward_description: null,
+  acceptance_deadline: null,
+  completion_days: 14,
+  status: 'archived',
+  is_template: false,
+  template_id: null,
+  narrative_context: null,
+  transformation_goal: null,
   created_by: 'gm-456',
-  claimed_by: 'user-123',
   created_at: '2024-01-05T00:00:00.000Z',
   updated_at: '2024-01-14T00:00:00.000Z',
+  published_at: '2024-01-06T00:00:00.000Z',
+  archived_at: '2024-01-14T00:00:00.000Z',
 }
 
 /**
- * Mock approved quest fixture
+ * Mock published quest fixture #2
  */
-export const mockApprovedQuest: Quest = {
+export const mockPublishedQuest2: QuestRow = {
   id: 'quest-004',
-  guild_id: 'guild-789',
   title: 'Rescue the Merchant',
   description: 'Save the traveling merchant from bandits',
-  status: 'approved',
-  xp_reward: 250,
+  category_id: 'cat-combat',
+  points: 250,
+  reward_description: null,
+  acceptance_deadline: null,
+  completion_days: 5,
+  status: 'published',
+  is_template: false,
+  template_id: null,
+  narrative_context: null,
+  transformation_goal: null,
   created_by: 'gm-456',
-  claimed_by: 'user-123',
   created_at: '2024-01-01T00:00:00.000Z',
   updated_at: '2024-01-08T00:00:00.000Z',
+  published_at: '2024-01-02T00:00:00.000Z',
+  archived_at: null,
 }
 
 /**
@@ -185,43 +218,33 @@ export const mockGMRole: UserRole = {
 }
 
 /**
- * Mock category - based on quest types (for future use)
- * Note: Categories are not in the current schema, but included for extensibility
+ * Mock category fixtures
  */
-export interface Category {
-  id: string
-  name: string
-  description: string
-  icon: string
-  color: string
-}
-
 export const mockCategory: Category = {
   id: 'category-001',
   name: 'Combat',
   description: 'Quests involving battles and defeating enemies',
   icon: 'sword',
   color: '#dc2626',
+  display_order: 0,
+  created_at: '2024-01-01T00:00:00.000Z',
 }
 
 /**
- * Mock objective - based on quest objectives (for future use)
- * Note: Objectives are not in the current schema, but included for extensibility
+ * Mock objective fixtures
  */
-export interface Objective {
-  id: string
-  quest_id: string
-  description: string
-  is_completed: boolean
-  order: number
-}
-
 export const mockObjective: Objective = {
   id: 'objective-001',
   quest_id: 'quest-001',
-  description: 'Find the dragon lair',
-  is_completed: false,
-  order: 1,
+  title: 'Find the dragon lair',
+  description: 'Locate the entrance to the dragon\'s lair in the mountains',
+  points: 100,
+  display_order: 0,
+  depends_on_id: null,
+  evidence_required: true,
+  evidence_type: 'text',
+  created_at: '2024-01-01T00:00:00.000Z',
+  updated_at: '2024-01-01T00:00:00.000Z',
 }
 
 /**
@@ -229,11 +252,11 @@ export const mockObjective: Objective = {
  */
 export const mockUsers: User[] = [mockUser, mockGMUser, mockPrivateUser]
 
-export const mockQuests: Quest[] = [
+export const mockQuests: QuestRow[] = [
   mockQuest,
-  mockClaimedQuest,
-  mockSubmittedQuest,
-  mockApprovedQuest,
+  mockDraftQuest,
+  mockArchivedQuest,
+  mockPublishedQuest2,
 ]
 
 export const mockGuilds: Guild[] = [mockGuild]
@@ -248,6 +271,8 @@ export const mockCategories: Category[] = [
     description: 'Quests involving discovering new places',
     icon: 'compass',
     color: '#2563eb',
+    display_order: 1,
+    created_at: '2024-01-01T00:00:00.000Z',
   },
   {
     id: 'category-003',
@@ -255,6 +280,8 @@ export const mockCategories: Category[] = [
     description: 'Quests involving collecting items or resources',
     icon: 'backpack',
     color: '#16a34a',
+    display_order: 2,
+    created_at: '2024-01-01T00:00:00.000Z',
   },
 ]
 
@@ -263,16 +290,28 @@ export const mockObjectives: Objective[] = [
   {
     id: 'objective-002',
     quest_id: 'quest-001',
-    description: 'Defeat the dragon',
-    is_completed: false,
-    order: 2,
+    title: 'Defeat the dragon',
+    description: 'Slay the dragon in combat',
+    points: 300,
+    display_order: 1,
+    depends_on_id: 'objective-001',
+    evidence_required: true,
+    evidence_type: 'link',
+    created_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
   },
   {
     id: 'objective-003',
     quest_id: 'quest-001',
-    description: 'Collect the dragon scales',
-    is_completed: false,
-    order: 3,
+    title: 'Collect the dragon scales',
+    description: 'Gather 5 dragon scales as proof of your victory',
+    points: 100,
+    display_order: 2,
+    depends_on_id: 'objective-002',
+    evidence_required: true,
+    evidence_type: 'text_or_link',
+    created_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
   },
 ]
 
@@ -287,7 +326,7 @@ export function createMockUser(overrides: Partial<User> = {}): User {
   }
 }
 
-export function createMockQuest(overrides: Partial<Quest> = {}): Quest {
+export function createMockQuest(overrides: Partial<QuestRow> = {}): QuestRow {
   return {
     ...mockQuest,
     id: `quest-${Date.now()}`,

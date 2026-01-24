@@ -11,6 +11,7 @@ const defaultCategories: Category[] = [
     description: 'Battle quests involving fighting enemies',
     icon: 'sword',
     color: '#dc2626',
+    display_order: 0,
     created_at: '2024-01-01T00:00:00.000Z',
   },
   {
@@ -19,6 +20,7 @@ const defaultCategories: Category[] = [
     description: 'Quests involving discovering new places',
     icon: 'compass',
     color: '#2563eb',
+    display_order: 1,
     created_at: '2024-01-01T00:00:00.000Z',
   },
   {
@@ -27,6 +29,7 @@ const defaultCategories: Category[] = [
     description: 'Quests involving collecting items or resources',
     icon: 'backpack',
     color: '#16a34a',
+    display_order: 2,
     created_at: '2024-01-01T00:00:00.000Z',
   },
   {
@@ -35,6 +38,7 @@ const defaultCategories: Category[] = [
     description: 'Quests involving interaction with others',
     icon: 'users',
     color: '#9333ea',
+    display_order: 3,
     created_at: '2024-01-01T00:00:00.000Z',
   },
   {
@@ -43,6 +47,7 @@ const defaultCategories: Category[] = [
     description: 'Quests involving solving puzzles and mysteries',
     icon: 'scroll',
     color: '#ca8a04',
+    display_order: 4,
     created_at: '2024-01-01T00:00:00.000Z',
   },
 ]
