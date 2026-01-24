@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/lib/types/database'
 
 /**
  * Leaderboard entry type matching the leaderboard view
@@ -15,16 +16,19 @@ export interface LeaderboardEntry {
   rank: number
 }
 
+type LeaderboardRow = Database['public']['Views']['leaderboard']['Row']
+
 /**
  * Fetch leaderboard data from the database view
  */
 async function fetchLeaderboard(limit?: number): Promise<LeaderboardEntry[]> {
   const supabase = createClient()
 
+  // Use type assertion for the view query since Supabase types don't auto-detect views
   let query = supabase
-    .from('leaderboard')
+    .from('leaderboard' as 'users') // Type workaround for views
     .select('*')
-    .order('rank', { ascending: true })
+    .order('rank' as 'id', { ascending: true })
 
   if (limit) {
     query = query.limit(limit)
@@ -36,7 +40,9 @@ async function fetchLeaderboard(limit?: number): Promise<LeaderboardEntry[]> {
     throw error
   }
 
-  return (data || []).map((entry) => ({
+  // Cast and transform the data
+  const entries = data as unknown as LeaderboardRow[]
+  return (entries || []).map((entry) => ({
     id: entry.id,
     display_name: entry.display_name,
     avatar_url: entry.avatar_url,
@@ -72,14 +78,14 @@ async function fetchUserRank(): Promise<{ rank: number; total: number } | null> 
 
   // Check if user appears on the leaderboard
   const { data: userEntry } = await supabase
-    .from('leaderboard')
-    .select('rank')
+    .from('leaderboard' as 'users')
+    .select('rank' as 'id')
     .eq('id', user.id)
     .single()
 
   // Get total count of users on leaderboard
   const { count } = await supabase
-    .from('leaderboard')
+    .from('leaderboard' as 'users')
     .select('*', { count: 'exact', head: true })
 
   if (!userEntry) {
@@ -87,8 +93,9 @@ async function fetchUserRank(): Promise<{ rank: number; total: number } | null> 
     return null
   }
 
+  const entry = userEntry as unknown as { rank: number }
   return {
-    rank: Number(userEntry.rank),
+    rank: Number(entry.rank),
     total: count || 0,
   }
 }

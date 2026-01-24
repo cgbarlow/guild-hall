@@ -635,7 +635,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard: {
+        Row: {
+          id: string
+          display_name: string | null
+          avatar_url: string | null
+          points: number
+          quests_completed: number
+          rank: number
+        }
+      }
     }
     Functions: {
       get_leaderboard_position: {
