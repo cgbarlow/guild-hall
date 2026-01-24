@@ -1,3 +1,4 @@
+export { GMAuthGuard, GMLoadingSkeleton } from './gm-auth-guard'
 export { GMNav } from './gm-nav'
 export { GMSidebar } from './gm-sidebar'
 export { GMQuestCard } from './gm-quest-card'

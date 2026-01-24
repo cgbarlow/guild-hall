@@ -3,16 +3,21 @@
 import { useState } from 'react'
 import { QuestList } from '@/components/quests/quest-list'
 import { QuestFilters } from '@/components/quests/quest-filters'
+import { QuestSearch } from '@/components/quests/quest-search'
 import { useQuests } from '@/lib/hooks/use-quests'
 import { useCategories } from '@/lib/hooks/use-categories'
+import { useDebounce } from '@/lib/hooks/use-debounce'
 
 export default function QuestsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearch = useDebounce(searchQuery, 300)
 
   const { data: categories = [], isLoading: categoriesLoading } = useCategories()
-  const { data: quests, isLoading: questsLoading, error } = useQuests(
-    selectedCategory ? { category_id: selectedCategory } : undefined
-  )
+  const { data: quests, isLoading: questsLoading, error } = useQuests({
+    category_id: selectedCategory ?? undefined,
+    search: debouncedSearch || undefined,
+  })
 
   return (
     <div className="space-y-6">
@@ -21,6 +26,14 @@ export default function QuestsPage() {
         <p className="text-muted-foreground">
           Browse available quests and embark on new adventures
         </p>
+      </div>
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <QuestSearch
+          value={searchQuery}
+          onChange={setSearchQuery}
+          className="w-full sm:max-w-xs"
+        />
       </div>
 
       {!categoriesLoading && (

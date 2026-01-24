@@ -3,10 +3,13 @@
 import { ProfileAvatar } from '@/components/profile/profile-avatar'
 import { ProfileStats } from '@/components/profile/profile-stats'
 import { ProfileForm } from '@/components/profile/profile-form'
+import { ActivityFeed } from '@/components/activity/activity-feed'
 import { useProfile } from '@/lib/hooks/use-profile'
+import { useUserActivity } from '@/lib/hooks/use-user-activity'
 
 export default function ProfilePage() {
   const { data: profile, isLoading, error } = useProfile()
+  const { data: activities = [], isLoading: activitiesLoading } = useUserActivity({ limit: 10 })
 
   if (isLoading) return <div className="flex items-center justify-center min-h-[400px]"><div className="text-muted-foreground">Loading profile...</div></div>
   if (error) return <div className="flex items-center justify-center min-h-[400px]"><div className="text-destructive">Error loading profile: {error.message}</div></div>
@@ -22,6 +25,16 @@ export default function ProfilePage() {
         </div>
       </div>
       <ProfileStats totalPoints={profile.total_points} questsCompleted={profile.quests_completed} />
+
+      {/* Activity Feed (FR9.5) */}
+      <ActivityFeed
+        activities={activities}
+        isLoading={activitiesLoading}
+        title="Recent Activity"
+        emptyMessage="No activity yet. Start a quest to see your progress here!"
+        limit={10}
+      />
+
       <ProfileForm initialData={{ display_name: profile.display_name, bio: profile.bio, avatar_url: profile.avatar_url }} />
     </div>
   )

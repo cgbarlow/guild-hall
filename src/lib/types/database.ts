@@ -633,6 +633,53 @@ export type Database = {
           }
         ]
       }
+      activities: {
+        Row: {
+          id: string
+          user_id: string
+          type: string
+          title: string
+          description: string | null
+          reference_type: string | null
+          reference_id: string | null
+          points_earned: number
+          is_public: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: string
+          title: string
+          description?: string | null
+          reference_type?: string | null
+          reference_id?: string | null
+          points_earned?: number
+          is_public?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: string
+          title?: string
+          description?: string | null
+          reference_type?: string | null
+          reference_id?: string | null
+          points_earned?: number
+          is_public?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'activities_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          }
+        ]
+      }
     }
     Views: {
       leaderboard: {

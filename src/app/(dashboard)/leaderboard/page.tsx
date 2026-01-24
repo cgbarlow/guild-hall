@@ -3,8 +3,10 @@
 import { useRouter } from 'next/navigation'
 import { Trophy, Star, TrendingUp } from 'lucide-react'
 import { useLeaderboard, useUserRank } from '@/lib/hooks/use-leaderboard'
+import { useGlobalActivity } from '@/lib/hooks/use-global-activity'
 import { LeaderboardTable } from '@/components/leaderboard/leaderboard-table'
 import { UserRank } from '@/components/leaderboard/user-rank'
+import { ActivityFeed } from '@/components/activity/activity-feed'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
@@ -13,6 +15,7 @@ export default function LeaderboardPage() {
   const router = useRouter()
   const { data: leaderboard, isLoading: isLoadingLeaderboard } = useLeaderboard()
   const { data: userRank, isLoading: isLoadingRank } = useUserRank()
+  const { data: globalActivity = [], isLoading: isLoadingActivity } = useGlobalActivity({ limit: 10 })
   const [currentUserId, setCurrentUserId] = useState<string | undefined>()
 
   // Get current user ID
@@ -89,15 +92,30 @@ export default function LeaderboardPage() {
         </Card>
       </div>
 
-      {/* Leaderboard Table */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Rankings</h2>
-        <LeaderboardTable
-          entries={leaderboard || []}
-          currentUserId={currentUserId}
-          isLoading={isLoadingLeaderboard}
-          onRowClick={handleRowClick}
-        />
+      {/* Two Column Layout for Rankings and Activity */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Leaderboard Table (2 columns) */}
+        <div className="lg:col-span-2">
+          <h2 className="text-lg font-semibold mb-4">Rankings</h2>
+          <LeaderboardTable
+            entries={leaderboard || []}
+            currentUserId={currentUserId}
+            isLoading={isLoadingLeaderboard}
+            onRowClick={handleRowClick}
+          />
+        </div>
+
+        {/* Global Activity Feed (FR10.4) */}
+        <div>
+          <ActivityFeed
+            activities={globalActivity}
+            isLoading={isLoadingActivity}
+            showUser={true}
+            title="Recent Activity"
+            emptyMessage="No recent community activity"
+            limit={10}
+          />
+        </div>
       </div>
 
       {/* Privacy Note */}

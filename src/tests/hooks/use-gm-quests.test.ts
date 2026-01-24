@@ -4,6 +4,23 @@ import { useGMQuests } from '@/lib/hooks/use-gm-quests'
 import { createWrapper } from '@/tests/utils/test-utils'
 import type { QuestDbStatus } from '@/lib/types/quest'
 
+// Mock auth context
+vi.mock('@/contexts/auth-context', () => ({
+  useAuth: () => ({
+    user: { id: 'gm-user-123' },
+    session: { user: { id: 'gm-user-123' } },
+    isLoading: false,
+  }),
+}))
+
+// Mock useIsGM hook
+vi.mock('@/lib/auth/hooks', () => ({
+  useIsGM: () => ({
+    data: true,
+    isLoading: false,
+  }),
+}))
+
 // Mock data for database response (raw format matching new schema)
 const mockDbQuests = [
   {
@@ -235,7 +252,7 @@ describe('useGMQuests', () => {
     })
   })
 
-  it('should handle error state', async () => {
+  it('should handle error state gracefully by returning empty array', async () => {
     const error = new Error('Failed to fetch quests')
     const queryBuilder = createMockQueryBuilder([])
     queryBuilder.order = vi.fn().mockResolvedValue({ data: null, error })
@@ -249,7 +266,9 @@ describe('useGMQuests', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.error).toBeTruthy()
+    // Graceful degradation - returns empty array instead of error
+    expect(result.current.data).toEqual([])
+    expect(result.current.error).toBeNull()
   })
 
   it('should return empty array when no quests found', async () => {

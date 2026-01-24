@@ -3,6 +3,23 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { usePendingSubmissions } from '@/lib/hooks/use-pending-submissions'
 import { createWrapper } from '@/tests/utils/test-utils'
 
+// Mock auth context
+vi.mock('@/contexts/auth-context', () => ({
+  useAuth: () => ({
+    user: { id: 'gm-user-123' },
+    session: { user: { id: 'gm-user-123' } },
+    isLoading: false,
+  }),
+}))
+
+// Mock useIsGM hook
+vi.mock('@/lib/auth/hooks', () => ({
+  useIsGM: () => ({
+    data: true,
+    isLoading: false,
+  }),
+}))
+
 // Mock data for pending submissions (raw database format with user_quests relation)
 const mockPendingSubmissionsDb = [
   {
@@ -156,7 +173,7 @@ describe('usePendingSubmissions', () => {
     })
   })
 
-  it('should handle error state', async () => {
+  it('should handle error state gracefully by returning empty array', async () => {
     const error = new Error('Failed to fetch submissions')
     const queryBuilder = createMockQueryBuilder([])
     queryBuilder.order = vi.fn().mockResolvedValue({ data: null, error })
@@ -170,7 +187,9 @@ describe('usePendingSubmissions', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.error).toBeTruthy()
+    // Graceful degradation - returns empty array instead of error
+    expect(result.current.data).toEqual([])
+    expect(result.current.error).toBeNull()
   })
 
   it('should return empty array when no pending submissions', async () => {

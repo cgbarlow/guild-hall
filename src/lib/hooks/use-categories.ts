@@ -1,73 +1,33 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
 import type { Category } from '@/lib/types/quest'
 
-// Default categories while the categories table doesn't exist in the database
-const defaultCategories: Category[] = [
-  {
-    id: 'cat-combat',
-    name: 'Combat',
-    description: 'Battle quests involving fighting enemies',
-    icon: 'sword',
-    color: '#dc2626',
-    display_order: 0,
-    created_at: '2024-01-01T00:00:00.000Z',
-  },
-  {
-    id: 'cat-exploration',
-    name: 'Exploration',
-    description: 'Quests involving discovering new places',
-    icon: 'compass',
-    color: '#2563eb',
-    display_order: 1,
-    created_at: '2024-01-01T00:00:00.000Z',
-  },
-  {
-    id: 'cat-gathering',
-    name: 'Gathering',
-    description: 'Quests involving collecting items or resources',
-    icon: 'backpack',
-    color: '#16a34a',
-    display_order: 2,
-    created_at: '2024-01-01T00:00:00.000Z',
-  },
-  {
-    id: 'cat-social',
-    name: 'Social',
-    description: 'Quests involving interaction with others',
-    icon: 'users',
-    color: '#9333ea',
-    display_order: 3,
-    created_at: '2024-01-01T00:00:00.000Z',
-  },
-  {
-    id: 'cat-mystery',
-    name: 'Mystery',
-    description: 'Quests involving solving puzzles and mysteries',
-    icon: 'scroll',
-    color: '#ca8a04',
-    display_order: 4,
-    created_at: '2024-01-01T00:00:00.000Z',
-  },
-]
-
 /**
- * Fetch all categories
- * Currently returns default categories until the categories table is added to the database
+ * Fetch all categories from the database
  */
 async function fetchCategories(): Promise<Category[]> {
-  // TODO: When categories table is added to the database:
-  // const supabase = createClient()
-  // const { data, error } = await supabase
-  //   .from('categories')
-  //   .select('*')
-  //   .order('name', { ascending: true })
-  // if (error) throw error
-  // return data || []
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .order('display_order', { ascending: true })
 
-  // For now, return default categories
-  return Promise.resolve(defaultCategories)
+  if (error) {
+    console.error('Error fetching categories:', error)
+    throw error
+  }
+
+  // Transform to match Category interface
+  return (data || []).map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    description: cat.description,
+    icon: cat.icon,
+    display_order: cat.display_order ?? 0,
+    created_at: cat.created_at,
+  }))
 }
 
 /**
@@ -97,8 +57,3 @@ export function useCategoryById(categoryId: string | null | undefined) {
     data: category,
   }
 }
-
-/**
- * Export default categories for static usage (e.g., in filters)
- */
-export { defaultCategories }

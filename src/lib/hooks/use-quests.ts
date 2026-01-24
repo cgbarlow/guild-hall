@@ -38,9 +38,9 @@ async function fetchQuests(filters?: QuestFilters): Promise<Quest[]> {
     }
   }
 
-  // Apply search filter if provided
+  // Apply search filter if provided (search both title and description)
   if (filters?.search) {
-    query = query.ilike('title', `%${filters.search}%`)
+    query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
   }
 
   // Order by created_at descending (newest first)
