@@ -26,15 +26,20 @@ export async function acceptQuestAction(questId: string): Promise<QuestActionRes
   }
 
   // Check if quest exists and is available (published status)
-  const { data: quest, error: questError } = await supabase
+  // Type for query result (Supabase type inference doesn't work properly)
+  type QuestResult = { id: string; status: string }
+
+  const { data: rawQuest, error: questError } = await supabase
     .from('quests')
     .select('id, status')
     .eq('id', questId)
     .single()
 
-  if (questError || !quest) {
+  if (questError || !rawQuest) {
     return { success: false, error: 'Quest not found' }
   }
+
+  const quest = rawQuest as unknown as QuestResult
 
   if (quest.status !== 'published') {
     return { success: false, error: 'Quest is not available' }
@@ -53,25 +58,26 @@ export async function acceptQuestAction(questId: string): Promise<QuestActionRes
   }
 
   // Insert into user_quests with 'accepted' status
-  const { data: userQuest, error: insertError } = await supabase
-    .from('user_quests')
+  // Type assertion to bypass Supabase type inference issues
+  const { data: userQuest, error: insertError } = await (supabase
+    .from('user_quests') as ReturnType<typeof supabase.from>)
     .insert({
       user_id: user.id,
       quest_id: questId,
       status: 'accepted',
       accepted_at: new Date().toISOString(),
-    })
+    } as Record<string, unknown>)
     .select('id')
     .single()
 
-  if (insertError) {
-    return { success: false, error: insertError.message }
+  if (insertError || !userQuest) {
+    return { success: false, error: insertError?.message || 'Failed to accept quest' }
   }
 
   return {
     success: true,
     data: {
-      userQuestId: userQuest.id,
+      userQuestId: (userQuest as unknown as { id: string }).id,
       questId,
     },
   }

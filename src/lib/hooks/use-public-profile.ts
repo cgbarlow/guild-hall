@@ -9,6 +9,29 @@ import type {
   PrivacySettings,
 } from '@/lib/types/public-profile'
 
+// Type for user query result
+type UserQueryResult = {
+  id: string
+  display_name: string | null
+  avatar_url: string | null
+  bio: string | null
+  total_points: number | null
+  quests_completed: number | null
+  privacy_settings: PrivacySettings | string | null
+}
+
+// Type for user achievements query result
+type UserAchievementQueryResult = {
+  id: string
+  earned_at: string
+  achievements: {
+    id: string
+    name: string
+    description: string
+    icon: string
+  } | null
+}
+
 /**
  * Query key for public profile data
  */
@@ -47,7 +70,7 @@ export function usePublicProfile(userId: string) {
     queryKey: publicProfileQueryKey(userId),
     queryFn: async (): Promise<PublicProfileResult> => {
       // Fetch the user profile with privacy settings
-      const { data: userData, error: userError } = await supabase
+      const { data: rawUserData, error: userError } = await supabase
         .from('users')
         .select(`
           id,
@@ -70,9 +93,11 @@ export function usePublicProfile(userId: string) {
         return { status: 'error', error: userError.message }
       }
 
-      if (!userData) {
+      if (!rawUserData) {
         return { status: 'not_found' }
       }
+
+      const userData = rawUserData as unknown as UserQueryResult
 
       // Parse privacy settings (handle both JSON string and object)
       const privacySettings: PrivacySettings =
@@ -98,7 +123,7 @@ export function usePublicProfile(userId: string) {
 
       // Fetch achievements if allowed
       if (privacySettings.show_achievements) {
-        const { data: achievementsData } = await supabase
+        const { data: rawAchievementsData } = await supabase
           .from('user_achievements')
           .select(`
             id,
@@ -114,12 +139,14 @@ export function usePublicProfile(userId: string) {
           .order('earned_at', { ascending: false })
           .limit(50)
 
-        if (achievementsData) {
+        const achievementsData = (rawAchievementsData || []) as unknown as UserAchievementQueryResult[]
+
+        if (achievementsData.length > 0) {
           publicProfile.achievements = achievementsData.map((ua) => ({
-            id: (ua.achievements as { id: string })?.id ?? ua.id,
-            name: (ua.achievements as { name: string })?.name ?? 'Unknown',
-            description: (ua.achievements as { description: string })?.description ?? '',
-            icon: (ua.achievements as { icon: string })?.icon ?? 'trophy',
+            id: ua.achievements?.id ?? ua.id,
+            name: ua.achievements?.name ?? 'Unknown',
+            description: ua.achievements?.description ?? '',
+            icon: ua.achievements?.icon ?? 'trophy',
             earned_at: ua.earned_at,
           })) as Achievement[]
         }
@@ -127,8 +154,10 @@ export function usePublicProfile(userId: string) {
 
       // Fetch leaderboard position if allowed
       if (privacySettings.show_on_leaderboard) {
-        const { data: leaderboardData } = await supabase
-          .rpc('get_leaderboard_position', { user_id: userId })
+        // Type assertion needed due to Supabase type inference issues
+        const { data: leaderboardData } = await (supabase as unknown as {
+          rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown }>
+        }).rpc('get_leaderboard_position', { user_id: userId })
 
         if (leaderboardData) {
           // Handle both direct position and object with position property
@@ -160,7 +189,7 @@ export async function fetchPublicProfile(
   userId: string
 ): Promise<PublicProfileResult> {
   // Fetch the user profile with privacy settings
-  const { data: userData, error: userError } = await supabase
+  const { data: rawUserData, error: userError } = await supabase
     .from('users')
     .select(`
       id,
@@ -182,9 +211,11 @@ export async function fetchPublicProfile(
     return { status: 'error', error: userError.message }
   }
 
-  if (!userData) {
+  if (!rawUserData) {
     return { status: 'not_found' }
   }
+
+  const userData = rawUserData as unknown as UserQueryResult
 
   // Parse privacy settings
   const privacySettings: PrivacySettings =
@@ -210,7 +241,7 @@ export async function fetchPublicProfile(
 
   // Fetch achievements if allowed
   if (privacySettings.show_achievements) {
-    const { data: achievementsData } = await supabase
+    const { data: rawAchievementsData } = await supabase
       .from('user_achievements')
       .select(`
         id,
@@ -226,12 +257,14 @@ export async function fetchPublicProfile(
       .order('earned_at', { ascending: false })
       .limit(50)
 
-    if (achievementsData) {
+    const achievementsData = (rawAchievementsData || []) as unknown as UserAchievementQueryResult[]
+
+    if (achievementsData.length > 0) {
       publicProfile.achievements = achievementsData.map((ua) => ({
-        id: (ua.achievements as { id: string })?.id ?? ua.id,
-        name: (ua.achievements as { name: string })?.name ?? 'Unknown',
-        description: (ua.achievements as { description: string })?.description ?? '',
-        icon: (ua.achievements as { icon: string })?.icon ?? 'trophy',
+        id: ua.achievements?.id ?? ua.id,
+        name: ua.achievements?.name ?? 'Unknown',
+        description: ua.achievements?.description ?? '',
+        icon: ua.achievements?.icon ?? 'trophy',
         earned_at: ua.earned_at,
       })) as Achievement[]
     }
@@ -239,8 +272,10 @@ export async function fetchPublicProfile(
 
   // Fetch leaderboard position if allowed
   if (privacySettings.show_on_leaderboard) {
-    const { data: leaderboardData } = await supabase
-      .rpc('get_leaderboard_position', { user_id: userId })
+    // Type assertion needed due to Supabase type inference issues
+    const { data: leaderboardData } = await (supabase as unknown as {
+      rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown }>
+    }).rpc('get_leaderboard_position', { user_id: userId })
 
     if (leaderboardData) {
       publicProfile.leaderboard_position =

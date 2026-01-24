@@ -93,7 +93,7 @@ export default function MyQuestsPage() {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              No quests with status "{statusFilter.replace('_', ' ')}"
+              No quests with status &quot;{statusFilter.replace('_', ' ')}&quot;
             </p>
           </div>
         )

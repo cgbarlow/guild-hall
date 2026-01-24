@@ -142,7 +142,7 @@ function TemplateCard({ template }: { template: Quest }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Template</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{template.title}"? This action cannot
+              Are you sure you want to delete &quot;{template.title}&quot;? This action cannot
               be undone. Quests created from this template will not be affected.
             </AlertDialogDescription>
           </AlertDialogHeader>

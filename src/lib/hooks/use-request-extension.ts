@@ -38,13 +38,13 @@ async function requestExtension(data: ExtensionRequestData): Promise<UserQuestRo
   }
 
   // Update user_quests with extension request
-  const { data: updatedQuest, error } = await supabase
-    .from('user_quests')
+  const { data: updatedQuest, error } = await (supabase
+    .from('user_quests') as ReturnType<typeof supabase.from>)
     .update({
       extension_requested: true,
       extension_requested_at: new Date().toISOString(),
       extension_reason: data.reason.trim(),
-    })
+    } as Record<string, unknown>)
     .eq('id', data.userQuestId)
     .eq('user_id', user.id) // Ensure user owns this quest
     .select()
@@ -58,7 +58,7 @@ async function requestExtension(data: ExtensionRequestData): Promise<UserQuestRo
     throw new Error('Quest not found or you do not have permission')
   }
 
-  return updatedQuest
+  return updatedQuest as UserQuestRow
 }
 
 /**

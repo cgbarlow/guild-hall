@@ -49,9 +49,9 @@ async function approveSubmission(data: ApproveSubmissionData): Promise<UserObjec
     updateData.feedback = data.feedback
   }
 
-  const { data: updatedObjective, error } = await supabase
-    .from('user_objectives')
-    .update(updateData)
+  const { data: updatedObjective, error } = await (supabase
+    .from('user_objectives') as ReturnType<typeof supabase.from>)
+    .update(updateData as Record<string, unknown>)
     .eq('id', data.userObjectiveId)
     .select()
     .single()
@@ -60,7 +60,7 @@ async function approveSubmission(data: ApproveSubmissionData): Promise<UserObjec
     throw new Error(error.message)
   }
 
-  return updatedObjective
+  return updatedObjective as UserObjectiveRow
 }
 
 /**
@@ -80,14 +80,14 @@ async function rejectSubmission(data: RejectSubmissionData): Promise<UserObjecti
     throw new Error('Not authenticated')
   }
 
-  const { data: updatedObjective, error } = await supabase
-    .from('user_objectives')
+  const { data: updatedObjective, error } = await (supabase
+    .from('user_objectives') as ReturnType<typeof supabase.from>)
     .update({
       status: 'rejected',
       reviewed_by: user.id,
       reviewed_at: new Date().toISOString(),
       feedback: data.feedback.trim(),
-    })
+    } as Record<string, unknown>)
     .eq('id', data.userObjectiveId)
     .select()
     .single()
@@ -96,7 +96,7 @@ async function rejectSubmission(data: RejectSubmissionData): Promise<UserObjecti
     throw new Error(error.message)
   }
 
-  return updatedObjective
+  return updatedObjective as UserObjectiveRow
 }
 
 /**

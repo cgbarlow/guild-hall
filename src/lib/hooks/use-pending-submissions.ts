@@ -25,6 +25,19 @@ export interface UsePendingSubmissionsOptions {
   enabled?: boolean
 }
 
+// Type for joined query result
+type PendingSubmissionQueryResult = UserObjectiveRow & {
+  user_quests: {
+    id: string
+    user_id: string
+    quest_id: string
+    status: string
+    users: Pick<UserRow, 'id' | 'display_name' | 'email' | 'total_points'> | null
+    quests: Pick<QuestRow, 'id' | 'title' | 'points'> | null
+  }
+  objectives: Pick<ObjectiveRow, 'id' | 'title' | 'description' | 'points' | 'evidence_type'> | null
+}
+
 /**
  * Fetch pending evidence submissions for GM review
  */
@@ -70,30 +83,29 @@ async function fetchPendingSubmissions(
   }
 
   // Order by submitted_at (oldest first for FIFO processing)
-  const { data, error } = await query.order('submitted_at', { ascending: true })
+  const { data: rawData, error } = await query.order('submitted_at', { ascending: true })
 
   if (error) {
     throw error
   }
 
+  const data = (rawData || []) as unknown as PendingSubmissionQueryResult[]
+
   // Transform the data to match our interface
-  return (data || []).map((item) => {
-    const userQuests = item.user_quests as Record<string, unknown>
-    return {
-      ...item,
-      user_quest: {
-        id: userQuests.id as string,
-        user_id: userQuests.user_id as string,
-        quest_id: userQuests.quest_id as string,
-        status: userQuests.status as string,
-        user: userQuests.users as PendingSubmission['user_quest']['user'],
-        quest: userQuests.quests as PendingSubmission['user_quest']['quest'],
-      },
-      objective: item.objectives as PendingSubmission['objective'],
-      user_quests: undefined,
-      objectives: undefined,
-    }
-  }) as PendingSubmission[]
+  return data.map((item) => ({
+    ...item,
+    user_quest: {
+      id: item.user_quests.id,
+      user_id: item.user_quests.user_id,
+      quest_id: item.user_quests.quest_id,
+      status: item.user_quests.status,
+      user: item.user_quests.users,
+      quest: item.user_quests.quests,
+    },
+    objective: item.objectives,
+    user_quests: undefined,
+    objectives: undefined,
+  })) as PendingSubmission[]
 }
 
 /**

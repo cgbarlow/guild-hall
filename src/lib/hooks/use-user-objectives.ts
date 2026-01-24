@@ -15,13 +15,21 @@ export interface UserObjectiveWithDetails extends UserObjectiveRow {
   > | null
 }
 
+// Type for joined query result
+type UserObjectiveQueryResult = UserObjectiveRow & {
+  objectives: Pick<
+    ObjectiveRow,
+    'id' | 'quest_id' | 'title' | 'description' | 'points' | 'display_order' | 'depends_on_id' | 'evidence_required' | 'evidence_type'
+  > | null
+}
+
 /**
  * Fetch user objectives for a specific user quest
  */
 async function fetchUserObjectives(userQuestId: string): Promise<UserObjectiveWithDetails[]> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  const { data: rawData, error } = await supabase
     .from('user_objectives')
     .select(`
       *,
@@ -44,10 +52,12 @@ async function fetchUserObjectives(userQuestId: string): Promise<UserObjectiveWi
     throw error
   }
 
+  const data = (rawData || []) as unknown as UserObjectiveQueryResult[]
+
   // Transform the data to match our interface
-  return (data || []).map((item) => ({
+  return data.map((item) => ({
     ...item,
-    objective: item.objectives as UserObjectiveWithDetails['objective'],
+    objective: item.objectives,
     objectives: undefined,
   })) as UserObjectiveWithDetails[]
 }

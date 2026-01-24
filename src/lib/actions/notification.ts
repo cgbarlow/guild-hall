@@ -14,12 +14,13 @@ export async function markNotificationRead(notificationId: string) {
     return { error: 'Unauthorized' }
   }
 
-  const { error } = await supabase
-    .from('notifications')
+  // Type assertion to bypass Supabase type inference issues
+  const { error } = await (supabase
+    .from('notifications') as ReturnType<typeof supabase.from>)
     .update({
       read: true,
       read_at: new Date().toISOString(),
-    })
+    } as Record<string, unknown>)
     .eq('id', notificationId)
     .eq('user_id', user.id) // Ensure user can only update their own notifications
 
@@ -43,12 +44,13 @@ export async function markAllNotificationsRead() {
     return { error: 'Unauthorized' }
   }
 
-  const { error } = await supabase
-    .from('notifications')
+  // Type assertion to bypass Supabase type inference issues
+  const { error } = await (supabase
+    .from('notifications') as ReturnType<typeof supabase.from>)
     .update({
       read: true,
       read_at: new Date().toISOString(),
-    })
+    } as Record<string, unknown>)
     .eq('user_id', user.id)
     .eq('read', false)
 
@@ -72,8 +74,9 @@ export async function deleteNotification(notificationId: string) {
     return { error: 'Unauthorized' }
   }
 
-  const { error } = await supabase
-    .from('notifications')
+  // Type assertion to bypass Supabase type inference issues
+  const { error } = await (supabase
+    .from('notifications') as ReturnType<typeof supabase.from>)
     .delete()
     .eq('id', notificationId)
     .eq('user_id', user.id) // Ensure user can only delete their own notifications
@@ -100,14 +103,15 @@ export async function createNotification(data: {
 }) {
   const supabase = await createClient()
 
-  const { error } = await supabase.from('notifications').insert({
+  // Type assertion to bypass Supabase type inference issues
+  const { error } = await (supabase.from('notifications') as ReturnType<typeof supabase.from>).insert({
     user_id: data.userId,
     type: data.type,
     title: data.title,
     message: data.message,
     reference_type: data.referenceType,
     reference_id: data.referenceId,
-  })
+  } as Record<string, unknown>)
 
   if (error) {
     console.error('Error creating notification:', error)

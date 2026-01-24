@@ -37,10 +37,10 @@ async function createQuest(data: QuestFormData): Promise<QuestRow> {
     status: 'draft', // New quests always start as drafts
   }
 
-  // Insert the quest
-  const { data: quest, error } = await supabase
-    .from('quests')
-    .insert(questData)
+  // Insert the quest (type assertion to bypass Supabase type inference)
+  const { data: quest, error } = await (supabase
+    .from('quests') as ReturnType<typeof supabase.from>)
+    .insert(questData as Record<string, unknown>)
     .select()
     .single()
 
@@ -48,7 +48,7 @@ async function createQuest(data: QuestFormData): Promise<QuestRow> {
     throw error
   }
 
-  return quest
+  return quest as Database['public']['Tables']['quests']['Row']
 }
 
 /**

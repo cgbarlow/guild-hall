@@ -4,12 +4,22 @@ import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { Category } from '@/lib/types/quest'
 
+// Type for category row from database
+type CategoryRow = {
+  id: string
+  name: string
+  description: string | null
+  icon: string | null
+  display_order: number | null
+  created_at: string
+}
+
 /**
  * Fetch all categories from the database
  */
 async function fetchCategories(): Promise<Category[]> {
   const supabase = createClient()
-  const { data, error } = await supabase
+  const { data: rawData, error } = await supabase
     .from('categories')
     .select('*')
     .order('display_order', { ascending: true })
@@ -19,8 +29,10 @@ async function fetchCategories(): Promise<Category[]> {
     throw error
   }
 
+  const data = (rawData || []) as unknown as CategoryRow[]
+
   // Transform to match Category interface
-  return (data || []).map((cat) => ({
+  return data.map((cat) => ({
     id: cat.id,
     name: cat.name,
     description: cat.description,

@@ -32,16 +32,27 @@ export async function requestExtensionAction(
     return { success: false, error: 'Not authenticated' }
   }
 
+  // Type for query result (Supabase type inference doesn't work properly)
+  type UserQuestResult = {
+    id: string
+    user_id: string
+    status: string
+    extension_requested: boolean | null
+    deadline: string | null
+  }
+
   // Verify the user owns this quest and it's in a valid state
-  const { data: userQuest, error: fetchError } = await supabase
+  const { data: rawData, error: fetchError } = await supabase
     .from('user_quests')
     .select('id, user_id, status, extension_requested, deadline')
     .eq('id', userQuestId)
     .single()
 
-  if (fetchError || !userQuest) {
+  if (fetchError || !rawData) {
     return { success: false, error: 'Quest not found' }
   }
+
+  const userQuest = rawData as unknown as UserQuestResult
 
   if (userQuest.user_id !== user.id) {
     return { success: false, error: 'You do not have permission to request an extension for this quest' }
@@ -60,13 +71,13 @@ export async function requestExtensionAction(
   }
 
   // Update the quest with extension request
-  const { error: updateError } = await supabase
-    .from('user_quests')
+  const { error: updateError } = await (supabase
+    .from('user_quests') as ReturnType<typeof supabase.from>)
     .update({
       extension_requested: true,
       extension_requested_at: new Date().toISOString(),
       extension_reason: reason.trim(),
-    })
+    } as Record<string, unknown>)
     .eq('id', userQuestId)
 
   if (updateError) {

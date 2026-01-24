@@ -25,22 +25,23 @@ async function acceptQuest(questId: string): Promise<UserQuest> {
   }
 
   // Insert into user_quests with 'accepted' status
-  const { data: userQuest, error: insertError } = await supabase
-    .from('user_quests')
+  // Type assertion to bypass Supabase type inference issues
+  const { data: userQuest, error: insertError } = await (supabase
+    .from('user_quests') as ReturnType<typeof supabase.from>)
     .insert({
       user_id: user.id,
       quest_id: questId,
       status: 'accepted',
       accepted_at: new Date().toISOString(),
-    })
+    } as Record<string, unknown>)
     .select()
     .single()
 
-  if (insertError) {
-    throw new Error(insertError.message)
+  if (insertError || !userQuest) {
+    throw new Error(insertError?.message || 'Failed to accept quest')
   }
 
-  return userQuest
+  return userQuest as UserQuest
 }
 
 /**

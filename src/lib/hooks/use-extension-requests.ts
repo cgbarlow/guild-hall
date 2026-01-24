@@ -27,13 +27,26 @@ export interface ExtensionRequest {
   status: UserQuest['status']
 }
 
+// Type for joined query result
+type ExtensionRequestResult = {
+  id: string
+  user_id: string
+  quest_id: string
+  extension_reason: string | null
+  extension_requested_at: string | null
+  deadline: string | null
+  status: UserQuest['status']
+  quests: { title: string } | null
+  users: { display_name: string | null; email: string } | null
+}
+
 /**
  * Fetch pending extension requests
  */
 async function fetchExtensionRequests(): Promise<ExtensionRequest[]> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  const { data: rawData, error } = await supabase
     .from('user_quests')
     .select(`
       id,
@@ -54,24 +67,21 @@ async function fetchExtensionRequests(): Promise<ExtensionRequest[]> {
     throw error
   }
 
-  return (data || []).map((item) => {
-    const quest = item.quests as unknown as Quest | null
-    const user = item.users as unknown as User | null
+  const data = (rawData || []) as unknown as ExtensionRequestResult[]
 
-    return {
-      id: item.id,
-      user_quest_id: item.id,
-      user_id: item.user_id,
-      quest_id: item.quest_id,
-      quest_title: quest?.title || 'Unknown Quest',
-      user_display_name: user?.display_name || null,
-      user_email: user?.email || 'unknown@example.com',
-      extension_reason: item.extension_reason,
-      extension_requested_at: item.extension_requested_at,
-      current_deadline: item.deadline,
-      status: item.status,
-    }
-  })
+  return data.map((item) => ({
+    id: item.id,
+    user_quest_id: item.id,
+    user_id: item.user_id,
+    quest_id: item.quest_id,
+    quest_title: item.quests?.title || 'Unknown Quest',
+    user_display_name: item.users?.display_name || null,
+    user_email: item.users?.email || 'unknown@example.com',
+    extension_reason: item.extension_reason,
+    extension_requested_at: item.extension_requested_at,
+    current_deadline: item.deadline,
+    status: item.status,
+  }))
 }
 
 /**
@@ -134,9 +144,9 @@ async function reviewExtension({
     updateData.deadline = newDeadline
   }
 
-  const { error } = await supabase
-    .from('user_quests')
-    .update(updateData)
+  const { error } = await (supabase
+    .from('user_quests') as ReturnType<typeof supabase.from>)
+    .update(updateData as Record<string, unknown>)
     .eq('id', userQuestId)
 
   if (error) {

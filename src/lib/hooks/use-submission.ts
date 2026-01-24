@@ -18,13 +18,22 @@ export interface SubmissionDetail extends UserObjectiveRow {
   objective: ObjectiveRow | null
 }
 
+// Type for joined query result
+type SubmissionQueryResult = UserObjectiveRow & {
+  user_quests: UserQuestRow & {
+    users: UserRow | null
+    quests: QuestRow | null
+  }
+  objectives: ObjectiveRow | null
+}
+
 /**
  * Fetch a single submission with full details for review
  */
 async function fetchSubmission(id: string): Promise<SubmissionDetail | null> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  const { data: rawData, error } = await supabase
     .from('user_objectives')
     .select(`
       *,
@@ -45,24 +54,28 @@ async function fetchSubmission(id: string): Promise<SubmissionDetail | null> {
     throw error
   }
 
-  if (!data) return null
+  if (!rawData) return null
+
+  const data = rawData as unknown as SubmissionQueryResult
 
   // Transform the data to match our interface
-  const userQuests = data.user_quests as Record<string, unknown>
   return {
     ...data,
     user_quest: {
-      ...userQuests,
-      user: userQuests.users as SubmissionDetail['user_quest']['user'],
-      quest: userQuests.quests as SubmissionDetail['user_quest']['quest'],
+      ...data.user_quests,
+      user: data.user_quests.users,
+      quest: data.user_quests.quests,
       users: undefined,
       quests: undefined,
     } as SubmissionDetail['user_quest'],
-    objective: data.objectives as SubmissionDetail['objective'],
+    objective: data.objectives,
     user_quests: undefined,
     objectives: undefined,
   } as SubmissionDetail
 }
+
+// Type for objective count query
+type ObjectiveCountResult = { id: string; status: string }
 
 /**
  * Fetch objective counts for a user quest
@@ -73,7 +86,7 @@ async function fetchObjectiveCounts(userQuestId: string): Promise<{
 }> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  const { data: rawData, error } = await supabase
     .from('user_objectives')
     .select('id, status')
     .eq('user_quest_id', userQuestId)
@@ -82,8 +95,9 @@ async function fetchObjectiveCounts(userQuestId: string): Promise<{
     throw error
   }
 
-  const total = data?.length ?? 0
-  const completed = data?.filter((o) => o.status === 'approved').length ?? 0
+  const data = (rawData || []) as unknown as ObjectiveCountResult[]
+  const total = data.length
+  const completed = data.filter((o) => o.status === 'approved').length
 
   return { total, completed }
 }

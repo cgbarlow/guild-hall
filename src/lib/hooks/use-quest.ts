@@ -3,6 +3,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { Objective, QuestWithRelations, QuestStatus, Category } from '@/lib/types/quest'
+import type { Database } from '@/lib/types/database'
+
+type QuestRow = Database['public']['Tables']['quests']['Row']
+type ObjectiveRow = Database['public']['Tables']['objectives']['Row']
+type CategoryRow = Database['public']['Tables']['categories']['Row']
 
 /**
  * Fetch a single quest by ID with its objectives
@@ -11,7 +16,7 @@ async function fetchQuest(questId: string): Promise<QuestWithRelations | null> {
   const supabase = createClient()
 
   // Fetch the quest
-  const { data: questData, error: questError } = await supabase
+  const { data: rawQuestData, error: questError } = await supabase
     .from('quests')
     .select('*')
     .eq('id', questId)
@@ -21,12 +26,14 @@ async function fetchQuest(questId: string): Promise<QuestWithRelations | null> {
     throw questError
   }
 
-  if (!questData) {
+  if (!rawQuestData) {
     return null
   }
 
+  const questData = rawQuestData as unknown as QuestRow
+
   // Fetch objectives for this quest
-  const { data: objectivesData, error: objectivesError } = await supabase
+  const { data: rawObjectivesData, error: objectivesError } = await supabase
     .from('objectives')
     .select('*')
     .eq('quest_id', questId)
@@ -37,7 +44,9 @@ async function fetchQuest(questId: string): Promise<QuestWithRelations | null> {
     console.warn('Could not fetch objectives:', objectivesError.message)
   }
 
-  const objectives: Objective[] = (objectivesData || []).map((obj) => ({
+  const objectivesData = (rawObjectivesData || []) as unknown as ObjectiveRow[]
+
+  const objectives: Objective[] = objectivesData.map((obj) => ({
     id: obj.id,
     quest_id: obj.quest_id,
     title: obj.title,
@@ -54,13 +63,14 @@ async function fetchQuest(questId: string): Promise<QuestWithRelations | null> {
   // Fetch category if exists
   let category: Category | null = null
   if (questData.category_id) {
-    const { data: categoryData, error: categoryError } = await supabase
+    const { data: rawCategoryData, error: categoryError } = await supabase
       .from('categories')
       .select('*')
       .eq('id', questData.category_id)
       .single()
 
-    if (!categoryError && categoryData) {
+    if (!categoryError && rawCategoryData) {
+      const categoryData = rawCategoryData as unknown as CategoryRow
       category = {
         id: categoryData.id,
         name: categoryData.name,

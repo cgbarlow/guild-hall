@@ -47,9 +47,13 @@ async function fetchAllUsers(options: UseAllUsersOptions = {}): Promise<UserWith
     throw error
   }
 
+  // Type for joined query result
+  type UserWithRolesResult = UserRow & { user_roles: { role: UserRoleRow['role'] }[] | null }
+
   // Transform the data
-  let users = (data || []).map((item) => {
-    const roles = item.user_roles as { role: UserRoleRow['role'] }[] | null
+  const typedData = (data || []) as unknown as UserWithRolesResult[]
+  let users = typedData.map((item) => {
+    const roles = item.user_roles
     // Get the highest priority role
     let role: UserRoleRow['role'] | null = null
     if (roles && roles.length > 0) {
@@ -87,7 +91,10 @@ async function fetchUserQuestCounts(userId: string): Promise<{
 }> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  // Type for query result
+  type UserQuestResult = { id: string; status: string }
+
+  const { data: rawData, error } = await supabase
     .from('user_quests')
     .select('id, status')
     .eq('user_id', userId)
@@ -96,9 +103,10 @@ async function fetchUserQuestCounts(userId: string): Promise<{
     throw error
   }
 
-  const total = data?.length ?? 0
-  const active = data?.filter(q => ['accepted', 'in_progress'].includes(q.status)).length ?? 0
-  const completed = data?.filter(q => q.status === 'completed').length ?? 0
+  const data = (rawData || []) as unknown as UserQuestResult[]
+  const total = data.length
+  const active = data.filter(q => ['accepted', 'in_progress'].includes(q.status)).length
+  const completed = data.filter(q => q.status === 'completed').length
 
   return { active, completed, total }
 }
@@ -149,7 +157,10 @@ export function useUserQuestCounts(userId: string | undefined) {
 async function fetchUserDetail(userId: string): Promise<UserWithRole | null> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  // Type for joined query result
+  type UserWithRolesResult = UserRow & { user_roles: { role: UserRoleRow['role'] }[] | null }
+
+  const { data: rawData, error } = await supabase
     .from('users')
     .select(`
       *,
@@ -167,7 +178,8 @@ async function fetchUserDetail(userId: string): Promise<UserWithRole | null> {
     throw error
   }
 
-  const roles = data.user_roles as { role: UserRoleRow['role'] }[] | null
+  const data = rawData as unknown as UserWithRolesResult
+  const roles = data.user_roles
   let role: UserRoleRow['role'] | null = null
   if (roles && roles.length > 0) {
     if (roles.some(r => r.role === 'admin')) {
@@ -203,7 +215,12 @@ export function useUserDetail(userId: string | undefined) {
 async function fetchUserQuestHistory(userId: string) {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  // Type for joined query result
+  type UserQuestWithQuest = Database['public']['Tables']['user_quests']['Row'] & {
+    quests: { id: string; title: string; points: number; description: string | null } | null
+  }
+
+  const { data: rawData, error } = await supabase
     .from('user_quests')
     .select(`
       *,
@@ -221,7 +238,8 @@ async function fetchUserQuestHistory(userId: string) {
     throw error
   }
 
-  return (data || []).map((item) => ({
+  const data = (rawData || []) as unknown as UserQuestWithQuest[]
+  return data.map((item) => ({
     ...item,
     quest: item.quests,
     quests: undefined,

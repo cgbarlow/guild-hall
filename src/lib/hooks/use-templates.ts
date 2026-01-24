@@ -17,7 +17,7 @@ type ObjectiveInsert = Database['public']['Tables']['objectives']['Insert']
 async function fetchTemplates(): Promise<Quest[]> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  const { data: rawData, error } = await supabase
     .from('quests')
     .select('*')
     .eq('is_template', true)
@@ -27,7 +27,9 @@ async function fetchTemplates(): Promise<Quest[]> {
     throw error
   }
 
-  return (data || []).map((quest) => ({
+  const data = (rawData || []) as unknown as QuestRow[]
+
+  return data.map((quest) => ({
     id: quest.id,
     title: quest.title,
     description: quest.description,
@@ -90,8 +92,8 @@ async function fetchTemplateWithObjectives(
   }
 
   return {
-    quest: questResult.data,
-    objectives: objectivesResult.data || [],
+    quest: questResult.data as unknown as QuestRow,
+    objectives: (objectivesResult.data || []) as unknown as ObjectiveRow[],
   }
 }
 
@@ -133,15 +135,17 @@ async function cloneTemplate({
     status: 'draft',
   }
 
-  const { data: newQuest, error: questError } = await supabase
-    .from('quests')
-    .insert(newQuestData)
+  const { data: newQuest, error: questError } = await (supabase
+    .from('quests') as ReturnType<typeof supabase.from>)
+    .insert(newQuestData as Record<string, unknown>)
     .select()
     .single()
 
   if (questError) {
     throw questError
   }
+
+  const typedNewQuest = newQuest as unknown as QuestRow
 
   // Clone objectives if there are any
   if (objectives.length > 0) {
@@ -151,7 +155,7 @@ async function cloneTemplate({
     // First pass: create objectives without dependencies
     for (const obj of objectives) {
       const newObjData: ObjectiveInsert = {
-        quest_id: newQuest.id,
+        quest_id: typedNewQuest.id,
         title: obj.title,
         description: obj.description,
         points: obj.points,
@@ -161,9 +165,9 @@ async function cloneTemplate({
         evidence_type: obj.evidence_type,
       }
 
-      const { data: newObj, error: objError } = await supabase
-        .from('objectives')
-        .insert(newObjData)
+      const { data: newObj, error: objError } = await (supabase
+        .from('objectives') as ReturnType<typeof supabase.from>)
+        .insert(newObjData as Record<string, unknown>)
         .select()
         .single()
 
@@ -171,7 +175,8 @@ async function cloneTemplate({
         throw objError
       }
 
-      idMap.set(obj.id, newObj.id)
+      const typedNewObj = newObj as unknown as ObjectiveRow
+      idMap.set(obj.id, typedNewObj.id)
     }
 
     // Second pass: update dependencies
@@ -181,9 +186,9 @@ async function cloneTemplate({
         const newDependsOnId = idMap.get(obj.depends_on_id)
 
         if (newId && newDependsOnId) {
-          const { error: updateError } = await supabase
-            .from('objectives')
-            .update({ depends_on_id: newDependsOnId })
+          const { error: updateError } = await (supabase
+            .from('objectives') as ReturnType<typeof supabase.from>)
+            .update({ depends_on_id: newDependsOnId } as Record<string, unknown>)
             .eq('id', newId)
 
           if (updateError) {
@@ -194,7 +199,7 @@ async function cloneTemplate({
     }
   }
 
-  return newQuest
+  return typedNewQuest
 }
 
 /**
@@ -218,9 +223,9 @@ export function useCloneTemplate() {
 async function convertToTemplate(questId: string): Promise<QuestRow> {
   const supabase = createClient()
 
-  const { data: quest, error } = await supabase
-    .from('quests')
-    .update({ is_template: true })
+  const { data: quest, error } = await (supabase
+    .from('quests') as ReturnType<typeof supabase.from>)
+    .update({ is_template: true } as Record<string, unknown>)
     .eq('id', questId)
     .select()
     .single()
@@ -229,7 +234,7 @@ async function convertToTemplate(questId: string): Promise<QuestRow> {
     throw error
   }
 
-  return quest
+  return quest as unknown as QuestRow
 }
 
 /**

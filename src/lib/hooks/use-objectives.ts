@@ -16,7 +16,7 @@ type ObjectiveUpdate = Database['public']['Tables']['objectives']['Update']
 async function fetchObjectives(questId: string): Promise<Objective[]> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  const { data: rawData, error } = await supabase
     .from('objectives')
     .select('*')
     .eq('quest_id', questId)
@@ -26,7 +26,7 @@ async function fetchObjectives(questId: string): Promise<Objective[]> {
     throw error
   }
 
-  return data || []
+  return (rawData || []) as unknown as Objective[]
 }
 
 /**
@@ -57,9 +57,9 @@ async function createObjective(data: CreateObjectiveData): Promise<ObjectiveRow>
     evidence_type: data.evidence_type ?? 'none',
   }
 
-  const { data: objective, error } = await supabase
-    .from('objectives')
-    .insert(objectiveData)
+  const { data: objective, error } = await (supabase
+    .from('objectives') as ReturnType<typeof supabase.from>)
+    .insert(objectiveData as Record<string, unknown>)
     .select()
     .single()
 
@@ -67,7 +67,7 @@ async function createObjective(data: CreateObjectiveData): Promise<ObjectiveRow>
     throw error
   }
 
-  return objective
+  return objective as ObjectiveRow
 }
 
 /**
@@ -106,9 +106,9 @@ async function updateObjective({
   if (data.evidence_required !== undefined) updateData.evidence_required = data.evidence_required
   if (data.evidence_type !== undefined) updateData.evidence_type = data.evidence_type
 
-  const { data: objective, error } = await supabase
-    .from('objectives')
-    .update(updateData)
+  const { data: objective, error } = await (supabase
+    .from('objectives') as ReturnType<typeof supabase.from>)
+    .update(updateData as Record<string, unknown>)
     .eq('id', id)
     .select()
     .single()
@@ -117,7 +117,7 @@ async function updateObjective({
     throw error
   }
 
-  return objective
+  return objective as ObjectiveRow
 }
 
 /**
@@ -140,8 +140,8 @@ export function useUpdateObjective() {
 async function deleteObjective(id: string): Promise<void> {
   const supabase = createClient()
 
-  const { error } = await supabase
-    .from('objectives')
+  const { error } = await (supabase
+    .from('objectives') as ReturnType<typeof supabase.from>)
     .delete()
     .eq('id', id)
 
@@ -175,9 +175,9 @@ async function reorderObjectives(
 
   // Update each objective's display_order
   const promises = updates.map(({ id, display_order }) =>
-    supabase
-      .from('objectives')
-      .update({ display_order })
+    (supabase
+      .from('objectives') as ReturnType<typeof supabase.from>)
+      .update({ display_order } as Record<string, unknown>)
       .eq('id', id)
   )
 

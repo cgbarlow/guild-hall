@@ -3,6 +3,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { Quest, QuestFilters, QuestStatus, QuestDbStatus } from '@/lib/types/quest'
+import type { Database } from '@/lib/types/database'
+
+type QuestRow = Database['public']['Tables']['quests']['Row']
 
 /**
  * Fetch quests from the database with optional filters
@@ -44,14 +47,16 @@ async function fetchQuests(filters?: QuestFilters): Promise<Quest[]> {
   }
 
   // Order by created_at descending (newest first)
-  const { data, error } = await query.order('created_at', { ascending: false })
+  const { data: rawData, error } = await query.order('created_at', { ascending: false })
 
   if (error) {
     throw error
   }
 
+  const data = (rawData || []) as unknown as QuestRow[]
+
   // Transform the data to match our Quest type
-  return (data || []).map((quest) => ({
+  return data.map((quest) => ({
     id: quest.id,
     title: quest.title,
     description: quest.description,

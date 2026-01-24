@@ -2,7 +2,26 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import type { ActivityWithUser } from '@/lib/types/activity'
+import type { ActivityWithUser, ActivityType, ActivityReferenceType } from '@/lib/types/activity'
+
+// Type for joined query result
+type ActivityQueryResult = {
+  id: string
+  user_id: string
+  type: ActivityType
+  title: string
+  description: string | null
+  reference_type: ActivityReferenceType | null
+  reference_id: string | null
+  points_earned: number
+  is_public: boolean
+  created_at: string
+  users: {
+    id: string
+    display_name: string | null
+    avatar_url: string | null
+  } | null
+}
 
 /**
  * Fetch global public activities (for leaderboard/dashboard)
@@ -10,7 +29,7 @@ import type { ActivityWithUser } from '@/lib/types/activity'
 async function fetchGlobalActivity(limit: number = 20): Promise<ActivityWithUser[]> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  const { data: rawData, error } = await supabase
     .from('activities')
     .select(`
       *,
@@ -29,8 +48,10 @@ async function fetchGlobalActivity(limit: number = 20): Promise<ActivityWithUser
     throw error
   }
 
+  const data = (rawData || []) as unknown as ActivityQueryResult[]
+
   // Transform to ActivityWithUser
-  return (data || []).map((item) => ({
+  return data.map((item) => ({
     id: item.id,
     user_id: item.user_id,
     type: item.type,

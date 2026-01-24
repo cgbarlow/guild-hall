@@ -164,7 +164,7 @@ export function ObjectiveItem({
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Objective</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete "{objective.title}"? This action cannot be undone.
+                Are you sure you want to delete &quot;{objective.title}&quot;? This action cannot be undone.
                 {allObjectives.some((o) => o.depends_on_id === objective.id) && (
                   <span className="block mt-2 font-medium text-destructive">
                     Warning: Other objectives depend on this one and will become unlocked.

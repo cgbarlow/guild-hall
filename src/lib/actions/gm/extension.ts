@@ -64,16 +64,16 @@ export async function approveExtensionAction(
     return { success: false, error: roleCheck.error }
   }
 
-  // Update the extension request
-  const { error } = await supabase
-    .from('user_quests')
+  // Update the extension request (type assertion to bypass Supabase type inference issues)
+  const { error } = await (supabase
+    .from('user_quests') as ReturnType<typeof supabase.from>)
     .update({
       extension_granted: true,
       extension_decided_by: roleCheck.userId,
       extension_decided_at: new Date().toISOString(),
       extended_deadline: deadlineDate.toISOString(),
       deadline: deadlineDate.toISOString(), // Update the actual deadline
-    })
+    } as Record<string, unknown>)
     .eq('id', userQuestId)
     .eq('extension_requested', true)
 
@@ -109,14 +109,14 @@ export async function denyExtensionAction(
     return { success: false, error: roleCheck.error }
   }
 
-  // Update the extension request
-  const { error } = await supabase
-    .from('user_quests')
+  // Update the extension request (type assertion to bypass Supabase type inference issues)
+  const { error } = await (supabase
+    .from('user_quests') as ReturnType<typeof supabase.from>)
     .update({
       extension_granted: false,
       extension_decided_by: roleCheck.userId,
       extension_decided_at: new Date().toISOString(),
-    })
+    } as Record<string, unknown>)
     .eq('id', userQuestId)
     .eq('extension_requested', true)
 

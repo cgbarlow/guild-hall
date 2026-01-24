@@ -14,12 +14,12 @@ export function useMarkNotificationRead() {
     mutationFn: async (notificationId: string) => {
       const supabase = createClient()
 
-      const { error } = await supabase
-        .from('notifications')
+      const { error } = await (supabase
+        .from('notifications') as ReturnType<typeof supabase.from>)
         .update({
           read: true,
           read_at: new Date().toISOString(),
-        })
+        } as Record<string, unknown>)
         .eq('id', notificationId)
 
       if (error) throw error
@@ -44,12 +44,12 @@ export function useMarkAllNotificationsRead() {
 
       const supabase = createClient()
 
-      const { error } = await supabase
-        .from('notifications')
+      const { error } = await (supabase
+        .from('notifications') as ReturnType<typeof supabase.from>)
         .update({
           read: true,
           read_at: new Date().toISOString(),
-        })
+        } as Record<string, unknown>)
         .eq('user_id', user.id)
         .eq('read', false)
 

@@ -34,9 +34,9 @@ async function updateQuest({
   if (data.is_template !== undefined) updateData.is_template = data.is_template
   if (data.template_id !== undefined) updateData.template_id = data.template_id
 
-  const { data: quest, error } = await supabase
-    .from('quests')
-    .update(updateData)
+  const { data: quest, error } = await (supabase
+    .from('quests') as ReturnType<typeof supabase.from>)
+    .update(updateData as Record<string, unknown>)
     .eq('id', id)
     .select()
     .single()
@@ -45,7 +45,7 @@ async function updateQuest({
     throw error
   }
 
-  return quest
+  return quest as unknown as QuestRow
 }
 
 /**
@@ -71,12 +71,12 @@ export function useUpdateQuest() {
 async function publishQuest(id: string): Promise<QuestRow> {
   const supabase = createClient()
 
-  const { data: quest, error } = await supabase
-    .from('quests')
+  const { data: quest, error } = await (supabase
+    .from('quests') as ReturnType<typeof supabase.from>)
     .update({
       status: 'published',
       published_at: new Date().toISOString(),
-    })
+    } as Record<string, unknown>)
     .eq('id', id)
     .select()
     .single()
@@ -85,7 +85,7 @@ async function publishQuest(id: string): Promise<QuestRow> {
     throw error
   }
 
-  return quest
+  return quest as unknown as QuestRow
 }
 
 /**
@@ -110,12 +110,12 @@ export function usePublishQuest() {
 async function archiveQuest(id: string): Promise<QuestRow> {
   const supabase = createClient()
 
-  const { data: quest, error } = await supabase
-    .from('quests')
+  const { data: quest, error } = await (supabase
+    .from('quests') as ReturnType<typeof supabase.from>)
     .update({
       status: 'archived',
       archived_at: new Date().toISOString(),
-    })
+    } as Record<string, unknown>)
     .eq('id', id)
     .select()
     .single()
@@ -124,7 +124,7 @@ async function archiveQuest(id: string): Promise<QuestRow> {
     throw error
   }
 
-  return quest
+  return quest as unknown as QuestRow
 }
 
 /**
@@ -149,12 +149,12 @@ export function useArchiveQuest() {
 async function unpublishQuest(id: string): Promise<QuestRow> {
   const supabase = createClient()
 
-  const { data: quest, error } = await supabase
-    .from('quests')
+  const { data: quest, error } = await (supabase
+    .from('quests') as ReturnType<typeof supabase.from>)
     .update({
       status: 'draft',
       published_at: null,
-    })
+    } as Record<string, unknown>)
     .eq('id', id)
     .select()
     .single()
@@ -163,7 +163,7 @@ async function unpublishQuest(id: string): Promise<QuestRow> {
     throw error
   }
 
-  return quest
+  return quest as unknown as QuestRow
 }
 
 /**
@@ -189,8 +189,8 @@ async function deleteQuest(id: string): Promise<void> {
   const supabase = createClient()
 
   // First delete all objectives
-  const { error: objError } = await supabase
-    .from('objectives')
+  const { error: objError } = await (supabase
+    .from('objectives') as ReturnType<typeof supabase.from>)
     .delete()
     .eq('quest_id', id)
 
@@ -199,8 +199,8 @@ async function deleteQuest(id: string): Promise<void> {
   }
 
   // Then delete the quest
-  const { error } = await supabase
-    .from('quests')
+  const { error } = await (supabase
+    .from('quests') as ReturnType<typeof supabase.from>)
     .delete()
     .eq('id', id)
 

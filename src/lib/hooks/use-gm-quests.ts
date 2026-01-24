@@ -5,6 +5,9 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/contexts/auth-context'
 import { useIsGM } from '@/lib/auth/hooks'
 import type { Quest, GMQuestFilters, QuestStatus, QuestDbStatus } from '@/lib/types/quest'
+import type { Database } from '@/lib/types/database'
+
+type QuestRow = Database['public']['Tables']['quests']['Row']
 
 /**
  * Fetch all quests for GM view (includes draft, published, archived)
@@ -46,14 +49,16 @@ async function fetchGMQuests(filters?: GMQuestFilters): Promise<Quest[]> {
   }
 
   // Order by created_at descending (newest first)
-  const { data, error } = await query.order('created_at', { ascending: false })
+  const { data: rawData, error } = await query.order('created_at', { ascending: false })
 
   if (error) {
     throw error
   }
 
+  const data = (rawData || []) as unknown as QuestRow[]
+
   // Transform the data to match our Quest type
-  return (data || []).map((quest) => ({
+  return data.map((quest) => ({
     id: quest.id,
     title: quest.title,
     description: quest.description,

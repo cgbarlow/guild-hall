@@ -42,9 +42,9 @@ async function submitEvidence(data: EvidenceFormData): Promise<UserObjectiveRow>
     updateData.evidence_url = data.evidenceUrl
   }
 
-  const { data: updatedObjective, error } = await supabase
-    .from('user_objectives')
-    .update(updateData)
+  const { data: updatedObjective, error } = await (supabase
+    .from('user_objectives') as ReturnType<typeof supabase.from>)
+    .update(updateData as Record<string, unknown>)
     .eq('id', data.userObjectiveId)
     .select()
     .single()
@@ -53,7 +53,7 @@ async function submitEvidence(data: EvidenceFormData): Promise<UserObjectiveRow>
     throw new Error(error.message)
   }
 
-  return updatedObjective
+  return updatedObjective as UserObjectiveRow
 }
 
 /**

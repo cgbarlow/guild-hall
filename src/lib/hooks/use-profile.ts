@@ -14,9 +14,9 @@ export function useProfile() {
     queryFn: async (): Promise<Profile | null> => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return null
-      const { data, error } = await supabase.from('profiles').select('*').eq('user_id', user.id).single()
+      const { data: rawData, error } = await supabase.from('profiles').select('*').eq('user_id', user.id).single()
       if (error) throw new Error(error.message)
-      return data
+      return rawData as unknown as Profile
     },
   })
 }
@@ -28,9 +28,13 @@ export function useUpdateProfile() {
     mutationFn: async (profileData: UpdateProfileData): Promise<Profile> => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('User not authenticated')
-      const { data, error } = await supabase.from('profiles').update({ ...profileData, updated_at: new Date().toISOString() }).eq('user_id', user.id).select().single()
+      const { data: rawData, error } = await (supabase.from('profiles') as ReturnType<typeof supabase.from>)
+        .update({ ...profileData, updated_at: new Date().toISOString() } as Record<string, unknown>)
+        .eq('user_id', user.id)
+        .select()
+        .single()
       if (error) throw new Error(error.message)
-      return data
+      return rawData as unknown as Profile
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['profile'] }) },
   })

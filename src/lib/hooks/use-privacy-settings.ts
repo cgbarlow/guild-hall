@@ -16,14 +16,14 @@ export function usePrivacySettings() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return null
 
-      const { data, error } = await supabase
+      const { data: rawData, error } = await supabase
         .from('privacy_settings')
         .select('*')
         .eq('user_id', user.id)
         .single()
 
       if (error) throw new Error(error.message)
-      return data
+      return rawData as unknown as PrivacySettings
     },
   })
 }
@@ -37,18 +37,18 @@ export function useUpdatePrivacySettings() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('User not authenticated')
 
-      const { data, error } = await supabase
-        .from('privacy_settings')
+      const { data: rawData, error } = await (supabase
+        .from('privacy_settings') as ReturnType<typeof supabase.from>)
         .update({
           ...settings,
           updated_at: new Date().toISOString(),
-        })
+        } as Record<string, unknown>)
         .eq('user_id', user.id)
         .select()
         .single()
 
       if (error) throw new Error(error.message)
-      return data
+      return rawData as unknown as PrivacySettings
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['privacy-settings'] })

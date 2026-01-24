@@ -41,7 +41,14 @@ export async function submitEvidenceAction(
   }
 
   // Verify the user owns this objective
-  const { data: userObjective, error: fetchError } = await supabase
+  // Type for query result (Supabase type inference doesn't handle joins well)
+  type UserObjectiveResult = {
+    id: string
+    status: string
+    user_quests: { user_id: string }
+  }
+
+  const { data: rawData, error: fetchError } = await supabase
     .from('user_objectives')
     .select(`
       id,
@@ -53,13 +60,14 @@ export async function submitEvidenceAction(
     .eq('id', userObjectiveId)
     .single()
 
-  if (fetchError || !userObjective) {
+  if (fetchError || !rawData) {
     return { success: false, error: 'Objective not found' }
   }
 
+  const userObjective = rawData as unknown as UserObjectiveResult
+
   // Check if user owns this objective
-  const userQuests = userObjective.user_quests as { user_id: string }
-  if (userQuests.user_id !== user.id) {
+  if (userObjective.user_quests.user_id !== user.id) {
     return { success: false, error: 'You do not have permission to submit evidence for this objective' }
   }
 
@@ -92,9 +100,10 @@ export async function submitEvidenceAction(
     updateData.evidence_url = evidenceUrl
   }
 
-  const { error: updateError } = await supabase
-    .from('user_objectives')
-    .update(updateData)
+  // Use type assertion to bypass Supabase type inference issues
+  const { error: updateError } = await (supabase
+    .from('user_objectives') as ReturnType<typeof supabase.from>)
+    .update(updateData as Record<string, unknown>)
     .eq('id', userObjectiveId)
 
   if (updateError) {

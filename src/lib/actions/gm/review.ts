@@ -69,9 +69,10 @@ export async function approveSubmissionAction(
     updateData.feedback = feedback.trim()
   }
 
-  const { error } = await supabase
-    .from('user_objectives')
-    .update(updateData)
+  // Type assertion to bypass Supabase type inference issues
+  const { error } = await (supabase
+    .from('user_objectives') as ReturnType<typeof supabase.from>)
+    .update(updateData as Record<string, unknown>)
     .eq('id', userObjectiveId)
 
   if (error) {
@@ -118,8 +119,9 @@ export async function rejectSubmissionAction(
   }
 
   // Update the submission - reset to available so user can try again
-  const { error } = await supabase
-    .from('user_objectives')
+  // Type assertion to bypass Supabase type inference issues
+  const { error } = await (supabase
+    .from('user_objectives') as ReturnType<typeof supabase.from>)
     .update({
       status: 'available', // Reset to available so user can resubmit
       reviewed_by: roleCheck.userId,
@@ -128,7 +130,7 @@ export async function rejectSubmissionAction(
       evidence_text: null, // Clear previous evidence
       evidence_url: null,
       submitted_at: null,
-    })
+    } as Record<string, unknown>)
     .eq('id', userObjectiveId)
 
   if (error) {

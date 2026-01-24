@@ -28,7 +28,7 @@ async function fetchUserAchievements(): Promise<UserAchievementWithDetails[]> {
   }
 
   // Fetch all achievements
-  const { data: achievements, error: achievementsError } = await supabase
+  const { data: rawAchievements, error: achievementsError } = await supabase
     .from('achievements')
     .select('*')
     .order('points', { ascending: false })
@@ -37,7 +37,12 @@ async function fetchUserAchievements(): Promise<UserAchievementWithDetails[]> {
     throw achievementsError
   }
 
+  const achievements = (rawAchievements || []) as unknown as Achievement[]
+
   // Fetch user's earned achievements
+  // Type for query result
+  type UserAchievementResult = { achievement_id: string; earned_at: string }
+
   const { data: userAchievements, error: userAchievementsError } = await supabase
     .from('user_achievements')
     .select('*')
@@ -49,12 +54,13 @@ async function fetchUserAchievements(): Promise<UserAchievementWithDetails[]> {
 
   // Create a map of earned achievements
   const earnedMap = new Map<string, string>()
-  userAchievements?.forEach((ua) => {
+  const typedUserAchievements = (userAchievements || []) as unknown as UserAchievementResult[]
+  typedUserAchievements.forEach((ua) => {
     earnedMap.set(ua.achievement_id, ua.earned_at)
   })
 
   // Combine data
-  return (achievements || []).map((achievement) => ({
+  return achievements.map((achievement) => ({
     ...achievement,
     earned: earnedMap.has(achievement.id),
     earned_at: earnedMap.get(achievement.id) || null,
@@ -84,6 +90,9 @@ async function fetchEarnedAchievements(): Promise<(Achievement & { earned_at: st
   }
 
   // Fetch user's earned achievements with achievement details
+  // Type for joined query result
+  type EarnedAchievementResult = { earned_at: string; achievements: Achievement }
+
   const { data, error } = await supabase
     .from('user_achievements')
     .select(`
@@ -98,8 +107,9 @@ async function fetchEarnedAchievements(): Promise<(Achievement & { earned_at: st
   }
 
   // Transform the data
-  return (data || []).map((item) => ({
-    ...(item.achievements as Achievement),
+  const typedData = (data || []) as unknown as EarnedAchievementResult[]
+  return typedData.map((item) => ({
+    ...item.achievements,
     earned_at: item.earned_at,
   }))
 }
@@ -120,18 +130,26 @@ export function useEarnedAchievements() {
 async function fetchUserPublicAchievements(userId: string): Promise<(Achievement & { earned_at: string })[]> {
   const supabase = createClient()
 
+  // Type for privacy settings
+  type PrivacyResult = { show_stats: boolean; show_profile: boolean }
+
   // Check if user allows showing achievements
-  const { data: privacy } = await supabase
+  const { data: rawPrivacy } = await supabase
     .from('privacy_settings')
     .select('show_stats, show_profile')
     .eq('user_id', userId)
     .single()
+
+  const privacy = rawPrivacy as unknown as PrivacyResult | null
 
   if (!privacy?.show_stats || !privacy?.show_profile) {
     return []
   }
 
   // Fetch user's earned achievements with achievement details
+  // Type for joined query result
+  type EarnedAchievementResult = { earned_at: string; achievements: Achievement }
+
   const { data, error } = await supabase
     .from('user_achievements')
     .select(`
@@ -146,8 +164,9 @@ async function fetchUserPublicAchievements(userId: string): Promise<(Achievement
   }
 
   // Transform the data
-  return (data || []).map((item) => ({
-    ...(item.achievements as Achievement),
+  const typedData = (data || []) as unknown as EarnedAchievementResult[]
+  return typedData.map((item) => ({
+    ...item.achievements,
     earned_at: item.earned_at,
   }))
 }

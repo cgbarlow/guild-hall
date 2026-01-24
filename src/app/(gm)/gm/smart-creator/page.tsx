@@ -103,7 +103,7 @@ export default function SmartCreatorPage() {
                 <Sparkles className="h-4 w-4 text-primary-foreground" />
               </div>
               <div className="flex-1 bg-primary/10 rounded-lg p-3 text-sm space-y-2">
-                <p className="font-medium">Generated Quest: "The Hook Master's Journey"</p>
+                <p className="font-medium">Generated Quest: &quot;The Hook Master&apos;s Journey&quot;</p>
                 <p className="text-muted-foreground text-xs">
                   A structured learning path with 5 objectives covering useState, useEffect, useContext, custom hooks, and a final project...
                 </p>
@@ -121,7 +121,7 @@ export default function SmartCreatorPage() {
       {/* CTA */}
       <div className="text-center space-y-4">
         <p className="text-muted-foreground">
-          While we're working on this feature, you can still create quests manually
+          While we&apos;re working on this feature, you can still create quests manually
         </p>
         <div className="flex gap-4 justify-center">
           <Button asChild>
@@ -138,7 +138,7 @@ export default function SmartCreatorPage() {
         <CardContent className="py-8 text-center">
           <h3 className="font-medium mb-2">Want to be notified when this launches?</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            We'll let you know as soon as Smart Quest Creator is available
+            We&apos;ll let you know as soon as Smart Quest Creator is available
           </p>
           <Button variant="secondary" disabled>
             Notify Me (Coming Soon)

@@ -14,6 +14,11 @@ export interface UserQuestWithQuest extends UserQuestRow {
   completedObjectivesCount?: number
 }
 
+// Type for joined query result
+type UserQuestQueryResult = UserQuestRow & {
+  quests: Pick<QuestRow, 'id' | 'title' | 'description' | 'points' | 'status' | 'completion_days' | 'category_id'> | null
+}
+
 export interface UseUserQuestsOptions {
   status?: UserQuestStatus | UserQuestStatus[]
   enabled?: boolean
@@ -54,16 +59,18 @@ async function fetchUserQuests(
     }
   }
 
-  const { data, error } = await query
+  const { data: rawData, error } = await query
 
   if (error) {
     throw error
   }
 
+  const data = (rawData || []) as unknown as UserQuestQueryResult[]
+
   // Transform the data to match our interface
-  return (data || []).map((item) => ({
+  return data.map((item) => ({
     ...item,
-    quest: item.quests as UserQuestWithQuest['quest'],
+    quest: item.quests,
     quests: undefined,
   })) as UserQuestWithQuest[]
 }

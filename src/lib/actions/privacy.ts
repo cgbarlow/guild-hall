@@ -24,9 +24,10 @@ export async function updatePrivacySettings(formData: FormData): Promise<Privacy
   const parsed = privacySettingsSchema.safeParse(rawData)
   if (!parsed.success) return { success: false, error: parsed.error.errors[0]?.message || 'Invalid data' }
 
-  const { error } = await supabase
-    .from('privacy_settings')
-    .update({ ...parsed.data, updated_at: new Date().toISOString() })
+  // Type assertion to bypass Supabase type inference issues
+  const { error } = await (supabase
+    .from('privacy_settings') as ReturnType<typeof supabase.from>)
+    .update({ ...parsed.data, updated_at: new Date().toISOString() } as Record<string, unknown>)
     .eq('user_id', user.id)
 
   if (error) return { success: false, error: error.message }
