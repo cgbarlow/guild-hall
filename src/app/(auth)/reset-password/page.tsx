@@ -1,10 +1,11 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ResetPasswordForm } from '@/components/auth/reset-password-form'
 import { UpdatePasswordForm } from '@/components/auth/update-password-form'
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const searchParams = useSearchParams()
   const isUpdateMode = searchParams.get('update') === 'true'
 
@@ -15,5 +16,13 @@ export default function ResetPasswordPage() {
       </h1>
       {isUpdateMode ? <UpdatePasswordForm /> : <ResetPasswordForm />}
     </>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="text-center">Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }
