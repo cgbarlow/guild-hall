@@ -31,10 +31,6 @@ GMs design quests with objectives, deadlines, and rewards. Users browse the **Bo
 ![Quest Detail Mockup](docs/mock-ups/02-quest-detail.jpg)
 *Track progress through objectives, submit evidence, earn points.*
 
-### GM Dashboard
-![GM Dashboard Mockup](docs/mock-ups/03-gm-dashboard.jpg)
-*Review submissions, manage quests, monitor guild activity.*
-
 ### Leaderboard
 ![Leaderboard Mockup](docs/mock-ups/04-leaderboard.jpg)
 *Compete for rankings, track progress, celebrate top questers.*
@@ -42,6 +38,10 @@ GMs design quests with objectives, deadlines, and rewards. Users browse the **Bo
 ### Hall of Fame
 ![Hall of Fame Mockup](docs/mock-ups/05-hall-of-fame.jpg)
 *Permanent recognition for legendary achievements and quest firsts.*
+
+### GM Dashboard
+![GM Dashboard Mockup](docs/mock-ups/03-gm-dashboard.jpg)
+*Review submissions, manage quests, monitor guild activity.*
 
 ---
 
