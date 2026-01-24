@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/auth-context'
 import { createClient } from '@/lib/supabase/client'
+import { NotificationBell } from '@/components/notifications/notification-bell'
 
 export function GMHeader() {
   const { user } = useAuth()
@@ -42,6 +43,7 @@ export function GMHeader() {
           <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
             Exit GM
           </Link>
+          {user && <NotificationBell />}
           {user && (
             <Button variant="outline" size="sm" onClick={handleLogout}>
               Sign out

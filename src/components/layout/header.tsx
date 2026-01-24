@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/auth-context'
 import { createClient } from '@/lib/supabase/client'
 import { ThemeToggleCompact } from '@/components/settings/theme-toggle'
+import { NotificationBell } from '@/components/notifications/notification-bell'
 
 export function Header() {
   const { user } = useAuth()
@@ -35,6 +36,7 @@ export function Header() {
           <Link href="/settings/appearance" className="text-sm hover:underline">
             Settings
           </Link>
+          {user && <NotificationBell />}
           <ThemeToggleCompact />
           {user && (
             <Button variant="outline" size="sm" onClick={handleLogout}>
