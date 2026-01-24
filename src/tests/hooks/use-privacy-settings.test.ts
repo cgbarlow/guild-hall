@@ -2,20 +2,20 @@ import { describe, it, expect } from 'vitest'
 
 describe('usePrivacySettings hook interface', () => {
   it('exports usePrivacySettings function', async () => {
-    const module = await import('@/lib/hooks/use-privacy-settings')
-    expect(typeof module.usePrivacySettings).toBe('function')
+    const privacyModule = await import('@/lib/hooks/use-privacy-settings')
+    expect(typeof privacyModule.usePrivacySettings).toBe('function')
   })
 
   it('exports useUpdatePrivacySettings function', async () => {
-    const module = await import('@/lib/hooks/use-privacy-settings')
-    expect(typeof module.useUpdatePrivacySettings).toBe('function')
+    const privacyModule = await import('@/lib/hooks/use-privacy-settings')
+    expect(typeof privacyModule.useUpdatePrivacySettings).toBe('function')
   })
 })
 
 describe('privacy schema', () => {
   it('exports privacySettingsSchema', async () => {
-    const module = await import('@/lib/schemas/privacy.schema')
-    expect(module.privacySettingsSchema).toBeDefined()
+    const schemaModule = await import('@/lib/schemas/privacy.schema')
+    expect(schemaModule.privacySettingsSchema).toBeDefined()
   })
 
   it('validates correct privacy settings', async () => {
