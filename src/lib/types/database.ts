@@ -18,6 +18,10 @@ export type Database = {
           email: string
           display_name: string | null
           avatar_url: string | null
+          bio: string | null
+          total_points: number
+          quests_completed: number
+          privacy_settings: Json | null
           created_at: string
           updated_at: string
         }
@@ -26,6 +30,10 @@ export type Database = {
           email: string
           display_name?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          total_points?: number
+          quests_completed?: number
+          privacy_settings?: Json | null
           created_at?: string
           updated_at?: string
         }
@@ -34,6 +42,10 @@ export type Database = {
           email?: string
           display_name?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          total_points?: number
+          quests_completed?: number
+          privacy_settings?: Json | null
           created_at?: string
           updated_at?: string
         }
@@ -192,12 +204,192 @@ export type Database = {
           }
         ]
       }
+      achievements: {
+        Row: {
+          id: string
+          name: string
+          description: string
+          icon: string
+          points: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description: string
+          icon?: string
+          points?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string
+          icon?: string
+          points?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          id: string
+          user_id: string
+          achievement_id: string
+          earned_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          achievement_id: string
+          earned_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          achievement_id?: string
+          earned_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'user_achievements_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_achievements_achievement_id_fkey'
+            columns: ['achievement_id']
+            isOneToOne: false
+            referencedRelation: 'achievements'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      profiles: {
+        Row: {
+          id: string
+          user_id: string
+          display_name: string | null
+          bio: string | null
+          avatar_url: string | null
+          total_points: number
+          quests_completed: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          display_name?: string | null
+          bio?: string | null
+          avatar_url?: string | null
+          total_points?: number
+          quests_completed?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          display_name?: string | null
+          bio?: string | null
+          avatar_url?: string | null
+          total_points?: number
+          quests_completed?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'profiles_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: true
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      privacy_settings: {
+        Row: {
+          id: string
+          user_id: string
+          show_profile: boolean
+          show_stats: boolean
+          show_activity: boolean
+          allow_guild_invites: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          show_profile?: boolean
+          show_stats?: boolean
+          show_activity?: boolean
+          allow_guild_invites?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          show_profile?: boolean
+          show_stats?: boolean
+          show_activity?: boolean
+          allow_guild_invites?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'privacy_settings_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: true
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_leaderboard_position: {
+        Args: { user_id: string }
+        Returns: { position: number } | null
+      }
+      export_user_data: {
+        Args: Record<string, never>
+        Returns: {
+          profile: {
+            display_name: string | null
+            bio: string | null
+            avatar_url: string | null
+            total_points: number
+            quests_completed: number
+          }
+          privacy_settings: {
+            show_profile: boolean
+            show_stats: boolean
+            show_activity: boolean
+            allow_guild_invites: boolean
+          }
+          guilds: Array<{
+            name: string
+            role: string
+            joined_at: string
+          }>
+          quests: Array<{
+            title: string
+            status: string
+            xp_reward: number
+            created_at: string
+          }>
+        }
+      }
     }
     Enums: {
       [_ in never]: never
