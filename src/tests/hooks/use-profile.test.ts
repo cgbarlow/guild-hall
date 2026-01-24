@@ -2,20 +2,20 @@ import { describe, it, expect } from 'vitest'
 
 describe('useProfile hook interface', () => {
   it('exports useProfile function', async () => {
-    const module = await import('@/lib/hooks/use-profile')
-    expect(typeof module.useProfile).toBe('function')
+    const profileModule = await import('@/lib/hooks/use-profile')
+    expect(typeof profileModule.useProfile).toBe('function')
   })
 
   it('exports useUpdateProfile function', async () => {
-    const module = await import('@/lib/hooks/use-profile')
-    expect(typeof module.useUpdateProfile).toBe('function')
+    const profileModule = await import('@/lib/hooks/use-profile')
+    expect(typeof profileModule.useUpdateProfile).toBe('function')
   })
 })
 
 describe('profile schema', () => {
   it('exports profileSchema', async () => {
-    const module = await import('@/lib/schemas/profile.schema')
-    expect(module.profileSchema).toBeDefined()
+    const schemaModule = await import('@/lib/schemas/profile.schema')
+    expect(schemaModule.profileSchema).toBeDefined()
   })
 
   it('validates correct profile data', async () => {
