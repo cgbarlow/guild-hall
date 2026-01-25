@@ -465,7 +465,7 @@ export type Database = {
           id: string
           user_id: string
           quest_id: string
-          status: 'accepted' | 'in_progress' | 'completed' | 'abandoned' | 'expired'
+          status: 'accepted' | 'in_progress' | 'ready_to_claim' | 'awaiting_final_approval' | 'completed' | 'abandoned' | 'expired'
           accepted_at: string
           started_at: string | null
           completed_at: string | null
@@ -483,7 +483,7 @@ export type Database = {
           id?: string
           user_id: string
           quest_id: string
-          status?: 'accepted' | 'in_progress' | 'completed' | 'abandoned' | 'expired'
+          status?: 'accepted' | 'in_progress' | 'ready_to_claim' | 'awaiting_final_approval' | 'completed' | 'abandoned' | 'expired'
           accepted_at?: string
           started_at?: string | null
           completed_at?: string | null
@@ -501,7 +501,7 @@ export type Database = {
           id?: string
           user_id?: string
           quest_id?: string
-          status?: 'accepted' | 'in_progress' | 'completed' | 'abandoned' | 'expired'
+          status?: 'accepted' | 'in_progress' | 'ready_to_claim' | 'awaiting_final_approval' | 'completed' | 'abandoned' | 'expired'
           accepted_at?: string
           started_at?: string | null
           completed_at?: string | null

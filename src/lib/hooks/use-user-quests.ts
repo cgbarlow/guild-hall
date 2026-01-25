@@ -9,14 +9,18 @@ type QuestRow = Database['public']['Tables']['quests']['Row']
 type UserQuestStatus = UserQuestRow['status']
 
 export interface UserQuestWithQuest extends UserQuestRow {
-  quest: Pick<QuestRow, 'id' | 'title' | 'description' | 'points' | 'status' | 'completion_days' | 'category_id'> | null
+  quest: Pick<QuestRow, 'id' | 'title' | 'description' | 'points' | 'status' | 'completion_days' | 'category_id'> & {
+    requires_final_approval?: boolean
+  } | null
   objectivesCount?: number
   completedObjectivesCount?: number
 }
 
 // Type for joined query result
 type UserQuestQueryResult = UserQuestRow & {
-  quests: Pick<QuestRow, 'id' | 'title' | 'description' | 'points' | 'status' | 'completion_days' | 'category_id'> | null
+  quests: Pick<QuestRow, 'id' | 'title' | 'description' | 'points' | 'status' | 'completion_days' | 'category_id'> & {
+    requires_final_approval?: boolean
+  } | null
 }
 
 export interface UseUserQuestsOptions {
@@ -44,7 +48,8 @@ async function fetchUserQuests(
         points,
         status,
         completion_days,
-        category_id
+        category_id,
+        requires_final_approval
       )
     `)
     .eq('user_id', userId)
@@ -116,9 +121,11 @@ export function getUserQuestStatusInfo(status: UserQuestStatus): {
   color: string
   variant: 'default' | 'secondary' | 'destructive' | 'outline'
 } {
-  const statusMap: Record<UserQuestStatus, { label: string; color: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+  const statusMap: Record<string, { label: string; color: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
     accepted: { label: 'Accepted', color: 'bg-blue-500', variant: 'secondary' },
     in_progress: { label: 'In Progress', color: 'bg-amber-500', variant: 'default' },
+    ready_to_claim: { label: 'Ready to Claim', color: 'bg-green-500', variant: 'default' },
+    awaiting_final_approval: { label: 'Awaiting Approval', color: 'bg-purple-500', variant: 'default' },
     completed: { label: 'Completed', color: 'bg-green-500', variant: 'default' },
     abandoned: { label: 'Abandoned', color: 'bg-gray-500', variant: 'outline' },
     expired: { label: 'Expired', color: 'bg-red-500', variant: 'destructive' },

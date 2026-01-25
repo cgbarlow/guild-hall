@@ -28,9 +28,10 @@ export async function POST() {
   }
 
   // Insert GM role (uses service role via RLS bypass for this dev endpoint)
-  const { error: insertError } = await supabase
-    .from('user_roles')
-    .insert({ user_id: user.id, role: 'gm' })
+  // Type assertion to bypass Supabase type inference issues
+  const { error: insertError } = await (supabase
+    .from('user_roles') as ReturnType<typeof supabase.from>)
+    .insert({ user_id: user.id, role: 'gm' } as Record<string, unknown>)
 
   if (insertError) {
     return NextResponse.json({

@@ -6,6 +6,7 @@ import { ArrowLeft, Award, Clock, Calendar, AlertCircle } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ProgressBar, ObjectiveChecklist } from '@/components/my-quests'
+import { ClaimRewardButton } from '@/components/my-quests/claim-reward-button'
 import { useUserQuests, getUserQuestStatusInfo } from '@/lib/hooks/use-user-quests'
 import { useUserObjectives } from '@/lib/hooks/use-user-objectives'
 import { cn } from '@/lib/utils'
@@ -111,6 +112,10 @@ export default function QuestProgressPage() {
   const progressPercentage = totalObjectives > 0
     ? Math.round((completedObjectives / totalObjectives) * 100)
     : 0
+
+  const isReadyToClaim = userQuest.status === 'ready_to_claim'
+  const isAwaitingApproval = userQuest.status === 'awaiting_final_approval'
+  const isCompleted = userQuest.status === 'completed'
 
   const handleSubmitEvidence = (objectiveId: string) => {
     // Navigate to evidence submission - to be implemented in Phase 4.4
@@ -236,6 +241,26 @@ export default function QuestProgressPage() {
 
           {/* Actions */}
           <div className="pt-4 border-t flex flex-wrap gap-3">
+            {isReadyToClaim && (
+              <ClaimRewardButton
+                userQuestId={userQuestId}
+                questTitle={userQuest.quest?.title || 'Quest'}
+                points={userQuest.quest?.points || 0}
+                requiresApproval={userQuest.quest?.requires_final_approval}
+              />
+            )}
+            {isAwaitingApproval && (
+              <div className="flex items-center gap-2 text-purple-600 font-medium">
+                <Clock className="h-5 w-5" />
+                <span>Awaiting GM final approval</span>
+              </div>
+            )}
+            {isCompleted && (
+              <div className="flex items-center gap-2 text-green-600 font-medium">
+                <Award className="h-5 w-5" />
+                <span>Quest completed! +{userQuest.quest?.points || 0} pts earned</span>
+              </div>
+            )}
             {userQuest.status === 'in_progress' && deadline && !userQuest.extension_requested && (
               <Button variant="outline" asChild>
                 <Link href={`/my-quests/${userQuestId}/extension`}>
@@ -244,6 +269,16 @@ export default function QuestProgressPage() {
               </Button>
             )}
           </div>
+
+          {/* Show final feedback if present */}
+          {(userQuest as { final_feedback?: string }).final_feedback && (
+            <div className="mt-4 p-4 rounded-lg bg-muted">
+              <h4 className="font-medium mb-1">GM Feedback</h4>
+              <p className="text-sm text-muted-foreground">
+                {(userQuest as { final_feedback?: string }).final_feedback}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

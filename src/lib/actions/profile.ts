@@ -28,9 +28,9 @@ export async function updateProfile(formData: FormData): Promise<ProfileActionRe
 
   // Type assertion to bypass Supabase type inference issues
   const { error } = await (supabase
-    .from('profiles') as ReturnType<typeof supabase.from>)
+    .from('users') as ReturnType<typeof supabase.from>)
     .update({ ...parsed.data, updated_at: new Date().toISOString() } as Record<string, unknown>)
-    .eq('user_id', user.id)
+    .eq('id', user.id)
 
   if (error) {
     return { success: false, error: error.message }

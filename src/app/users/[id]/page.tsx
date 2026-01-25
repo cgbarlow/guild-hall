@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
-import { fetchPublicProfile } from '@/lib/hooks/use-public-profile'
+import { fetchPublicProfile } from '@/lib/actions/public-profile'
 import { PublicProfileCard } from '@/components/profile/public-profile-card'
 
 interface PageProps {
@@ -15,8 +14,7 @@ interface PageProps {
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params
-  const supabase = await createClient()
-  const result = await fetchPublicProfile(supabase, id)
+  const result = await fetchPublicProfile(id)
 
   if (result.status !== 'success') {
     return {
@@ -48,8 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  */
 export default async function PublicProfilePage({ params }: PageProps) {
   const { id } = await params
-  const supabase = await createClient()
-  const result = await fetchPublicProfile(supabase, id)
+  const result = await fetchPublicProfile(id)
 
   // Handle different result statuses
   switch (result.status) {

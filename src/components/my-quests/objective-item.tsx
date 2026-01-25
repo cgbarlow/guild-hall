@@ -1,11 +1,22 @@
 'use client'
 
 import { useState } from 'react'
-import { Lock, Circle, Clock, CheckCircle2, XCircle, FileText, Check, Loader2 } from 'lucide-react'
+import { Lock, Circle, Clock, CheckCircle2, XCircle, FileText, Check, Loader2, Undo2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { DependencyIndicator } from './dependency-indicator'
 import { getUserObjectiveStatusInfo, type UserObjectiveWithDetails } from '@/lib/hooks/use-user-objectives'
 import { useMarkObjectiveComplete } from '@/lib/hooks/use-mark-objective-complete'
+import { useUncheckObjective } from '@/lib/hooks/use-uncheck-objective'
 import { cn } from '@/lib/utils'
 
 interface ObjectiveItemProps {
@@ -38,7 +49,33 @@ export function ObjectiveItem({
   const isCompleted = userObjective.status === 'approved'
 
   const markComplete = useMarkObjectiveComplete()
+  const uncheckObjective = useUncheckObjective()
   const [isMarking, setIsMarking] = useState(false)
+  const [showUndoConfirm, setShowUndoConfirm] = useState(false)
+
+  // Determine if undo is available (not locked status)
+  const canUndo = userObjective.status !== 'locked' && userObjective.status !== 'available'
+  const needsConfirmation = userObjective.status === 'submitted' || userObjective.status === 'approved'
+
+  const handleUndo = async () => {
+    if (needsConfirmation) {
+      setShowUndoConfirm(true)
+    } else {
+      await performUndo()
+    }
+  }
+
+  const performUndo = async () => {
+    setShowUndoConfirm(false)
+    try {
+      const result = await uncheckObjective.mutateAsync(userObjective.id)
+      if (!result.success) {
+        console.error('Failed to undo objective:', result.error)
+      }
+    } catch (error) {
+      console.error('Failed to undo objective:', error)
+    }
+  }
 
   const handleMarkComplete = async () => {
     setIsMarking(true)
@@ -105,42 +142,94 @@ export function ObjectiveItem({
               {statusInfo.label}
             </span>
 
-            {/* Submit Evidence Button */}
-            {canSubmit && onSubmitEvidence && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onSubmitEvidence(userObjective.objective_id)}
-              >
-                <FileText className="h-4 w-4 mr-1" />
-                Submit Evidence
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {/* Undo Button */}
+              {canUndo && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleUndo}
+                  disabled={uncheckObjective.isPending}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  {uncheckObjective.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Undo2 className="h-4 w-4" />
+                  )}
+                  <span className="ml-1 sr-only sm:not-sr-only">Undo</span>
+                </Button>
+              )}
 
-            {/* Mark Complete Button (for objectives without evidence requirement) */}
-            {canMarkComplete && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleMarkComplete}
-                disabled={isMarking}
-              >
-                {isMarking ? (
-                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                ) : (
-                  <Check className="h-4 w-4 mr-1" />
-                )}
-                Mark Complete
-              </Button>
-            )}
+              {/* Submit Evidence Button */}
+              {canSubmit && onSubmitEvidence && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onSubmitEvidence(userObjective.objective_id)}
+                >
+                  <FileText className="h-4 w-4 mr-1" />
+                  Submit Evidence
+                </Button>
+              )}
 
-            {/* Show submitted evidence indicator */}
-            {userObjective.status === 'submitted' && (
-              <span className="text-xs text-amber-500">
-                Awaiting GM review
-              </span>
-            )}
+              {/* Mark Complete Button (for objectives without evidence requirement) */}
+              {canMarkComplete && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleMarkComplete}
+                  disabled={isMarking}
+                >
+                  {isMarking ? (
+                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                  ) : (
+                    <Check className="h-4 w-4 mr-1" />
+                  )}
+                  Mark Complete
+                </Button>
+              )}
+
+              {/* Show submitted evidence indicator */}
+              {userObjective.status === 'submitted' && (
+                <span className="text-xs text-amber-500">
+                  Awaiting GM review
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* Undo Confirmation Dialog */}
+          <AlertDialog open={showUndoConfirm} onOpenChange={setShowUndoConfirm}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Undo Objective?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {userObjective.status === 'submitted' ? (
+                    <>
+                      This will cancel your evidence submission for &ldquo;{userObjective.objective?.title}&rdquo;.
+                      Your submitted evidence will be removed.
+                    </>
+                  ) : userObjective.status === 'approved' ? (
+                    <>
+                      This will reset &ldquo;{userObjective.objective?.title}&rdquo; back to available.
+                      You will need to complete it again.
+                    </>
+                  ) : (
+                    <>
+                      This will reset &ldquo;{userObjective.objective?.title}&rdquo; back to available.
+                    </>
+                  )}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={performUndo}>
+                  Undo
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {/* Feedback from GM */}
           {userObjective.feedback && (
