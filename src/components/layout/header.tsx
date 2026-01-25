@@ -5,11 +5,13 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/auth-context'
+import { useIsGm } from '@/lib/hooks/use-is-gm'
 import { createClient } from '@/lib/supabase/client'
 import { NotificationBell } from '@/components/notifications/notification-bell'
 
 export function Header() {
   const { user } = useAuth()
+  const { data: isGm } = useIsGm()
   const router = useRouter()
   const supabase = createClient()
 
@@ -38,9 +40,11 @@ export function Header() {
         </Link>
 
         <nav className="flex items-center gap-4">
-          <Link href="/gm" className="text-sm hover:underline">
-            GM
-          </Link>
+          {isGm && (
+            <Link href="/gm" className="text-sm hover:underline">
+              GM
+            </Link>
+          )}
           <Link href="/settings/appearance" className="text-sm hover:underline">
             Settings
           </Link>

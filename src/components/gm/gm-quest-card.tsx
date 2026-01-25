@@ -71,18 +71,20 @@ export function GMQuestCard({ quest, className, onArchive, onDelete }: GMQuestCa
     <Link href={`/gm/quests/${quest.id}`} className="block">
     <Card className={cn('h-full transition-colors hover:bg-muted/50', className)}>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex flex-col gap-2 flex-1 min-w-0">
-            {quest.category && <CategoryBadge category={quest.category} />}
-            <CardTitle className="text-lg leading-tight break-words">{quest.title}</CardTitle>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              {quest.category && <CategoryBadge category={quest.category} className="flex-shrink-0" />}
+              {quest.featured && (
+                <Badge variant="outline" className="border-amber-500 text-amber-600 bg-amber-50 flex-shrink-0">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Featured
+                </Badge>
+              )}
+            </div>
+            <CardTitle className="text-lg leading-tight line-clamp-2">{quest.title}</CardTitle>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {quest.featured && (
-              <Badge variant="outline" className="border-amber-500 text-amber-600 bg-amber-50">
-                <Sparkles className="h-3 w-3 mr-1" />
-                Featured
-              </Badge>
-            )}
+          <div className="flex items-center gap-1 flex-shrink-0">
             <Badge variant={getStatusBadgeVariant(status)}>
               {getStatusLabel(status)}
             </Badge>
