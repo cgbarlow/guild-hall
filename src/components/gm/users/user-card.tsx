@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 
 interface UserCardProps {
   user: UserWithRole
+  isCurrentUser?: boolean
   className?: string
 }
 
@@ -33,11 +34,11 @@ function formatDate(dateString: string): string {
   })
 }
 
-export function UserCard({ user, className }: UserCardProps) {
+export function UserCard({ user, isCurrentUser, className }: UserCardProps) {
   const roleBadge = getRoleBadge(user.role)
 
   return (
-    <Card className={cn('hover:border-primary/50 transition-colors', className)}>
+    <Card className={cn('hover:border-primary/50 transition-colors', isCurrentUser && 'ring-2 ring-primary/50', className)}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -56,6 +57,7 @@ export function UserCard({ user, className }: UserCardProps) {
             <div className="min-w-0">
               <CardTitle className="text-base leading-tight truncate">
                 {user.display_name || 'Anonymous'}
+                {isCurrentUser && <span className="ml-2 text-xs text-primary font-normal">(You)</span>}
               </CardTitle>
               <p className="text-xs text-muted-foreground truncate">
                 {user.email}

@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 import { useAllUsers } from '@/lib/hooks/use-all-users'
 import { useDebounce } from '@/lib/hooks/use-debounce'
+import { useAuth } from '@/contexts/auth-context'
 
 function UserCardSkeleton() {
   return (
@@ -43,6 +44,7 @@ function UserCardSkeleton() {
 export function UserList() {
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<'all' | 'gm' | 'admin' | 'member'>('all')
+  const { user: currentUser } = useAuth()
 
   const debouncedSearch = useDebounce(searchQuery, 300)
 
@@ -113,7 +115,7 @@ export function UserList() {
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {users.map((user) => (
-              <UserCard key={user.id} user={user} />
+              <UserCard key={user.id} user={user} isCurrentUser={user.id === currentUser?.id} />
             ))}
           </div>
         </>
