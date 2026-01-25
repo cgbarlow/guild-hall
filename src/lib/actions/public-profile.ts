@@ -16,7 +16,13 @@ type UserQueryResult = {
   bio: string | null
   total_points: number | null
   quests_completed: number | null
-  privacy_settings: PrivacySettings | string | null
+}
+
+// Type for privacy settings from table
+type PrivacySettingsRow = {
+  profile_public: boolean
+  show_on_leaderboard: boolean
+  show_badges: boolean
 }
 
 // Type for user achievements query result
@@ -37,15 +43,6 @@ type UserAchievementQueryResult = {
 const DEFAULT_DISPLAY_NAME = 'Anonymous Adventurer'
 
 /**
- * Default privacy settings when not set
- */
-const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
-  profile_visibility: false,
-  show_achievements: false,
-  show_on_leaderboard: false,
-}
-
-/**
  * Server-side function to fetch a public profile
  * Used for SSR/SEO purposes in server components
  *
@@ -55,18 +52,10 @@ const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
 export async function fetchPublicProfile(userId: string): Promise<PublicProfileResult> {
   const supabase = await createClient()
 
-  // Fetch the user profile with privacy settings
+  // Fetch the user profile
   const { data: rawUserData, error: userError } = await supabase
     .from('users')
-    .select(`
-      id,
-      display_name,
-      avatar_url,
-      bio,
-      total_points,
-      quests_completed,
-      privacy_settings
-    `)
+    .select('id, display_name, avatar_url, bio, total_points, quests_completed')
     .eq('id', userId)
     .single()
 
@@ -84,14 +73,17 @@ export async function fetchPublicProfile(userId: string): Promise<PublicProfileR
 
   const userData = rawUserData as unknown as UserQueryResult
 
-  // Parse privacy settings
-  const privacySettings: PrivacySettings =
-    typeof userData.privacy_settings === 'string'
-      ? JSON.parse(userData.privacy_settings)
-      : userData.privacy_settings ?? DEFAULT_PRIVACY_SETTINGS
+  // Fetch privacy settings from the privacy_settings TABLE
+  const { data: privacyData } = await supabase
+    .from('privacy_settings')
+    .select('profile_public, show_on_leaderboard, show_badges')
+    .eq('user_id', userId)
+    .single()
 
-  // Check if profile is visible
-  if (!privacySettings.profile_visibility) {
+  const privacySettings = privacyData as PrivacySettingsRow | null
+
+  // Check if profile is visible (default to true if no privacy settings exist)
+  if (privacySettings && !privacySettings.profile_public) {
     return { status: 'private' }
   }
 
@@ -106,8 +98,9 @@ export async function fetchPublicProfile(userId: string): Promise<PublicProfileR
     achievements: [],
   }
 
-  // Fetch achievements if allowed
-  if (privacySettings.show_achievements) {
+  // Fetch achievements if allowed (default to true if no privacy settings)
+  const showBadges = privacySettings?.show_badges ?? true
+  if (showBadges) {
     const { data: rawAchievementsData } = await supabase
       .from('user_achievements')
       .select(`
@@ -137,8 +130,9 @@ export async function fetchPublicProfile(userId: string): Promise<PublicProfileR
     }
   }
 
-  // Fetch leaderboard position if allowed
-  if (privacySettings.show_on_leaderboard) {
+  // Fetch leaderboard position if allowed (default to true if no privacy settings)
+  const showOnLeaderboard = privacySettings?.show_on_leaderboard ?? true
+  if (showOnLeaderboard) {
     // Type assertion needed due to Supabase type inference issues
     const { data: leaderboardData } = await (supabase as unknown as {
       rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown }>

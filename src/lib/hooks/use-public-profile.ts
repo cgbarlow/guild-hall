@@ -6,7 +6,6 @@ import type {
   PublicProfile,
   PublicProfileResult,
   Achievement,
-  PrivacySettings,
 } from '@/lib/types/public-profile'
 
 // Type for user query result
@@ -17,7 +16,13 @@ type UserQueryResult = {
   bio: string | null
   total_points: number | null
   quests_completed: number | null
-  privacy_settings: PrivacySettings | string | null
+}
+
+// Type for privacy settings from table
+type PrivacySettingsRow = {
+  profile_public: boolean
+  show_on_leaderboard: boolean
+  show_badges: boolean
 }
 
 // Type for user achievements query result
@@ -44,20 +49,11 @@ export const publicProfileQueryKey = (userId: string) =>
 const DEFAULT_DISPLAY_NAME = 'Anonymous Adventurer'
 
 /**
- * Default privacy settings when not set
- */
-const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
-  profile_visibility: false,
-  show_achievements: false,
-  show_on_leaderboard: false,
-}
-
-/**
  * Hook to fetch a public user profile by user ID
  *
- * Respects privacy settings:
- * - Returns 'private' status if profile_visibility is false
- * - Only includes achievements if show_achievements is true
+ * Respects privacy settings from privacy_settings TABLE:
+ * - Returns 'private' status if profile_public is false
+ * - Only includes achievements if show_badges is true
  * - Only includes leaderboard_position if show_on_leaderboard is true
  *
  * @param userId - The ID of the user to fetch
@@ -69,24 +65,15 @@ export function usePublicProfile(userId: string) {
   return useQuery<PublicProfileResult>({
     queryKey: publicProfileQueryKey(userId),
     queryFn: async (): Promise<PublicProfileResult> => {
-      // Fetch the user profile with privacy settings
+      // Fetch the user profile
       const { data: rawUserData, error: userError } = await supabase
         .from('users')
-        .select(`
-          id,
-          display_name,
-          avatar_url,
-          bio,
-          total_points,
-          quests_completed,
-          privacy_settings
-        `)
+        .select('id, display_name, avatar_url, bio, total_points, quests_completed')
         .eq('id', userId)
         .single()
 
       // Handle errors
       if (userError) {
-        // Check if it's a "not found" error
         if (userError.code === 'PGRST116') {
           return { status: 'not_found' }
         }
@@ -99,14 +86,17 @@ export function usePublicProfile(userId: string) {
 
       const userData = rawUserData as unknown as UserQueryResult
 
-      // Parse privacy settings (handle both JSON string and object)
-      const privacySettings: PrivacySettings =
-        typeof userData.privacy_settings === 'string'
-          ? JSON.parse(userData.privacy_settings)
-          : userData.privacy_settings ?? DEFAULT_PRIVACY_SETTINGS
+      // Fetch privacy settings from the privacy_settings TABLE
+      const { data: privacyData } = await supabase
+        .from('privacy_settings')
+        .select('profile_public, show_on_leaderboard, show_badges')
+        .eq('user_id', userId)
+        .single()
 
-      // Check if profile is visible
-      if (!privacySettings.profile_visibility) {
+      const privacySettings = privacyData as PrivacySettingsRow | null
+
+      // Check if profile is visible (default to true if no privacy settings exist)
+      if (privacySettings && !privacySettings.profile_public) {
         return { status: 'private' }
       }
 
@@ -121,8 +111,9 @@ export function usePublicProfile(userId: string) {
         achievements: [],
       }
 
-      // Fetch achievements if allowed
-      if (privacySettings.show_achievements) {
+      // Fetch achievements if allowed (default to true if no privacy settings)
+      const showBadges = privacySettings?.show_badges ?? true
+      if (showBadges) {
         const { data: rawAchievementsData } = await supabase
           .from('user_achievements')
           .select(`
@@ -152,15 +143,15 @@ export function usePublicProfile(userId: string) {
         }
       }
 
-      // Fetch leaderboard position if allowed
-      if (privacySettings.show_on_leaderboard) {
+      // Fetch leaderboard position if allowed (default to true if no privacy settings)
+      const showOnLeaderboard = privacySettings?.show_on_leaderboard ?? true
+      if (showOnLeaderboard) {
         // Type assertion needed due to Supabase type inference issues
         const { data: leaderboardData } = await (supabase as unknown as {
           rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown }>
         }).rpc('get_leaderboard_position', { user_id: userId })
 
         if (leaderboardData) {
-          // Handle both direct position and object with position property
           publicProfile.leaderboard_position =
             typeof leaderboardData === 'number'
               ? leaderboardData

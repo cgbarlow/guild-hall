@@ -24,7 +24,7 @@ export default function ProfilePage() {
           {profile.bio && <p className="text-muted-foreground mt-1">{profile.bio}</p>}
         </div>
       </div>
-      <ProfileStats totalPoints={profile.total_points} questsCompleted={profile.quests_completed} />
+      <ProfileStats totalPoints={profile.total_points ?? 0} questsCompleted={profile.quests_completed ?? 0} />
 
       {/* Activity Feed (FR9.5) */}
       <ActivityFeed
