@@ -38,6 +38,13 @@ async function fetchGMQuests(filters?: GMQuestFilters): Promise<Quest[]> {
     filtered = filtered.filter(q => !q.is_template)
   }
 
+  // Sort: featured first, then by created_at descending
+  filtered.sort((a, b) => {
+    if (a.featured && !b.featured) return -1
+    if (!a.featured && b.featured) return 1
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  })
+
   return filtered
 }
 
