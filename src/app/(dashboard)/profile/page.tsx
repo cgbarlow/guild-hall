@@ -1,9 +1,9 @@
 'use client'
 
-import { ProfileAvatar } from '@/components/profile/profile-avatar'
 import { ProfileStats } from '@/components/profile/profile-stats'
 import { ProfileForm } from '@/components/profile/profile-form'
 import { ActivityFeed } from '@/components/activity/activity-feed'
+import { AvatarUpload } from '@/components/profile/avatar-upload'
 import { useProfile } from '@/lib/hooks/use-profile'
 import { useUserActivity } from '@/lib/hooks/use-user-activity'
 
@@ -17,9 +17,13 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-6">
-        <ProfileAvatar avatarUrl={profile.avatar_url} displayName={profile.display_name} size="lg" />
-        <div>
+      <div className="flex items-start gap-6">
+        <AvatarUpload
+          currentAvatarUrl={profile.avatar_url}
+          displayName={profile.display_name}
+          compact
+        />
+        <div className="flex-1">
           <h1 className="text-2xl font-bold">{profile.display_name || 'Unnamed User'}</h1>
           {profile.bio && <p className="text-muted-foreground mt-1">{profile.bio}</p>}
         </div>
