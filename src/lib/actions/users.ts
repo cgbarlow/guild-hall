@@ -38,6 +38,10 @@ export interface GetAllUsersOptions {
 export async function getAllUsers(options: GetAllUsersOptions = {}): Promise<UserWithRole[]> {
   const supabase = await createClient()
 
+  // Debug: Check current user
+  const { data: { user: currentUser } } = await supabase.auth.getUser()
+  console.log('[getAllUsers] Current user:', currentUser?.id, currentUser?.email)
+
   let query = supabase
     .from('users')
     .select(`
@@ -56,9 +60,11 @@ export async function getAllUsers(options: GetAllUsersOptions = {}): Promise<Use
   const { data, error } = await query
 
   if (error) {
-    console.error('Error fetching users:', error)
+    console.error('[getAllUsers] Error fetching users:', error)
     return []
   }
+
+  console.log('[getAllUsers] Raw data count:', data?.length ?? 0)
 
   // Transform the data
   let users = (data || []).map((item: Record<string, unknown>) => {
