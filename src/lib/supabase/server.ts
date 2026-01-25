@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/database.types'
 
@@ -47,5 +48,22 @@ export function isSupabaseConfigured(): boolean {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+}
+
+/**
+ * Create a Supabase client with service role key (bypasses RLS)
+ * Only use this for server-side operations that need admin access
+ */
+export function createServiceClient() {
+  return createSupabaseClient<Database>(
+    SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key',
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
   )
 }

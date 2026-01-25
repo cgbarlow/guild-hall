@@ -7,17 +7,19 @@ import { QuestSearch } from '@/components/quests/quest-search'
 import { useQuests } from '@/lib/hooks/use-quests'
 import { useCategories } from '@/lib/hooks/use-categories'
 import { useDebounce } from '@/lib/hooks/use-debounce'
+import { useUserActiveQuestIds } from '@/lib/hooks/use-user-active-quest-ids'
 
 export default function QuestsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const debouncedSearch = useDebounce(searchQuery, 300)
 
-  const { data: categories = [], isLoading: categoriesLoading } = useCategories()
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories({ onlyWithQuests: true })
   const { data: quests, isLoading: questsLoading, error } = useQuests({
     category_id: selectedCategory ?? undefined,
     search: debouncedSearch || undefined,
   })
+  const { data: activeQuestIds } = useUserActiveQuestIds()
 
   return (
     <div className="space-y-6">
@@ -51,7 +53,7 @@ export default function QuestsPage() {
           </p>
         </div>
       ) : (
-        <QuestList quests={quests || []} isLoading={questsLoading} />
+        <QuestList quests={quests || []} isLoading={questsLoading} activeQuestIds={activeQuestIds} />
       )}
     </div>
   )

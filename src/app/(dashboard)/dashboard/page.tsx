@@ -1,5 +1,7 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { FeaturedQuests } from '@/components/dashboard/featured-quests'
 
 export const metadata = {
   title: 'Dashboard | Guild Hall',
@@ -13,6 +15,8 @@ export default async function DashboardPage() {
   // Fetch user profile - handle cases where profile may not exist yet
   let displayName = user?.email || 'User'
   let points = 0
+  let activeQuestsCount = 0
+  let completedQuestsCount = 0
 
   if (user?.id) {
     const { data: profile } = await supabase
@@ -24,6 +28,18 @@ export default async function DashboardPage() {
     if (profile) {
       displayName = (profile as { display_name?: string; points?: number }).display_name || displayName
       points = (profile as { display_name?: string; points?: number }).points || 0
+    }
+
+    // Fetch user quests for stats
+    const { data: userQuests } = await supabase
+      .from('user_quests')
+      .select('id, status')
+      .eq('user_id', user.id)
+
+    if (userQuests) {
+      const quests = userQuests as { id: string; status: string }[]
+      activeQuestsCount = quests.filter(q => ['accepted', 'in_progress'].includes(q.status)).length
+      completedQuestsCount = quests.filter(q => q.status === 'completed').length
     }
   }
 
@@ -47,15 +63,17 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Active Quests</CardTitle>
-            <CardDescription>Quests in progress</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">0</p>
-          </CardContent>
-        </Card>
+        <Link href="/my-quests">
+          <Card className="transition-colors hover:bg-muted/50 cursor-pointer">
+            <CardHeader>
+              <CardTitle>Active Quests</CardTitle>
+              <CardDescription>Quests in progress</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{activeQuestsCount}</p>
+            </CardContent>
+          </Card>
+        </Link>
 
         <Card>
           <CardHeader>
@@ -63,22 +81,12 @@ export default async function DashboardPage() {
             <CardDescription>Quests completed</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">0</p>
+            <p className="text-3xl font-bold">{completedQuestsCount}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Available Quests</CardTitle>
-          <CardDescription>Browse and accept new quests</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            No quests available yet. Check back soon!
-          </p>
-        </CardContent>
-      </Card>
+      <FeaturedQuests />
     </div>
   )
 }

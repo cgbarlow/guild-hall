@@ -38,9 +38,19 @@ export interface Objective {
   depends_on_id: string | null
   evidence_required: boolean
   evidence_type: 'none' | 'text' | 'link' | 'text_or_link'
+  resource_url: string | null
   created_at: string
   updated_at: string
 }
+
+// Resource link type for quest resources
+export interface QuestResource {
+  title: string
+  url: string
+}
+
+// Difficulty levels
+export type QuestDifficulty = 'Apprentice' | 'Journeyman' | 'Expert' | 'Master'
 
 // Extended quest type with additional fields for display
 export interface Quest {
@@ -62,6 +72,10 @@ export interface Quest {
   narrative_context: string | null
   transformation_goal: string | null
   reward_description: string | null
+  difficulty: QuestDifficulty
+  resources: QuestResource[]
+  design_notes: string | null
+  featured: boolean
   created_by: string
   created_at: string
   updated_at: string

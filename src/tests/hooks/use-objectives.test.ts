@@ -150,6 +150,7 @@ describe('useCreateObjective', () => {
       depends_on_id: null,
       evidence_required: false,
       evidence_type: 'none',
+      resource_url: null,
     }
 
     await act(async () => {
@@ -183,6 +184,7 @@ describe('useCreateObjective', () => {
         display_order: 0,
         evidence_required: false,
         evidence_type: 'none',
+        resource_url: null,
       })
     })
 

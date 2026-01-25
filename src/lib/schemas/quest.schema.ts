@@ -1,6 +1,20 @@
 import { z } from 'zod'
 
 /**
+ * Quest difficulty levels
+ */
+export const questDifficultyEnum = z.enum(['Apprentice', 'Journeyman', 'Expert', 'Master'])
+export type QuestDifficultyType = z.infer<typeof questDifficultyEnum>
+
+/**
+ * Schema for quest resource links
+ */
+export const questResourceSchema = z.object({
+  title: z.string().min(1, 'Resource title is required').max(100),
+  url: z.string().url('Must be a valid URL'),
+})
+
+/**
  * Schema for creating/updating quest basic info
  */
 export const questSchema = z.object({
@@ -25,6 +39,13 @@ export const questSchema = z.object({
     .max(500, 'Reward description must be 500 characters or less')
     .nullable()
     .optional(),
+  difficulty: questDifficultyEnum.default('Apprentice'),
+  resources: z.array(questResourceSchema).default([]),
+  design_notes: z
+    .string()
+    .max(2000, 'Design notes must be 2000 characters or less')
+    .nullable()
+    .optional(),
   acceptance_deadline: z.string().datetime().nullable().optional(),
   completion_days: z
     .number()
@@ -45,6 +66,7 @@ export const questSchema = z.object({
     .optional(),
   is_template: z.boolean().optional().default(false),
   template_id: z.string().uuid('Invalid template').nullable().optional(),
+  featured: z.boolean().optional().default(false),
 })
 
 /**
@@ -65,12 +87,16 @@ export const createQuestSchema = z.object({
   category_id: z.string().uuid().nullable().optional(),
   points: z.number().int().min(0).max(10000).default(100),
   reward_description: z.string().max(500).nullable().optional(),
+  difficulty: questDifficultyEnum.default('Apprentice'),
+  resources: z.array(questResourceSchema).default([]),
+  design_notes: z.string().max(2000).nullable().optional(),
   acceptance_deadline: z.string().datetime().nullable().optional(),
   completion_days: z.number().int().min(1).max(365).nullable().optional(),
   narrative_context: z.string().max(1000).nullable().optional(),
   transformation_goal: z.string().max(500).nullable().optional(),
   is_template: z.boolean().optional().default(false),
   template_id: z.string().uuid().nullable().optional(),
+  featured: z.boolean().optional().default(false),
 })
 
 /**
@@ -118,6 +144,15 @@ export const objectiveSchema = z.object({
   evidence_type: z
     .enum(['none', 'text', 'link', 'text_or_link'])
     .default('none'),
+  resource_url: z
+    .string()
+    .max(500, 'URL must be 500 characters or less')
+    .refine((val) => !val || val.startsWith('http://') || val.startsWith('https://'), {
+      message: 'Must be a valid URL starting with http:// or https://',
+    })
+    .nullable()
+    .optional()
+    .transform((val) => val || null),
 })
 
 /**

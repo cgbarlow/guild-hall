@@ -1,9 +1,11 @@
 'use client'
 
-import { Lock, Circle, Clock, CheckCircle2, XCircle, FileText } from 'lucide-react'
+import { useState } from 'react'
+import { Lock, Circle, Clock, CheckCircle2, XCircle, FileText, Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DependencyIndicator } from './dependency-indicator'
 import { getUserObjectiveStatusInfo, type UserObjectiveWithDetails } from '@/lib/hooks/use-user-objectives'
+import { useMarkObjectiveComplete } from '@/lib/hooks/use-mark-objective-complete'
 import { cn } from '@/lib/utils'
 
 interface ObjectiveItemProps {
@@ -30,8 +32,24 @@ export function ObjectiveItem({
   const statusInfo = getUserObjectiveStatusInfo(userObjective.status)
   const StatusIcon = statusIcons[statusInfo.icon]
   const isLocked = userObjective.status === 'locked'
-  const canSubmit = userObjective.status === 'available' && userObjective.objective?.evidence_required
+  const requiresEvidence = userObjective.objective?.evidence_required
+  const canSubmit = userObjective.status === 'available' && requiresEvidence
+  const canMarkComplete = userObjective.status === 'available' && !requiresEvidence
   const isCompleted = userObjective.status === 'approved'
+
+  const markComplete = useMarkObjectiveComplete()
+  const [isMarking, setIsMarking] = useState(false)
+
+  const handleMarkComplete = async () => {
+    setIsMarking(true)
+    try {
+      await markComplete.mutateAsync(userObjective.id)
+    } catch (error) {
+      console.error('Failed to mark objective complete:', error)
+    } finally {
+      setIsMarking(false)
+    }
+  }
 
   return (
     <div
@@ -96,6 +114,23 @@ export function ObjectiveItem({
               >
                 <FileText className="h-4 w-4 mr-1" />
                 Submit Evidence
+              </Button>
+            )}
+
+            {/* Mark Complete Button (for objectives without evidence requirement) */}
+            {canMarkComplete && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleMarkComplete}
+                disabled={isMarking}
+              >
+                {isMarking ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4 mr-1" />
+                )}
+                Mark Complete
               </Button>
             )}
 

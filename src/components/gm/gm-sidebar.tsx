@@ -32,7 +32,7 @@ const sidebarItems: SidebarItem[] = [
     icon: <Scroll className="h-5 w-5" />,
   },
   {
-    href: '/gm/quests/smart',
+    href: '/gm/smart-creator',
     label: 'Smart Creator',
     icon: <Sparkles className="h-5 w-5" />,
     badge: 'Soon',

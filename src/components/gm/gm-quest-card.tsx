@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Clock, Award, Edit, Eye, MoreVertical, Archive, Trash2 } from 'lucide-react'
+import { Clock, Award, Edit, MoreVertical, Archive, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -68,12 +68,13 @@ export function GMQuestCard({ quest, className, onArchive, onDelete }: GMQuestCa
   const status = quest.status as QuestDbStatus
 
   return (
-    <Card className={cn('h-full', className)}>
+    <Link href={`/gm/quests/${quest.id}`} className="block">
+    <Card className={cn('h-full transition-colors hover:bg-muted/50', className)}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-col gap-2 flex-1 min-w-0">
             {quest.category && <CategoryBadge category={quest.category} />}
-            <CardTitle className="text-lg leading-tight truncate">{quest.title}</CardTitle>
+            <CardTitle className="text-lg leading-tight break-words">{quest.title}</CardTitle>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <Badge variant={getStatusBadgeVariant(status)}>
@@ -89,12 +90,6 @@ export function GMQuestCard({ quest, className, onArchive, onDelete }: GMQuestCa
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
                   <Link href={`/gm/quests/${quest.id}`}>
-                    <Eye className="mr-2 h-4 w-4" />
-                    View Details
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href={`/gm/quests/${quest.id}/edit`}>
                     <Edit className="mr-2 h-4 w-4" />
                     Edit Quest
                   </Link>
@@ -149,5 +144,6 @@ export function GMQuestCard({ quest, className, onArchive, onDelete }: GMQuestCa
         </div>
       </CardContent>
     </Card>
+    </Link>
   )
 }

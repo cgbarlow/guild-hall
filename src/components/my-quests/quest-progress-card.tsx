@@ -1,9 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Clock, Award, ChevronRight, AlertCircle } from 'lucide-react'
+import { Clock, Award, AlertCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { ProgressBar } from './progress-bar'
 import { getUserQuestStatusInfo, type UserQuestWithQuest } from '@/lib/hooks/use-user-quests'
 import { cn } from '@/lib/utils'
@@ -35,42 +34,33 @@ export function QuestProgressCard({
     : 0
 
   return (
-    <Card className={cn('hover:shadow-md transition-shadow', className)}>
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span
-                className={cn(
-                  'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                  statusInfo.color,
-                  'text-white'
-                )}
-              >
-                {statusInfo.label}
-              </span>
-              {userQuest.extension_requested && (
-                <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
-                  Extension Requested
+    <Link href={`/my-quests/${userQuest.id}`} className="block">
+      <Card className={cn('hover:shadow-md hover:border-primary/50 transition-all cursor-pointer', className)}>
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                    statusInfo.color,
+                    'text-white'
+                  )}
+                >
+                  {statusInfo.label}
                 </span>
-              )}
-            </div>
-            <CardTitle className="text-lg">
-              <Link
-                href={`/my-quests/${userQuest.id}`}
-                className="hover:underline"
-              >
+                {userQuest.extension_requested && (
+                  <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                    Extension Requested
+                  </span>
+                )}
+              </div>
+              <CardTitle className="text-lg">
                 {userQuest.quest?.title || 'Untitled Quest'}
-              </Link>
-            </CardTitle>
+              </CardTitle>
+            </div>
           </div>
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={`/my-quests/${userQuest.id}`}>
-              <ChevronRight className="h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
-      </CardHeader>
+        </CardHeader>
       <CardContent className="space-y-4">
         {/* Progress */}
         {userQuest.status !== 'completed' && userQuest.objectivesCount && (
@@ -122,6 +112,7 @@ export function QuestProgressCard({
           </p>
         )}
       </CardContent>
-    </Card>
+      </Card>
+    </Link>
   )
 }

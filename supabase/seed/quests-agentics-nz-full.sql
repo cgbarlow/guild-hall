@@ -17,7 +17,7 @@ DECLARE
   cat_challenge UUID;
   cat_creative UUID;
   cat_community UUID;
-  quest_id UUID;
+  v_quest_id UUID;
   obj_id UUID;
   prev_obj_id UUID;
 BEGIN
@@ -51,6 +51,20 @@ BEGIN
     RETURN;
   END IF;
 
+  -- Delete existing test quests from Agentics-NZ to allow re-seeding
+  DELETE FROM quests WHERE is_test_data = true AND title IN (
+    'First Steps in the Realm',
+    'The Prompt Whisperer',
+    'Local Model Liberation',
+    'The GRASP Protocol',
+    'She''ll Be Right Compliance',
+    'The Dreaming Machine',
+    'Sovereign Data, Sovereign AI',
+    'Agent Swarm Commander',
+    'The Mentor''s Path',
+    'Gorse Bot 3000'
+  );
+
   -- ============================================================
   -- QUEST 1: First Steps in the Realm
   -- Category: Learning | Points: 25 | Objectives: 4 | No deadline
@@ -71,28 +85,23 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
   -- Delete existing objectives for this quest (for idempotent re-runs)
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
 
   -- Quest 1 Objectives
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Join the Tribe', 'Join the Agentics NZ WhatsApp group and introduce yourself with your background and what you hope to learn.', 5, 1, NULL, false, 'none');
+  VALUES (v_quest_id, 'Join the Tribe', 'Join the Agentics NZ WhatsApp group and introduce yourself with your background and what you hope to learn.', 5, 1, NULL, false, 'none');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Know the Foundation', 'Read the Agentics Foundation website and watch one recorded session from the YouTube channel.', 5, 2, NULL, false, 'none');
+  VALUES (v_quest_id, 'Know the Foundation', 'Read the Agentics Foundation website and watch one recorded session from the YouTube channel.', 5, 2, NULL, false, 'none');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Attend Your First Hackerspace', 'Join a monthly AI Hackerspace event (live or watch recording within 7 days).', 10, 3, NULL, false, 'none');
+  VALUES (v_quest_id, 'Attend Your First Hackerspace', 'Join a monthly AI Hackerspace event (live or watch recording within 7 days).', 10, 3, NULL, false, 'none');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Share a Spark', 'Post one question, insight, or resource in the WhatsApp group that could help others.', 5, 4, NULL, false, 'none');
+  VALUES (v_quest_id, 'Share a Spark', 'Post one question, insight, or resource in the WhatsApp group that could help others.', 5, 4, NULL, false, 'none');
 
   -- ============================================================
   -- QUEST 2: The Prompt Whisperer
@@ -114,31 +123,26 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
   prev_obj_id := NULL;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Study the Fundamentals', 'Read Anthropic''s prompt engineering guide and one additional resource of your choice. Note 3 key principles you learned.', 10, 1, NULL, true, 'text')
+  VALUES (v_quest_id, 'Study the Fundamentals', 'Read Anthropic''s prompt engineering guide and one additional resource of your choice. Note 3 key principles you learned.', 10, 1, NULL, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Analyze the Masters', 'Find 3 effective prompts online (Reddit, GitHub, blogs). For each, explain what makes it work well.', 10, 2, NULL, true, 'text_or_link');
+  VALUES (v_quest_id, 'Analyze the Masters', 'Find 3 effective prompts online (Reddit, GitHub, blogs). For each, explain what makes it work well.', 10, 2, NULL, true, 'text_or_link');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Craft Your First Spell', 'Write an original prompt for a real task you face. Submit the prompt, the AI''s response, and what you''d improve.', 15, 3, prev_obj_id, true, 'text')
+  VALUES (v_quest_id, 'Craft Your First Spell', 'Write an original prompt for a real task you face. Submit the prompt, the AI''s response, and what you''d improve.', 15, 3, prev_obj_id, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'The Iteration Trial', 'Take feedback on Objective 3, refine your prompt, and demonstrate measurable improvement in the output.', 15, 4, prev_obj_id, true, 'text');
+  VALUES (v_quest_id, 'The Iteration Trial', 'Take feedback on Objective 3, refine your prompt, and demonstrate measurable improvement in the output.', 15, 4, prev_obj_id, true, 'text');
 
   -- ============================================================
   -- QUEST 3: Local Model Liberation
@@ -160,38 +164,33 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
   prev_obj_id := NULL;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Choose Your Weapon', 'Research local model options (Ollama, LM Studio, llama.cpp, etc.). Document your hardware specs and which tool you''ll use.', 15, 1, NULL, true, 'text')
+  VALUES (v_quest_id, 'Choose Your Weapon', 'Research local model options (Ollama, LM Studio, llama.cpp, etc.). Document your hardware specs and which tool you''ll use.', 15, 1, NULL, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'First Boot', 'Install your chosen tool and successfully run a small model (7B or under). Screenshot the output.', 20, 2, prev_obj_id, true, 'text_or_link')
+  VALUES (v_quest_id, 'First Boot', 'Install your chosen tool and successfully run a small model (7B or under). Screenshot the output.', 20, 2, prev_obj_id, true, 'text_or_link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Push the Limits', 'Run the largest model your hardware can handle. Document inference speed, memory usage, and quality observations.', 25, 3, prev_obj_id, true, 'text')
+  VALUES (v_quest_id, 'Push the Limits', 'Run the largest model your hardware can handle. Document inference speed, memory usage, and quality observations.', 25, 3, prev_obj_id, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Practical Application', 'Use your local model for a real task (summarization, coding help, writing). Compare results to a cloud model.', 25, 4, prev_obj_id, true, 'text')
+  VALUES (v_quest_id, 'Practical Application', 'Use your local model for a real task (summarization, coding help, writing). Compare results to a cloud model.', 25, 4, prev_obj_id, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Share the Knowledge', 'Post your setup guide and findings to the WhatsApp group or write a short blog post.', 15, 5, prev_obj_id, true, 'link');
+  VALUES (v_quest_id, 'Share the Knowledge', 'Post your setup guide and findings to the WhatsApp group or write a short blog post.', 15, 5, prev_obj_id, true, 'link');
 
   -- ============================================================
   -- QUEST 4: The GRASP Protocol
@@ -213,38 +212,33 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
   prev_obj_id := NULL;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Deep Study', 'Read both parts of "What Happens When the Machine Never Stops Thinking?" Take detailed notes on each GRASP phase.', 20, 1, NULL, true, 'text')
+  VALUES (v_quest_id, 'Deep Study', 'Read both parts of "What Happens When the Machine Never Stops Thinking?" Take detailed notes on each GRASP phase.', 20, 1, NULL, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Architecture Design', 'Design a system architecture for implementing GRASP. Include memory storage, phase transitions, and validation mechanisms.', 30, 2, prev_obj_id, true, 'text_or_link')
+  VALUES (v_quest_id, 'Architecture Design', 'Design a system architecture for implementing GRASP. Include memory storage, phase transitions, and validation mechanisms.', 30, 2, prev_obj_id, true, 'text_or_link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Generate & Review', 'Implement the Generate and Review phases. Demonstrate an agent that explores a topic and validates its outputs.', 35, 3, prev_obj_id, true, 'link')
+  VALUES (v_quest_id, 'Generate & Review', 'Implement the Generate and Review phases. Demonstrate an agent that explores a topic and validates its outputs.', 35, 3, prev_obj_id, true, 'link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Absorb & Synthesise', 'Add external memory (vector DB, file system, etc.). Show the agent updating and consolidating knowledge.', 35, 4, prev_obj_id, true, 'link')
+  VALUES (v_quest_id, 'Absorb & Synthesise', 'Add external memory (vector DB, file system, etc.). Show the agent updating and consolidating knowledge.', 35, 4, prev_obj_id, true, 'link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Persist & Present', 'Complete the cycle with goal persistence. Present your implementation at an AI Hackerspace event.', 30, 5, prev_obj_id, true, 'link');
+  VALUES (v_quest_id, 'Persist & Present', 'Complete the cycle with goal persistence. Present your implementation at an AI Hackerspace event.', 30, 5, prev_obj_id, true, 'link');
 
   -- ============================================================
   -- QUEST 5: She'll Be Right Compliance
@@ -266,36 +260,31 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
   prev_obj_id := NULL;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Know the Rules', 'Research NZ Health & Safety at Work Act requirements for small businesses. Document 5 key compliance tasks that are paperwork-heavy.', 20, 1, NULL, true, 'text_or_link');
+  VALUES (v_quest_id, 'Know the Rules', 'Research NZ Health & Safety at Work Act requirements for small businesses. Document 5 key compliance tasks that are paperwork-heavy.', 20, 1, NULL, true, 'text_or_link');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Talk to a Tradie', 'Interview a tradesperson or small business owner about their compliance pain points. Summarize findings.', 25, 2, NULL, true, 'text')
+  VALUES (v_quest_id, 'Talk to a Tradie', 'Interview a tradesperson or small business owner about their compliance pain points. Summarize findings.', 25, 2, NULL, true, 'text')
   RETURNING id INTO obj_id;
 
   -- Objectives 1 and 2 are parallel, then 3 depends on both
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Design the Solution', 'Create a product concept: what does the AI agent do, what inputs does it need, what outputs does it produce?', 30, 3, obj_id, true, 'text_or_link')
+  VALUES (v_quest_id, 'Design the Solution', 'Create a product concept: what does the AI agent do, what inputs does it need, what outputs does it produce?', 30, 3, obj_id, true, 'text_or_link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Build a Prototype', 'Implement a working prototype that generates at least one compliance document from user input.', 35, 4, prev_obj_id, true, 'link')
+  VALUES (v_quest_id, 'Build a Prototype', 'Implement a working prototype that generates at least one compliance document from user input.', 35, 4, prev_obj_id, true, 'link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Validate with Users', 'Get feedback from 2+ potential users. Document what worked and what needs improvement.', 15, 5, prev_obj_id, true, 'text');
+  VALUES (v_quest_id, 'Validate with Users', 'Get feedback from 2+ potential users. Document what worked and what needs improvement.', 15, 5, prev_obj_id, true, 'text');
 
   -- ============================================================
   -- QUEST 6: The Dreaming Machine
@@ -317,43 +306,38 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
   prev_obj_id := NULL;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Study Sleep Science', 'Research the five biological sleep functions mapped to AI (memory consolidation, synaptic homeostasis, creative recombination, predictive refinement, emotional processing). Document each.', 25, 1, NULL, true, 'text')
+  VALUES (v_quest_id, 'Study Sleep Science', 'Research the five biological sleep functions mapped to AI (memory consolidation, synaptic homeostasis, creative recombination, predictive refinement, emotional processing). Document each.', 25, 1, NULL, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Experience Capture', 'Build a system that logs agent interactions with uncertainty markers and contradiction flags.', 30, 2, prev_obj_id, true, 'link')
+  VALUES (v_quest_id, 'Experience Capture', 'Build a system that logs agent interactions with uncertainty markers and contradiction flags.', 30, 2, prev_obj_id, true, 'link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Triage Sleep', 'Implement deduplication, salience filtering, and chunk formation on captured experiences.', 35, 3, prev_obj_id, true, 'link')
+  VALUES (v_quest_id, 'Triage Sleep', 'Implement deduplication, salience filtering, and chunk formation on captured experiences.', 35, 3, prev_obj_id, true, 'link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Deep Dreaming', 'Add at least two of: compression, abstraction, integration, counterfactual generation, or adversarial testing.', 40, 4, prev_obj_id, true, 'link')
+  VALUES (v_quest_id, 'Deep Dreaming', 'Add at least two of: compression, abstraction, integration, counterfactual generation, or adversarial testing.', 40, 4, prev_obj_id, true, 'link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Integrity Verification', 'Implement coherence checking and hallucination detection on consolidated knowledge.', 30, 5, prev_obj_id, true, 'link')
+  VALUES (v_quest_id, 'Integrity Verification', 'Implement coherence checking and hallucination detection on consolidated knowledge.', 30, 5, prev_obj_id, true, 'link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Dream Journal', 'Document your architecture, findings, and open questions. Share with the guild.', 15, 6, prev_obj_id, true, 'text_or_link');
+  VALUES (v_quest_id, 'Dream Journal', 'Document your architecture, findings, and open questions. Share with the guild.', 15, 6, prev_obj_id, true, 'text_or_link');
 
   -- ============================================================
   -- QUEST 7: Sovereign Data, Sovereign AI
@@ -375,31 +359,26 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'The Five Pillars', 'Read the guild''s sovereignty article. Summarize each pillar (Data, Infrastructure, Regulatory, Economic, Competitive) in your own words.', 15, 1, NULL, true, 'text');
+  VALUES (v_quest_id, 'The Five Pillars', 'Read the guild''s sovereignty article. Summarize each pillar (Data, Infrastructure, Regulatory, Economic, Competitive) in your own words.', 15, 1, NULL, true, 'text');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Global Examples', 'Research two other nations pursuing sovereign AI (e.g., France/Mistral, UAE/Falcon). What can NZ learn from their approaches?', 20, 2, NULL, true, 'text_or_link');
+  VALUES (v_quest_id, 'Global Examples', 'Research two other nations pursuing sovereign AI (e.g., France/Mistral, UAE/Falcon). What can NZ learn from their approaches?', 20, 2, NULL, true, 'text_or_link');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Te Tiriti & AI', 'Investigate how Te Tiriti o Waitangi principles might apply to AI governance in NZ. Document at least 3 considerations.', 20, 3, NULL, true, 'text');
+  VALUES (v_quest_id, 'Te Tiriti & AI', 'Investigate how Te Tiriti o Waitangi principles might apply to AI governance in NZ. Document at least 3 considerations.', 20, 3, NULL, true, 'text');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Local Landscape', 'Map NZ organizations working on sovereign AI (companies, research groups, government initiatives).', 10, 4, NULL, true, 'text_or_link')
+  VALUES (v_quest_id, 'Local Landscape', 'Map NZ organizations working on sovereign AI (companies, research groups, government initiatives).', 10, 4, NULL, true, 'text_or_link')
   RETURNING id INTO obj_id;
 
   -- Objective 5 depends on all previous
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Personal Manifesto', 'Write a 500-word piece: "What sovereign AI means to me and what I can do about it."', 10, 5, obj_id, true, 'text');
+  VALUES (v_quest_id, 'Personal Manifesto', 'Write a 500-word piece: "What sovereign AI means to me and what I can do about it."', 10, 5, obj_id, true, 'text');
 
   -- ============================================================
   -- QUEST 8: Agent Swarm Commander
@@ -421,43 +400,38 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
   prev_obj_id := NULL;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Swarm Theory', 'Study multi-agent coordination patterns (hierarchical, mesh, consensus). Document trade-offs of each approach.', 25, 1, NULL, true, 'text')
+  VALUES (v_quest_id, 'Swarm Theory', 'Study multi-agent coordination patterns (hierarchical, mesh, consensus). Document trade-offs of each approach.', 25, 1, NULL, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Tool Mastery', 'Set up Claude Code with claude-flow. Successfully run a basic multi-agent workflow.', 30, 2, prev_obj_id, true, 'text_or_link')
+  VALUES (v_quest_id, 'Tool Mastery', 'Set up Claude Code with claude-flow. Successfully run a basic multi-agent workflow.', 30, 2, prev_obj_id, true, 'text_or_link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Design a Swarm', 'Design a swarm architecture for a non-trivial task (research, code review, content generation). Document agent roles and communication patterns.', 35, 3, prev_obj_id, true, 'text_or_link')
+  VALUES (v_quest_id, 'Design a Swarm', 'Design a swarm architecture for a non-trivial task (research, code review, content generation). Document agent roles and communication patterns.', 35, 3, prev_obj_id, true, 'text_or_link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Build & Run', 'Implement your swarm. Demonstrate it completing a real task with observable coordination.', 50, 4, prev_obj_id, true, 'link')
+  VALUES (v_quest_id, 'Build & Run', 'Implement your swarm. Demonstrate it completing a real task with observable coordination.', 50, 4, prev_obj_id, true, 'link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Failure Analysis', 'Document what went wrong, where agents drifted, and how you''d improve the design.', 30, 5, prev_obj_id, true, 'text')
+  VALUES (v_quest_id, 'Failure Analysis', 'Document what went wrong, where agents drifted, and how you''d improve the design.', 30, 5, prev_obj_id, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Teach Others', 'Create a tutorial or present at AI Hackerspace on what you learned.', 30, 6, prev_obj_id, true, 'link');
+  VALUES (v_quest_id, 'Teach Others', 'Create a tutorial or present at AI Hackerspace on what you learned.', 30, 6, prev_obj_id, true, 'link');
 
   -- ============================================================
   -- QUEST 9: The Mentor's Path
@@ -479,41 +453,36 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
   prev_obj_id := NULL;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Commit to the Path', 'Register as a mentor in the WhatsApp group. Be matched with a mentee who has completed "First Steps in the Realm."', 10, 1, NULL, true, 'text')
+  VALUES (v_quest_id, 'Commit to the Path', 'Register as a mentor in the WhatsApp group. Be matched with a mentee who has completed "First Steps in the Realm."', 10, 1, NULL, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Set the Direction', 'Meet with your mentee (video call or in person). Understand their goals and agree on a learning plan for 6 weeks.', 20, 2, prev_obj_id, true, 'text')
+  VALUES (v_quest_id, 'Set the Direction', 'Meet with your mentee (video call or in person). Understand their goals and agree on a learning plan for 6 weeks.', 20, 2, prev_obj_id, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Weekly Guidance', 'Hold at least 4 weekly check-ins. Document topics covered, challenges faced, and progress made.', 40, 3, prev_obj_id, true, 'text')
+  VALUES (v_quest_id, 'Weekly Guidance', 'Hold at least 4 weekly check-ins. Document topics covered, challenges faced, and progress made.', 40, 3, prev_obj_id, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Quest Companion', 'Support your mentee through completing at least one Journeyman-level quest.', 40, 4, prev_obj_id, true, 'text')
+  VALUES (v_quest_id, 'Quest Companion', 'Support your mentee through completing at least one Journeyman-level quest.', 40, 4, prev_obj_id, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Reflection', 'Write a reflection on what you learned as a mentor, what worked, and advice for future mentors.', 20, 5, prev_obj_id, true, 'text');
+  VALUES (v_quest_id, 'Reflection', 'Write a reflection on what you learned as a mentor, what worked, and advice for future mentors.', 20, 5, prev_obj_id, true, 'text');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Mentee Testimonial', 'Have your mentee write a brief testimonial about the experience.', 20, 6, prev_obj_id, true, 'text');
+  VALUES (v_quest_id, 'Mentee Testimonial', 'Have your mentee write a brief testimonial about the experience.', 20, 6, prev_obj_id, true, 'text');
 
   -- ============================================================
   -- QUEST 10: Gorse Bot 3000 — AgTech Agent
@@ -535,46 +504,41 @@ BEGIN
     true,
     now()
   )
-  ON CONFLICT (title) DO UPDATE SET
-    description = EXCLUDED.description,
-    narrative_context = EXCLUDED.narrative_context,
-    transformation_goal = EXCLUDED.transformation_goal,
-    updated_at = now()
-  RETURNING id INTO quest_id;
+  RETURNING id INTO v_quest_id;
 
-  DELETE FROM objectives WHERE quest_id = quest_id;
+  DELETE FROM objectives WHERE quest_id = v_quest_id;
   prev_obj_id := NULL;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Know Your Enemy', 'Research gorse biology, current control methods, and the scale of the problem in NZ. Interview a farmer or DOC ranger if possible.', 25, 1, NULL, true, 'text_or_link');
+  VALUES (v_quest_id, 'Know Your Enemy', 'Research gorse biology, current control methods, and the scale of the problem in NZ. Interview a farmer or DOC ranger if possible.', 25, 1, NULL, true, 'text_or_link');
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Data Reconnaissance', 'Identify available data sources: satellite imagery, drone footage, existing weed mapping projects. Document access methods.', 25, 2, NULL, true, 'text_or_link')
+  VALUES (v_quest_id, 'Data Reconnaissance', 'Identify available data sources: satellite imagery, drone footage, existing weed mapping projects. Document access methods.', 25, 2, NULL, true, 'text_or_link')
   RETURNING id INTO obj_id;
 
   -- Objective 3 depends on 1 and 2
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Detection Design', 'Design an AI system for gorse detection from imagery. Could be ML classification, vision model prompting, or hybrid approach.', 35, 3, obj_id, true, 'text_or_link')
+  VALUES (v_quest_id, 'Detection Design', 'Design an AI system for gorse detection from imagery. Could be ML classification, vision model prompting, or hybrid approach.', 35, 3, obj_id, true, 'text_or_link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Prototype Detection', 'Build a working gorse detector. Demonstrate on sample imagery with accuracy metrics.', 45, 4, prev_obj_id, true, 'link')
+  VALUES (v_quest_id, 'Prototype Detection', 'Build a working gorse detector. Demonstrate on sample imagery with accuracy metrics.', 45, 4, prev_obj_id, true, 'link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Agent Orchestration', 'Design an agent system that takes detection outputs and generates treatment recommendations (location priority, method, timing).', 35, 5, prev_obj_id, true, 'text_or_link')
+  VALUES (v_quest_id, 'Agent Orchestration', 'Design an agent system that takes detection outputs and generates treatment recommendations (location priority, method, timing).', 35, 5, prev_obj_id, true, 'text_or_link')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Field Validation', 'If possible, validate with real-world data or expert review. Document findings and next steps.', 20, 6, prev_obj_id, true, 'text')
+  VALUES (v_quest_id, 'Field Validation', 'If possible, validate with real-world data or expert review. Document findings and next steps.', 20, 6, prev_obj_id, true, 'text')
   RETURNING id INTO obj_id;
   prev_obj_id := obj_id;
 
   INSERT INTO objectives (quest_id, title, description, points, display_order, depends_on_id, evidence_required, evidence_type)
-  VALUES (quest_id, 'Open Source', 'Release your code and documentation for the guild and broader community.', 15, 7, prev_obj_id, true, 'link');
+  VALUES (v_quest_id, 'Open Source', 'Release your code and documentation for the guild and broader community.', 15, 7, prev_obj_id, true, 'link');
 
   RAISE NOTICE 'Successfully seeded 10 Agentics-NZ quests';
 END $$;

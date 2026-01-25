@@ -243,6 +243,7 @@ export const mockObjective: Objective = {
   depends_on_id: null,
   evidence_required: true,
   evidence_type: 'text',
+  resource_url: null,
   created_at: '2024-01-01T00:00:00.000Z',
   updated_at: '2024-01-01T00:00:00.000Z',
 }
@@ -297,6 +298,7 @@ export const mockObjectives: Objective[] = [
     depends_on_id: 'objective-001',
     evidence_required: true,
     evidence_type: 'link',
+    resource_url: 'https://example.com/dragon-guide',
     created_at: '2024-01-01T00:00:00.000Z',
     updated_at: '2024-01-01T00:00:00.000Z',
   },
@@ -310,6 +312,7 @@ export const mockObjectives: Objective[] = [
     depends_on_id: 'objective-002',
     evidence_required: true,
     evidence_type: 'text_or_link',
+    resource_url: null,
     created_at: '2024-01-01T00:00:00.000Z',
     updated_at: '2024-01-01T00:00:00.000Z',
   },

@@ -3,82 +3,15 @@
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/contexts/auth-context'
-import { useIsGM } from '@/lib/auth/hooks'
+import { getAllUsers, getUserById, type UserWithRole } from '@/lib/actions/users'
 import type { Database } from '@/lib/types/database'
 
-type UserRow = Database['public']['Tables']['users']['Row']
-type UserRoleRow = Database['public']['Tables']['user_roles']['Row']
-
-export interface UserWithRole extends UserRow {
-  role: UserRoleRow['role'] | null
-  questsInProgress?: number
-}
+export type { UserWithRole }
 
 export interface UseAllUsersOptions {
   search?: string
   roleFilter?: 'all' | 'gm' | 'admin' | 'member'
   enabled?: boolean
-}
-
-/**
- * Fetch all users for GM view
- */
-async function fetchAllUsers(options: UseAllUsersOptions = {}): Promise<UserWithRole[]> {
-  const supabase = createClient()
-
-  let query = supabase
-    .from('users')
-    .select(`
-      *,
-      user_roles (
-        role
-      )
-    `)
-    .order('total_points', { ascending: false })
-
-  // Apply search filter
-  if (options.search) {
-    query = query.or(`display_name.ilike.%${options.search}%,email.ilike.%${options.search}%`)
-  }
-
-  const { data, error } = await query
-
-  if (error) {
-    throw error
-  }
-
-  // Type for joined query result
-  type UserWithRolesResult = UserRow & { user_roles: { role: UserRoleRow['role'] }[] | null }
-
-  // Transform the data
-  const typedData = (data || []) as unknown as UserWithRolesResult[]
-  let users = typedData.map((item) => {
-    const roles = item.user_roles
-    // Get the highest priority role
-    let role: UserRoleRow['role'] | null = null
-    if (roles && roles.length > 0) {
-      if (roles.some(r => r.role === 'admin')) {
-        role = 'admin'
-      } else if (roles.some(r => r.role === 'gm')) {
-        role = 'gm'
-      } else {
-        role = 'member'
-      }
-    }
-
-    return {
-      ...item,
-      role,
-      user_roles: undefined,
-    }
-  }) as UserWithRole[]
-
-  // Apply role filter client-side
-  if (options.roleFilter && options.roleFilter !== 'all') {
-    users = users.filter(u => u.role === options.roleFilter)
-  }
-
-  return users
 }
 
 /**
@@ -113,30 +46,22 @@ async function fetchUserQuestCounts(userId: string): Promise<{
 
 /**
  * React Query hook for fetching all users (GM view)
+ * Uses server action with service role to bypass RLS
  * Returns empty array if user is not authenticated or not a GM
  */
 export function useAllUsers(options: UseAllUsersOptions = {}) {
   const { search, roleFilter, enabled = true } = options
   const { user, isLoading: authLoading } = useAuth()
-  const { data: isGM, isLoading: gmLoading } = useIsGM()
 
   return useQuery({
     queryKey: ['allUsers', search, roleFilter, user?.id],
     queryFn: async () => {
-      // Graceful fallback: return empty array if not authenticated or not GM
-      if (!user || !isGM) {
-        return []
-      }
-      try {
-        return await fetchAllUsers({ search, roleFilter })
-      } catch (error) {
-        // Log error but return empty array for graceful degradation
-        console.error('Error fetching all users:', error)
-        return []
-      }
+      const result = await getAllUsers({ search, roleFilter })
+      console.log('All users fetched:', result.length, 'users')
+      return result
     },
-    // Only run query when user is authenticated, GM check is complete, and explicitly enabled
-    enabled: enabled && !!user && !authLoading && !gmLoading && isGM === true,
+    // Only run query when user is authenticated and auth check is complete
+    enabled: enabled && !!user && !authLoading,
   })
 }
 
@@ -152,59 +77,13 @@ export function useUserQuestCounts(userId: string | undefined) {
 }
 
 /**
- * Fetch a single user with full details
- */
-async function fetchUserDetail(userId: string): Promise<UserWithRole | null> {
-  const supabase = createClient()
-
-  // Type for joined query result
-  type UserWithRolesResult = UserRow & { user_roles: { role: UserRoleRow['role'] }[] | null }
-
-  const { data: rawData, error } = await supabase
-    .from('users')
-    .select(`
-      *,
-      user_roles (
-        role
-      )
-    `)
-    .eq('id', userId)
-    .single()
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null
-    }
-    throw error
-  }
-
-  const data = rawData as unknown as UserWithRolesResult
-  const roles = data.user_roles
-  let role: UserRoleRow['role'] | null = null
-  if (roles && roles.length > 0) {
-    if (roles.some(r => r.role === 'admin')) {
-      role = 'admin'
-    } else if (roles.some(r => r.role === 'gm')) {
-      role = 'gm'
-    } else {
-      role = 'member'
-    }
-  }
-
-  return {
-    ...data,
-    role,
-    user_roles: undefined,
-  } as UserWithRole
-}
-
-/**
  * React Query hook for fetching a single user
+ * Uses server action with service role to bypass RLS
  */
 export function useUserDetail(userId: string | undefined) {
   return useQuery({
     queryKey: ['userDetail', userId],
-    queryFn: () => fetchUserDetail(userId!),
+    queryFn: () => getUserById(userId!),
     enabled: !!userId,
   })
 }

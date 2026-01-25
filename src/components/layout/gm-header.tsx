@@ -31,15 +31,6 @@ export function GMHeader() {
         </div>
 
         <nav className="flex items-center gap-4">
-          <Link href="/gm" className="text-sm hover:underline">
-            Overview
-          </Link>
-          <Link href="/gm/quests" className="text-sm hover:underline">
-            Quests
-          </Link>
-          <Link href="/gm/review" className="text-sm hover:underline">
-            Review
-          </Link>
           <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
             Exit GM
           </Link>

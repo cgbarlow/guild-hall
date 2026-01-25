@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { GripVertical, Trash2, ChevronDown, ChevronUp, Link as LinkIcon, FileText, Lock } from 'lucide-react'
+import { GripVertical, Trash2, ChevronDown, ChevronUp, Link as LinkIcon, FileText, Lock, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -71,6 +71,7 @@ export function ObjectiveItem({
       depends_on_id: objective.depends_on_id,
       evidence_required: objective.evidence_required,
       evidence_type: objective.evidence_type,
+      resource_url: (objective as { resource_url?: string | null }).resource_url ?? '',
     },
   })
 
@@ -271,6 +272,27 @@ export function ObjectiveItem({
                 </Select>
               </div>
             )}
+          </div>
+
+          {/* Resource URL */}
+          <div className="space-y-2">
+            <Label htmlFor={`url-${objective.id}`} className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4" />
+              Resource URL
+            </Label>
+            <Input
+              id={`url-${objective.id}`}
+              type="text"
+              value={watch('resource_url') ?? ''}
+              onChange={(e) => {
+                const value = e.target.value.trim()
+                handleFieldChange('resource_url', value === '' ? null : value)
+              }}
+              placeholder="https://example.com/resource"
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional link to a resource that helps complete this objective (opens in new tab)
+            </p>
           </div>
         </div>
       )}

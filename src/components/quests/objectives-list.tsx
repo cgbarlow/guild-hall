@@ -1,4 +1,4 @@
-import { CheckCircle2, Circle, Lock } from 'lucide-react'
+import { CheckCircle2, Circle, Lock, ExternalLink } from 'lucide-react'
 import type { Objective } from '@/lib/types/quest'
 import { cn } from '@/lib/utils'
 
@@ -46,9 +46,23 @@ export function ObjectivesList({ objectives, userProgress, className }: Objectiv
               {objective.description && (
                 <p className="text-xs text-muted-foreground mt-1">{objective.description}</p>
               )}
-              {objective.points > 0 && (
-                <span className="text-xs text-amber-600 ml-2">+{objective.points} pts</span>
-              )}
+              <div className="flex items-center gap-2 mt-1">
+                {objective.points > 0 && (
+                  <span className="text-xs text-amber-600">+{objective.points} pts</span>
+                )}
+                {objective.resource_url && (
+                  <a
+                    href={objective.resource_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Resource
+                  </a>
+                )}
+              </div>
             </div>
           </li>
         )

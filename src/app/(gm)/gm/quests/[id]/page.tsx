@@ -1,15 +1,11 @@
 'use client'
 
-import { use } from 'react'
+import { useParams } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import { useQuest } from '@/lib/hooks/use-quest'
 import { QuestEditForm } from '@/components/gm/quest-edit-form'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-
-interface QuestEditPageProps {
-  params: Promise<{ id: string }>
-}
 
 function QuestEditSkeleton() {
   return (
@@ -48,8 +44,9 @@ function QuestEditSkeleton() {
   )
 }
 
-export default function QuestEditPage({ params }: QuestEditPageProps) {
-  const { id } = use(params)
+export default function QuestEditPage() {
+  const params = useParams<{ id: string }>()
+  const id = params.id
   const { data: quest, isLoading, error } = useQuest(id)
 
   if (isLoading) {

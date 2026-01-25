@@ -96,7 +96,7 @@ async function updateObjective({
 }): Promise<ObjectiveRow> {
   const supabase = createClient()
 
-  const updateData: ObjectiveUpdate = {}
+  const updateData: ObjectiveUpdate & { resource_url?: string | null } = {}
 
   if (data.title !== undefined) updateData.title = data.title
   if (data.description !== undefined) updateData.description = data.description
@@ -105,6 +105,7 @@ async function updateObjective({
   if (data.depends_on_id !== undefined) updateData.depends_on_id = data.depends_on_id
   if (data.evidence_required !== undefined) updateData.evidence_required = data.evidence_required
   if (data.evidence_type !== undefined) updateData.evidence_type = data.evidence_type
+  if (data.resource_url !== undefined) updateData.resource_url = data.resource_url
 
   const { data: objective, error } = await (supabase
     .from('objectives') as ReturnType<typeof supabase.from>)

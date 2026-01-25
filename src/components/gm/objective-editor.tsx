@@ -59,6 +59,7 @@ export function ObjectiveEditor({ questId, className }: ObjectiveEditorProps) {
         depends_on_id: null,
         evidence_required: false,
         evidence_type: 'none',
+        resource_url: null,
       })
     } catch (error) {
       console.error('Failed to create objective:', error)

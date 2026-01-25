@@ -20,19 +20,23 @@ async function updateQuest({
 }): Promise<QuestRow> {
   const supabase = createClient()
 
-  const updateData: QuestUpdate = {}
+  const updateData: QuestUpdate & { difficulty?: string; resources?: unknown; design_notes?: string | null; featured?: boolean } = {}
 
   if (data.title !== undefined) updateData.title = data.title
   if (data.description !== undefined) updateData.description = data.description
   if (data.category_id !== undefined) updateData.category_id = data.category_id
   if (data.points !== undefined) updateData.points = data.points
   if (data.reward_description !== undefined) updateData.reward_description = data.reward_description
+  if (data.difficulty !== undefined) updateData.difficulty = data.difficulty
+  if (data.resources !== undefined) updateData.resources = data.resources
+  if (data.design_notes !== undefined) updateData.design_notes = data.design_notes
   if (data.acceptance_deadline !== undefined) updateData.acceptance_deadline = data.acceptance_deadline
   if (data.completion_days !== undefined) updateData.completion_days = data.completion_days
   if (data.narrative_context !== undefined) updateData.narrative_context = data.narrative_context
   if (data.transformation_goal !== undefined) updateData.transformation_goal = data.transformation_goal
   if (data.is_template !== undefined) updateData.is_template = data.is_template
   if (data.template_id !== undefined) updateData.template_id = data.template_id
+  if (data.featured !== undefined) updateData.featured = data.featured
 
   const { data: quest, error } = await (supabase
     .from('quests') as ReturnType<typeof supabase.from>)

@@ -36,9 +36,13 @@ describe('useCreateQuest', () => {
     points: 500,
     completion_days: 7,
     reward_description: '500 points and a trophy',
+    difficulty: 'Apprentice',
+    resources: [],
+    design_notes: null,
     narrative_context: 'In a world where...',
     transformation_goal: 'Learn to code',
     is_template: false,
+    featured: false,
   }
 
   const mockCreatedQuest = {
@@ -105,6 +109,9 @@ describe('useCreateQuest', () => {
       title: 'Minimal Quest',
       points: 100,
       is_template: false,
+      featured: false,
+      difficulty: 'Apprentice',
+      resources: [],
     }
 
     const minimalCreatedQuest = {

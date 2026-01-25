@@ -4,7 +4,6 @@ import { useParams, useRouter } from 'next/navigation'
 import { QuestDetail } from '@/components/quests/quest-detail'
 import { useQuest } from '@/lib/hooks/use-quest'
 import { useAcceptQuest } from '@/lib/hooks/use-accept-quest'
-import { Loader2 } from 'lucide-react'
 
 function LoadingSkeleton() {
   return (
@@ -48,12 +47,9 @@ export default function QuestDetailPage() {
   const { data: quest, isLoading, error } = useQuest(questId)
   const acceptQuestMutation = useAcceptQuest({
     onSuccess: () => {
-      // Refresh the page to show updated status
-      router.refresh()
+      // Navigate to my-quests to see the active quest
+      router.push('/my-quests')
     },
-    onError: (error) => {
-      console.error('Failed to accept quest:', error)
-    }
   })
 
   const handleAcceptQuest = async (id: string) => {

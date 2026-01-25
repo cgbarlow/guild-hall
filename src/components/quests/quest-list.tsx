@@ -9,6 +9,8 @@ interface QuestListProps {
   quests: Quest[]
   isLoading?: boolean
   className?: string
+  /** Map of questId -> userQuestId for quests the user is actively taking */
+  activeQuestIds?: Map<string, string>
 }
 
 function QuestListSkeleton() {
@@ -49,7 +51,7 @@ function EmptyState() {
   )
 }
 
-export function QuestList({ quests, isLoading, className }: QuestListProps) {
+export function QuestList({ quests, isLoading, className, activeQuestIds }: QuestListProps) {
   if (isLoading) {
     return <QuestListSkeleton />
   }
@@ -61,7 +63,11 @@ export function QuestList({ quests, isLoading, className }: QuestListProps) {
   return (
     <div className={cn('grid gap-4 sm:grid-cols-2 lg:grid-cols-3', className)}>
       {quests.map((quest) => (
-        <QuestCard key={quest.id} quest={quest} />
+        <QuestCard
+          key={quest.id}
+          quest={quest}
+          userQuestId={activeQuestIds?.get(quest.id)}
+        />
       ))}
     </div>
   )

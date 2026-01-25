@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Award, Clock, User, Calendar } from 'lucide-react'
+import { ArrowLeft, Award, Clock, User, Calendar, Zap, ExternalLink, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -32,7 +32,8 @@ export function QuestDetail({
   canAccept = true,
   className,
 }: QuestDetailProps) {
-  const isOpen = quest.status === 'open'
+  // Quest is available if it's published (for users to accept)
+  const isOpen = quest.status === 'published' || quest.status === 'open'
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -62,6 +63,15 @@ export function QuestDetail({
         <CardContent className="space-y-6">
           {/* Quest stats */}
           <div className="flex flex-wrap gap-6">
+            {quest.difficulty && (
+              <div className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-purple-500" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Difficulty</p>
+                  <p className="text-lg font-semibold">{quest.difficulty}</p>
+                </div>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <Award className="h-5 w-5 text-amber-500" />
               <div>
@@ -69,12 +79,12 @@ export function QuestDetail({
                 <p className="text-lg font-semibold">{quest.points} pts</p>
               </div>
             </div>
-            {quest.time_limit_days && (
+            {(quest.time_limit_days || quest.completion_days) && (
               <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-blue-500" />
                 <div>
                   <p className="text-sm text-muted-foreground">Time Limit</p>
-                  <p className="text-lg font-semibold">{quest.time_limit_days} days</p>
+                  <p className="text-lg font-semibold">{quest.time_limit_days || quest.completion_days} days</p>
                 </div>
               </div>
             )}
@@ -89,6 +99,15 @@ export function QuestDetail({
             )}
           </div>
 
+          {/* Reward description if provided */}
+          {quest.reward_description && (
+            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 p-4">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                {quest.reward_description}
+              </p>
+            </div>
+          )}
+
           {/* Description */}
           <div>
             <h3 className="text-lg font-semibold mb-2">Description</h3>
@@ -102,6 +121,31 @@ export function QuestDetail({
             <div>
               <h3 className="text-lg font-semibold mb-3">Objectives</h3>
               <ObjectivesList objectives={quest.objectives} />
+            </div>
+          )}
+
+          {/* Resources */}
+          {quest.resources && quest.resources.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Resources
+              </h3>
+              <ul className="space-y-2">
+                {quest.resources.map((resource, index) => (
+                  <li key={index}>
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-primary hover:underline"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      {resource.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 

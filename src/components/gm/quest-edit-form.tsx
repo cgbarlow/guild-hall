@@ -31,10 +31,17 @@ import {
 import { useUpdateQuest, usePublishQuest, useArchiveQuest, useUnpublishQuest, useDeleteQuest } from '@/lib/hooks/use-update-quest'
 import { useCategories } from '@/lib/hooks/use-categories'
 import { ObjectiveEditor } from './objective-editor'
-import { questFormSchema, type QuestFormData } from '@/lib/schemas/quest.schema'
-import type { Quest, QuestDbStatus } from '@/lib/types/quest'
-import { Loader2, Save, ArrowLeft, Send, Archive, Trash2, RotateCcw } from 'lucide-react'
+import { questFormSchema, type QuestFormData, type QuestDifficultyType } from '@/lib/schemas/quest.schema'
+import type { Quest, QuestDbStatus, QuestResource } from '@/lib/types/quest'
+import { Loader2, Save, ArrowLeft, Send, Archive, Trash2, RotateCcw, Plus, X, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+
+const difficultyOptions: { value: QuestDifficultyType; label: string; description: string }[] = [
+  { value: 'Apprentice', label: 'Apprentice', description: 'Entry-level, self-paced' },
+  { value: 'Journeyman', label: 'Journeyman', description: 'Intermediate difficulty' },
+  { value: 'Expert', label: 'Expert', description: 'Advanced, requires experience' },
+  { value: 'Master', label: 'Master', description: 'Maximum challenge' },
+]
 
 interface QuestEditFormProps {
   quest: Quest
@@ -77,14 +84,37 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
       points: quest.points,
       completion_days: quest.completion_days ?? 7,
       reward_description: quest.reward_description ?? '',
+      difficulty: quest.difficulty ?? 'Apprentice',
+      resources: quest.resources ?? [],
+      design_notes: quest.design_notes ?? '',
       narrative_context: quest.narrative_context ?? '',
       transformation_goal: quest.transformation_goal ?? '',
       is_template: quest.is_template,
+      featured: quest.featured ?? false,
     },
   })
 
   const isTemplate = watch('is_template')
+  const isFeatured = watch('featured')
   const categoryId = watch('category_id')
+  const difficulty = watch('difficulty')
+  const resources = watch('resources') ?? []
+
+  const addResource = () => {
+    const newResources = [...resources, { title: '', url: '' }]
+    setValue('resources', newResources, { shouldDirty: true })
+  }
+
+  const removeResource = (index: number) => {
+    const newResources = resources.filter((_, i) => i !== index)
+    setValue('resources', newResources, { shouldDirty: true })
+  }
+
+  const updateResource = (index: number, field: 'title' | 'url', value: string) => {
+    const newResources = [...resources]
+    newResources[index] = { ...newResources[index], [field]: value }
+    setValue('resources', newResources, { shouldDirty: true })
+  }
 
   const status = quest.status as QuestDbStatus
   const isPublished = status === 'published'
@@ -329,45 +359,165 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Difficulty */}
+            <div className="space-y-2">
+              <Label htmlFor="difficulty">Difficulty</Label>
+              <Select
+                value={difficulty}
+                onValueChange={(value) => setValue('difficulty', value as QuestDifficultyType, { shouldDirty: true })}
+              >
+                <SelectTrigger id="difficulty">
+                  <SelectValue placeholder="Select difficulty" />
+                </SelectTrigger>
+                <SelectContent>
+                  {difficultyOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <div className="flex flex-col">
+                        <span>{option.label}</span>
+                        <span className="text-xs text-muted-foreground">{option.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Points */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="points">
+                  Quest Points <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="points"
+                  type="number"
+                  min={0}
+                  max={10000}
+                  {...register('points', { valueAsNumber: true })}
+                  aria-invalid={!!errors.points}
+                />
+                {errors.points && (
+                  <p className="text-sm text-destructive">{errors.points.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reward_description">Reward Description</Label>
+                <Input
+                  id="reward_description"
+                  placeholder="e.g., +1 Guild Rank"
+                  {...register('reward_description')}
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Rewards & Points */}
+        {/* Story & Context */}
         <Card>
           <CardHeader>
-            <CardTitle>Rewards & Points</CardTitle>
+            <CardTitle>Story & Context</CardTitle>
             <CardDescription>
-              Set the rewards adventurers will earn
+              Add narrative elements to engage adventurers
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Points */}
             <div className="space-y-2">
-              <Label htmlFor="points">
-                Points <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="points"
-                type="number"
-                min={0}
-                max={10000}
-                {...register('points', { valueAsNumber: true })}
-                aria-invalid={!!errors.points}
+              <Label htmlFor="narrative_context">Narrative Context</Label>
+              <Textarea
+                id="narrative_context"
+                placeholder="Set the scene..."
+                className="min-h-[100px]"
+                {...register('narrative_context')}
               />
-              {errors.points && (
-                <p className="text-sm text-destructive">{errors.points.message}</p>
-              )}
             </div>
 
-            {/* Reward Description */}
             <div className="space-y-2">
-              <Label htmlFor="reward_description">Reward Description</Label>
+              <Label htmlFor="transformation_goal">Transformation Goal</Label>
               <Textarea
-                id="reward_description"
-                placeholder="Describe any additional rewards"
-                {...register('reward_description')}
+                id="transformation_goal"
+                placeholder="What will the adventurer learn or achieve?"
+                className="min-h-[80px]"
+                {...register('transformation_goal')}
               />
             </div>
+          </CardContent>
+        </Card>
+      </form>
+
+      {/* Objectives Editor - outside form for separate saves */}
+      <ObjectiveEditor questId={quest.id} />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        {/* Resources */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ExternalLink className="h-5 w-5" />
+              Resources
+            </CardTitle>
+            <CardDescription>
+              Links to helpful resources for completing the quest
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {resources.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No resources added yet
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {resources.map((resource, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <div className="flex-1 grid gap-2 sm:grid-cols-2">
+                      <Input
+                        placeholder="Resource title"
+                        value={resource.title}
+                        onChange={(e) => updateResource(index, 'title', e.target.value)}
+                      />
+                      <Input
+                        placeholder="https://..."
+                        type="url"
+                        value={resource.url}
+                        onChange={(e) => updateResource(index, 'url', e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeResource(index)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Button type="button" variant="outline" onClick={addResource} className="w-full">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Resource
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Design Notes (GM Only) */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Design Notes</CardTitle>
+            <CardDescription>
+              Internal notes about quest design (not visible to adventurers)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              id="design_notes"
+              placeholder="Add notes about quest design, rationale, or implementation details..."
+              className="min-h-[120px]"
+              {...register('design_notes')}
+            />
           </CardContent>
         </Card>
 
@@ -390,47 +540,31 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
                 {...register('completion_days', { valueAsNumber: true })}
               />
               <p className="text-sm text-muted-foreground">
-                Number of days adventurers have to complete the quest
+                Number of days adventurers have to complete the quest after accepting
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Story & Context */}
+        {/* Visibility Settings */}
         <Card>
           <CardHeader>
-            <CardTitle>Story & Context</CardTitle>
-            <CardDescription>
-              Add narrative elements
-            </CardDescription>
+            <CardTitle>Visibility Settings</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="narrative_context">Narrative Context</Label>
-              <Textarea
-                id="narrative_context"
-                placeholder="Set the scene..."
-                {...register('narrative_context')}
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="featured">Featured Quest</Label>
+                <p className="text-sm text-muted-foreground">
+                  Featured quests appear on the user dashboard
+                </p>
+              </div>
+              <Switch
+                id="featured"
+                checked={isFeatured}
+                onCheckedChange={(checked) => setValue('featured', checked, { shouldDirty: true })}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="transformation_goal">Transformation Goal</Label>
-              <Textarea
-                id="transformation_goal"
-                placeholder="What will the adventurer learn or achieve?"
-                {...register('transformation_goal')}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Template Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Template Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="is_template">Save as Template</Label>
@@ -463,9 +597,6 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
           </div>
         )}
       </form>
-
-      {/* Objectives Editor */}
-      <ObjectiveEditor questId={quest.id} />
     </div>
   )
 }

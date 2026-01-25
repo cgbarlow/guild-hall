@@ -3,7 +3,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/contexts/auth-context'
-import { useIsGM } from '@/lib/auth/hooks'
 import type { Database } from '@/lib/types/database'
 
 type UserQuest = Database['public']['Tables']['user_quests']['Row']
@@ -86,19 +85,15 @@ async function fetchExtensionRequests(): Promise<ExtensionRequest[]> {
 
 /**
  * Hook to fetch pending extension requests
- * Returns empty array if user is not authenticated or not a GM
+ * Returns empty array if user is not authenticated
+ * Server-side authorization handles GM permission check
  */
 export function useExtensionRequests() {
   const { user, isLoading: authLoading } = useAuth()
-  const { data: isGM, isLoading: gmLoading } = useIsGM()
 
   return useQuery({
     queryKey: ['extension-requests', user?.id],
     queryFn: async () => {
-      // Graceful fallback: return empty array if not authenticated or not GM
-      if (!user || !isGM) {
-        return []
-      }
       try {
         return await fetchExtensionRequests()
       } catch (error) {
@@ -107,8 +102,8 @@ export function useExtensionRequests() {
         return []
       }
     },
-    // Only run query when user is authenticated, GM check is complete
-    enabled: !!user && !authLoading && !gmLoading && isGM === true,
+    // Only run query when user is authenticated
+    enabled: !!user && !authLoading,
   })
 }
 
