@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Clock, Award, Edit, MoreVertical, Archive, Trash2 } from 'lucide-react'
+import { Clock, Award, Edit, MoreVertical, Archive, Trash2, Sparkles } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -77,6 +77,12 @@ export function GMQuestCard({ quest, className, onArchive, onDelete }: GMQuestCa
             <CardTitle className="text-lg leading-tight break-words">{quest.title}</CardTitle>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
+            {quest.featured && (
+              <Badge variant="outline" className="border-amber-500 text-amber-600 bg-amber-50">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Featured
+              </Badge>
+            )}
             <Badge variant={getStatusBadgeVariant(status)}>
               {getStatusLabel(status)}
             </Badge>
