@@ -123,9 +123,10 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
 
   const onSubmit = async (data: QuestFormData) => {
     try {
+      console.log('Submitting quest update:', { id: quest.id, data })
       await updateQuest.mutateAsync({ id: quest.id, data })
     } catch (error) {
-      console.error('Failed to update quest:', error)
+      console.error('Failed to update quest:', error instanceof Error ? error.message : error)
     }
   }
 

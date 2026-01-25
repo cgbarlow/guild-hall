@@ -1,4 +1,32 @@
-# Claude Code Configuration - Claude Flow V3
+# Claude Code Configuration - Guild Hall
+
+## 🗄️ DATABASE CONFIGURATION (IMPORTANT!)
+
+**This project uses REMOTE Supabase, NOT local.**
+
+- **Database**: Remote Supabase (cloud-hosted)
+- **Migrations**: Must be pushed to remote with `npx supabase db push`
+- **DO NOT** use `--local` flags or assume local database
+- **DO NOT** use `supabase db reset` (this only affects local)
+
+### Applying Migrations to Remote
+
+```bash
+# Login to Supabase (if not already)
+npx supabase login
+
+# Link to project (if not already linked)
+npx supabase link --project-ref <project-ref>
+
+# Push migrations to remote
+npx supabase db push
+```
+
+### Direct SQL (via Supabase Dashboard)
+
+If migrations fail, run SQL directly in Supabase Dashboard → SQL Editor.
+
+---
 
 ## 🚨 AUTOMATIC SWARM ORCHESTRATION
 

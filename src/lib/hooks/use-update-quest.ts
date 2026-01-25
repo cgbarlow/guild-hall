@@ -46,7 +46,8 @@ async function updateQuest({
     .single()
 
   if (error) {
-    throw error
+    console.error('Supabase update error:', error.message, error.code, error.details)
+    throw new Error(error.message || 'Failed to update quest')
   }
 
   return quest as unknown as QuestRow
