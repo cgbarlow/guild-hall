@@ -154,16 +154,34 @@ export async function getAllUsers(options: GetAllUsersOptions = {}): Promise<Use
  * Fetch a single user by ID with role (server action)
  */
 export async function getUserById(userId: string): Promise<UserWithRole | null> {
-  const supabase = await createClient()
+  // Verify caller is authenticated and is GM
+  const authClient = await createClient()
+  const { data: { user: currentUser } } = await authClient.auth.getUser()
 
+  if (!currentUser) {
+    return null
+  }
+
+  // Check if user is GM
+  const { data: callerRoles } = await authClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', currentUser.id)
+
+  const roles = callerRoles as { role: string }[] | null
+  const isGm = roles?.some(r => r.role === 'gm' || r.role === 'admin')
+
+  if (!isGm) {
+    return null
+  }
+
+  // Use service client to bypass RLS
+  const supabase = createServiceClient()
+
+  // Fetch user
   const { data: rawData, error } = await supabase
     .from('users')
-    .select(`
-      *,
-      user_roles (
-        role
-      )
-    `)
+    .select('*')
     .eq('id', userId)
     .single()
 
@@ -175,19 +193,25 @@ export async function getUserById(userId: string): Promise<UserWithRole | null> 
     return null
   }
 
-  const item = rawData as Record<string, unknown>
-  const roles = item.user_roles as { role: UserRoleRow['role'] }[] | null
+  // Fetch roles separately
+  const { data: userRolesData } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+
+  const userRoles = (userRolesData || []) as { role: string }[]
   let role: UserRoleRow['role'] | null = null
-  if (roles && roles.length > 0) {
-    if (roles.some(r => r.role === 'admin')) {
+  if (userRoles.length > 0) {
+    if (userRoles.some(r => r.role === 'admin')) {
       role = 'admin'
-    } else if (roles.some(r => r.role === 'gm')) {
+    } else if (userRoles.some(r => r.role === 'gm')) {
       role = 'gm'
     } else {
       role = 'member'
     }
   }
 
+  const item = rawData as Record<string, unknown>
   return {
     id: item.id as string,
     email: item.email as string | null,

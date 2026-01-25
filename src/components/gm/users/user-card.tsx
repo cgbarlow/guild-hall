@@ -55,9 +55,13 @@ export function UserCard({ user, isCurrentUser, className }: UserCardProps) {
               )}
             </div>
             <div className="min-w-0">
-              <CardTitle className="text-base leading-tight truncate">
+              <CardTitle className="text-base leading-tight truncate flex items-center gap-2">
                 {user.display_name || 'Anonymous'}
-                {isCurrentUser && <span className="ml-2 text-xs text-primary font-normal">(You)</span>}
+                {isCurrentUser && (
+                  <span className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded">
+                    You
+                  </span>
+                )}
               </CardTitle>
               <p className="text-xs text-muted-foreground truncate">
                 {user.email}
