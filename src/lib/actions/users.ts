@@ -66,14 +66,10 @@ export async function getAllUsers(options: GetAllUsersOptions = {}): Promise<Use
   // Use service client to bypass RLS for GM operations
   const supabase = createServiceClient()
 
+  // Fetch users (without embedded user_roles - FK points to auth.users not public.users)
   let query = supabase
     .from('users')
-    .select(`
-      *,
-      user_roles (
-        role
-      )
-    `)
+    .select('*')
     .order('total_points', { ascending: false })
 
   // Apply search filter
@@ -81,24 +77,43 @@ export async function getAllUsers(options: GetAllUsersOptions = {}): Promise<Use
     query = query.or(`display_name.ilike.%${options.search}%,email.ilike.%${options.search}%`)
   }
 
-  const { data, error } = await query
+  const { data: usersData, error: usersError } = await query
 
-  if (error) {
-    console.error('[getAllUsers] Error fetching users:', error)
+  if (usersError) {
+    console.error('[getAllUsers] Error fetching users:', usersError)
     return []
   }
 
-  console.log('[getAllUsers] Raw data count:', data?.length ?? 0)
+  console.log('[getAllUsers] Raw users count:', usersData?.length ?? 0)
+
+  // Fetch all roles separately
+  const { data: rolesData, error: rolesError } = await supabase
+    .from('user_roles')
+    .select('user_id, role')
+
+  if (rolesError) {
+    console.error('[getAllUsers] Error fetching roles:', rolesError)
+  }
+
+  // Create a map of user_id -> roles
+  const allRoles = (rolesData || []) as { user_id: string; role: string }[]
+  const rolesByUserId = new Map<string, string[]>()
+  for (const r of allRoles) {
+    if (!rolesByUserId.has(r.user_id)) {
+      rolesByUserId.set(r.user_id, [])
+    }
+    rolesByUserId.get(r.user_id)!.push(r.role)
+  }
 
   // Transform the data
-  let users = (data || []).map((item: Record<string, unknown>) => {
-    const roles = item.user_roles as { role: UserRoleRow['role'] }[] | null
+  let users = (usersData || []).map((item: Record<string, unknown>) => {
+    const userRoles = rolesByUserId.get(item.id as string) || []
     // Get the highest priority role
     let role: UserRoleRow['role'] | null = null
-    if (roles && roles.length > 0) {
-      if (roles.some(r => r.role === 'admin')) {
+    if (userRoles.length > 0) {
+      if (userRoles.includes('admin')) {
         role = 'admin'
-      } else if (roles.some(r => r.role === 'gm')) {
+      } else if (userRoles.includes('gm')) {
         role = 'gm'
       } else {
         role = 'member'
