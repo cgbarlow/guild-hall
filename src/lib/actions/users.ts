@@ -54,7 +54,8 @@ export async function getAllUsers(options: GetAllUsersOptions = {}): Promise<Use
     .select('role')
     .eq('user_id', currentUser.id)
 
-  const isGm = userRoles?.some(r => r.role === 'gm' || r.role === 'admin')
+  const roles = userRoles as { role: string }[] | null
+  const isGm = roles?.some(r => r.role === 'gm' || r.role === 'admin')
   console.log('[getAllUsers] User roles:', userRoles, 'Is GM:', isGm)
 
   if (!isGm) {
