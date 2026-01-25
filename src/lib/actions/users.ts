@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/types/database'
 
 type UserRow = Database['public']['Tables']['users']['Row']
@@ -33,14 +33,37 @@ export interface GetAllUsersOptions {
 }
 
 /**
- * Fetch all users (server action - RLS allows GMs to see all users)
+ * Fetch all users (server action)
+ * Uses service role to bypass RLS after verifying caller is GM
  */
 export async function getAllUsers(options: GetAllUsersOptions = {}): Promise<UserWithRole[]> {
-  const supabase = await createClient()
+  // First, verify the user is authenticated and is a GM
+  const authClient = await createClient()
+  const { data: { user: currentUser } } = await authClient.auth.getUser()
 
-  // Debug: Check current user
-  const { data: { user: currentUser } } = await supabase.auth.getUser()
-  console.log('[getAllUsers] Current user:', currentUser?.id, currentUser?.email)
+  if (!currentUser) {
+    console.log('[getAllUsers] No authenticated user')
+    return []
+  }
+
+  console.log('[getAllUsers] Current user:', currentUser.id, currentUser.email)
+
+  // Check if user is GM using auth client (respects RLS for own roles)
+  const { data: userRoles } = await authClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', currentUser.id)
+
+  const isGm = userRoles?.some(r => r.role === 'gm' || r.role === 'admin')
+  console.log('[getAllUsers] User roles:', userRoles, 'Is GM:', isGm)
+
+  if (!isGm) {
+    console.log('[getAllUsers] User is not GM, returning empty')
+    return []
+  }
+
+  // Use service client to bypass RLS for GM operations
+  const supabase = createServiceClient()
 
   let query = supabase
     .from('users')
