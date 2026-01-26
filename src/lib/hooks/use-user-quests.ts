@@ -9,7 +9,7 @@ type QuestRow = Database['public']['Tables']['quests']['Row']
 type UserQuestStatus = UserQuestRow['status']
 
 export interface UserQuestWithQuest extends UserQuestRow {
-  quest: Pick<QuestRow, 'id' | 'title' | 'description' | 'points' | 'status' | 'completion_days' | 'category_id'> & {
+  quest: Pick<QuestRow, 'id' | 'title' | 'description' | 'points' | 'status' | 'completion_days' | 'category_id' | 'badge_url'> & {
     requires_final_approval?: boolean
   } | null
   objectivesCount?: number
@@ -18,7 +18,7 @@ export interface UserQuestWithQuest extends UserQuestRow {
 
 // Type for joined query result
 type UserQuestQueryResult = UserQuestRow & {
-  quests: Pick<QuestRow, 'id' | 'title' | 'description' | 'points' | 'status' | 'completion_days' | 'category_id'> & {
+  quests: Pick<QuestRow, 'id' | 'title' | 'description' | 'points' | 'status' | 'completion_days' | 'category_id' | 'badge_url'> & {
     requires_final_approval?: boolean
   } | null
 }
@@ -49,6 +49,7 @@ async function fetchUserQuests(
         status,
         completion_days,
         category_id,
+        badge_url,
         requires_final_approval
       )
     `)

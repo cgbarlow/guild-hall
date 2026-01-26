@@ -102,6 +102,9 @@ export default function ReviewDetailPage() {
             userObjectiveId={submission.id}
             userName={user?.display_name || undefined}
             objectiveTitle={objective?.title}
+            currentStatus={submission.status}
+            reviewedAt={submission.reviewed_at}
+            feedback={submission.feedback}
           />
         </div>
 

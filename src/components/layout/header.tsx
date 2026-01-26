@@ -16,6 +16,7 @@ export function Header() {
   const supabase = createClient()
 
   const logoUrl = process.env.NEXT_PUBLIC_GUILD_LOGO_URL
+  const guildName = process.env.NEXT_PUBLIC_GUILD_NAME
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -26,17 +27,22 @@ export function Header() {
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2 text-xl font-bold">
-          {logoUrl && (
-            <Image
-              src={logoUrl}
-              alt="Guild Logo"
-              width={32}
-              height={32}
-              className="h-8 w-8 object-contain"
-            />
+        <Link href="/dashboard" className="flex items-center gap-3 text-xl">
+          <span className="font-bold">Guild Hall</span>
+          {guildName && (
+            <>
+              {logoUrl && (
+                <Image
+                  src={logoUrl}
+                  alt="Guild Logo"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 object-contain"
+                />
+              )}
+              <span className="font-normal text-lg">{guildName}</span>
+            </>
           )}
-          Guild Hall
         </Link>
 
         <nav className="flex items-center gap-4">

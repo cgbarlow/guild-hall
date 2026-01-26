@@ -2,27 +2,29 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/auth-context'
-import { getPendingSubmissions, type PendingSubmissionData } from '@/lib/actions/evidence'
+import { getPendingSubmissions, type PendingSubmissionData, type ReviewStatusFilter } from '@/lib/actions/evidence'
 
 export type PendingSubmission = PendingSubmissionData
+export type { ReviewStatusFilter }
 
 export interface UsePendingSubmissionsOptions {
   questId?: string
+  statusFilter?: ReviewStatusFilter
   enabled?: boolean
 }
 
 /**
- * React Query hook for fetching pending submissions for GM review
+ * React Query hook for fetching submissions for GM review
  */
 export function usePendingSubmissions(options: UsePendingSubmissionsOptions = {}) {
-  const { questId, enabled = true } = options
+  const { questId, statusFilter = 'pending', enabled = true } = options
   const { user, isLoading: authLoading } = useAuth()
 
   return useQuery({
-    queryKey: ['pendingSubmissions', questId, user?.id],
+    queryKey: ['pendingSubmissions', questId, statusFilter, user?.id],
     queryFn: async () => {
-      const result = await getPendingSubmissions(questId)
-      console.log('Pending submissions fetched:', result.length, 'items')
+      const result = await getPendingSubmissions(questId, statusFilter)
+      console.log('Submissions fetched:', result.length, 'items', 'filter:', statusFilter)
       return result
     },
     // Only run query when user is authenticated and explicitly enabled

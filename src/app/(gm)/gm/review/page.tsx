@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button'
 import { SubmissionList } from '@/components/gm/review/submission-list'
 import { ReviewFilters } from '@/components/gm/review/review-filters'
 import { QuestApprovalCard } from '@/components/gm/quest-approval-card'
-import { usePendingSubmissions } from '@/lib/hooks/use-pending-submissions'
+import { usePendingSubmissions, type ReviewStatusFilter } from '@/lib/hooks/use-pending-submissions'
 import { usePendingQuestApprovals } from '@/lib/hooks/use-quest-approvals'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function ReviewQueuePage() {
   const [questFilter, setQuestFilter] = useState<string | undefined>(undefined)
+  const [statusFilter, setStatusFilter] = useState<ReviewStatusFilter>('pending')
 
   const {
     data: submissions,
@@ -19,7 +20,7 @@ export default function ReviewQueuePage() {
     error,
     refetch,
     isFetching
-  } = usePendingSubmissions({ questId: questFilter })
+  } = usePendingSubmissions({ questId: questFilter, statusFilter })
 
   const {
     data: questApprovals,
@@ -84,6 +85,8 @@ export default function ReviewQueuePage() {
           <ReviewFilters
             questId={questFilter}
             onQuestChange={setQuestFilter}
+            statusFilter={statusFilter}
+            onStatusChange={setStatusFilter}
           />
 
           {error ? (
@@ -101,13 +104,22 @@ export default function ReviewQueuePage() {
             <>
               {!isLoading && submissions && submissions.length > 0 && (
                 <p className="text-sm text-muted-foreground">
-                  {submissions.length} submission{submissions.length !== 1 ? 's' : ''} pending review
+                  {submissions.length} submission{submissions.length !== 1 ? 's' : ''}{' '}
+                  {statusFilter === 'pending' ? 'pending review' : statusFilter === 'approved' ? 'approved' : statusFilter === 'rejected' ? 'rejected' : 'found'}
                 </p>
               )}
               <SubmissionList
                 submissions={submissions || []}
                 isLoading={isLoading}
-                emptyMessage="No pending submissions to review. Check back later!"
+                emptyMessage={
+                  statusFilter === 'pending'
+                    ? 'No pending submissions to review. Check back later!'
+                    : statusFilter === 'approved'
+                    ? 'No approved submissions yet.'
+                    : statusFilter === 'rejected'
+                    ? 'No rejected submissions.'
+                    : 'No submissions found.'
+                }
               />
             </>
           )}

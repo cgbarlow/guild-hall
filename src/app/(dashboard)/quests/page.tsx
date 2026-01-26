@@ -4,13 +4,16 @@ import { useState } from 'react'
 import { QuestList } from '@/components/quests/quest-list'
 import { QuestFilters } from '@/components/quests/quest-filters'
 import { QuestSearch } from '@/components/quests/quest-search'
+import { DifficultyFilter } from '@/components/quests/difficulty-filter'
 import { useQuests } from '@/lib/hooks/use-quests'
 import { useCategories } from '@/lib/hooks/use-categories'
 import { useDebounce } from '@/lib/hooks/use-debounce'
 import { useUserActiveQuestIds } from '@/lib/hooks/use-user-active-quest-ids'
+import type { QuestDifficulty } from '@/lib/types/quest'
 
 export default function QuestsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedDifficulty, setSelectedDifficulty] = useState<QuestDifficulty | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const debouncedSearch = useDebounce(searchQuery, 300)
 
@@ -18,6 +21,7 @@ export default function QuestsPage() {
   const { data: quests, isLoading: questsLoading, error } = useQuests({
     category_id: selectedCategory ?? undefined,
     search: debouncedSearch || undefined,
+    difficulty: selectedDifficulty ?? undefined,
   })
   const { data: activeQuestIds } = useUserActiveQuestIds()
 
@@ -39,11 +43,17 @@ export default function QuestsPage() {
       </div>
 
       {!categoriesLoading && (
-        <QuestFilters
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-        />
+        <div className="space-y-4">
+          <QuestFilters
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
+          <DifficultyFilter
+            selectedDifficulty={selectedDifficulty}
+            onDifficultyChange={setSelectedDifficulty}
+          />
+        </div>
       )}
 
       {error ? (

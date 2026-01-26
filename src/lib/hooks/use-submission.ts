@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { createClient } from '@/lib/supabase/client'
+import { getSubmissionById, getObjectiveCounts } from '@/lib/actions/evidence'
 import type { Database } from '@/lib/types/database'
 
 type UserObjectiveRow = Database['public']['Tables']['user_objectives']['Row']
@@ -18,88 +18,67 @@ export interface SubmissionDetail extends UserObjectiveRow {
   objective: ObjectiveRow | null
 }
 
-// Type for joined query result
-type SubmissionQueryResult = UserObjectiveRow & {
-  user_quests: UserQuestRow & {
-    users: UserRow | null
-    quests: QuestRow | null
-  }
-  objectives: ObjectiveRow | null
-}
-
 /**
  * Fetch a single submission with full details for review
+ * Uses server action to bypass RLS for GM access
  */
 async function fetchSubmission(id: string): Promise<SubmissionDetail | null> {
-  const supabase = createClient()
+  const submission = await getSubmissionById(id)
 
-  const { data: rawData, error } = await supabase
-    .from('user_objectives')
-    .select(`
-      *,
-      user_quests!inner (
-        *,
-        users (*),
-        quests (*)
-      ),
-      objectives (*)
-    `)
-    .eq('id', id)
-    .single()
-
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null // Not found
-    }
-    throw error
+  if (!submission) {
+    return null
   }
 
-  if (!rawData) return null
-
-  const data = rawData as unknown as SubmissionQueryResult
-
-  // Transform the data to match our interface
+  // Transform PendingSubmissionData to SubmissionDetail format
+  // The structures are compatible, just need type assertion
   return {
-    ...data,
+    id: submission.id,
+    objective_id: submission.objective_id,
+    user_quest_id: submission.user_quest_id,
+    status: submission.status,
+    evidence_text: submission.evidence_text,
+    evidence_url: submission.evidence_url,
+    submitted_at: submission.submitted_at,
+    reviewed_by: submission.reviewed_by,
+    reviewed_at: submission.reviewed_at,
+    feedback: submission.feedback,
+    created_at: submission.created_at,
+    updated_at: submission.updated_at,
     user_quest: {
-      ...data.user_quests,
-      user: data.user_quests.users,
-      quest: data.user_quests.quests,
-      users: undefined,
-      quests: undefined,
+      id: submission.user_quest.id,
+      user_id: submission.user_quest.user_id,
+      quest_id: submission.user_quest.quest_id,
+      status: submission.user_quest.status,
+      user: submission.user_quest.user ? {
+        id: submission.user_quest.user.id,
+        display_name: submission.user_quest.user.display_name,
+        email: submission.user_quest.user.email,
+        total_points: submission.user_quest.user.total_points,
+      } as UserRow : null,
+      quest: submission.user_quest.quest ? {
+        id: submission.user_quest.quest.id,
+        title: submission.user_quest.quest.title,
+        points: submission.user_quest.quest.points,
+      } as QuestRow : null,
     } as SubmissionDetail['user_quest'],
-    objective: data.objectives,
-    user_quests: undefined,
-    objectives: undefined,
+    objective: submission.objective ? {
+      id: submission.objective.id,
+      title: submission.objective.title,
+      description: submission.objective.description,
+      points: submission.objective.points,
+      evidence_type: submission.objective.evidence_type,
+    } as ObjectiveRow : null,
   } as SubmissionDetail
 }
 
-// Type for objective count query
-type ObjectiveCountResult = { id: string; status: string }
-
 /**
- * Fetch objective counts for a user quest
+ * Fetch objective counts for a user quest (uses server action for GM access)
  */
 async function fetchObjectiveCounts(userQuestId: string): Promise<{
   total: number
   completed: number
 }> {
-  const supabase = createClient()
-
-  const { data: rawData, error } = await supabase
-    .from('user_objectives')
-    .select('id, status')
-    .eq('user_quest_id', userQuestId)
-
-  if (error) {
-    throw error
-  }
-
-  const data = (rawData || []) as unknown as ObjectiveCountResult[]
-  const total = data.length
-  const completed = data.filter((o) => o.status === 'approved').length
-
-  return { total, completed }
+  return getObjectiveCounts(userQuestId)
 }
 
 /**

@@ -5,7 +5,7 @@ import { Clock, User, FileText, Link as LinkIcon, Eye, Award } from 'lucide-reac
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import type { PendingSubmission } from '@/lib/hooks/use-pending-submissions'
+import { getSubmissionStatusInfo, type PendingSubmission } from '@/lib/hooks/use-pending-submissions'
 import { cn } from '@/lib/utils'
 
 interface SubmissionCardProps {
@@ -47,6 +47,7 @@ export function SubmissionCard({ submission, className }: SubmissionCardProps) {
   const user = submission.user_quest.user
   const quest = submission.user_quest.quest
   const objective = submission.objective
+  const statusInfo = getSubmissionStatusInfo(submission.status)
 
   const hasTextEvidence = !!submission.evidence_text
   const hasUrlEvidence = !!submission.evidence_url
@@ -72,7 +73,7 @@ export function SubmissionCard({ submission, className }: SubmissionCardProps) {
               Quest: {quest?.title || 'Unknown Quest'}
             </p>
           </div>
-          <Badge variant="default">Pending Review</Badge>
+          <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
         </div>
       </CardHeader>
       <CardContent>

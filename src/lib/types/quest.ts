@@ -52,6 +52,20 @@ export interface QuestResource {
 // Difficulty levels
 export type QuestDifficulty = 'Apprentice' | 'Journeyman' | 'Expert' | 'Master'
 
+// Difficulty order for sorting (lower = easier)
+export const DIFFICULTY_ORDER: Record<QuestDifficulty, number> = {
+  'Apprentice': 1,
+  'Journeyman': 2,
+  'Expert': 3,
+  'Master': 4,
+}
+
+// Get difficulty order value (defaults to 1 if unknown)
+export function getDifficultyOrder(difficulty: QuestDifficulty | undefined | null): number {
+  if (!difficulty) return 1
+  return DIFFICULTY_ORDER[difficulty] ?? 1
+}
+
 // Extended quest type with additional fields for display
 export interface Quest {
   id: string
@@ -76,6 +90,7 @@ export interface Quest {
   resources: QuestResource[]
   design_notes: string | null
   featured: boolean
+  badge_url: string | null
   created_by: string
   created_at: string
   updated_at: string
@@ -99,6 +114,7 @@ export interface QuestFilters {
   status?: QuestStatus | QuestStatus[]
   search?: string
   is_template?: boolean
+  difficulty?: QuestDifficulty | null
 }
 
 // GM-specific quest filters

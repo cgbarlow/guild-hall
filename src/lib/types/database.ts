@@ -158,6 +158,11 @@ export type Database = {
           template_id: string | null
           narrative_context: string | null
           transformation_goal: string | null
+          difficulty: 'Apprentice' | 'Journeyman' | 'Expert' | 'Master' | null
+          resources: Json | null
+          design_notes: string | null
+          featured: boolean | null
+          badge_url: string | null
           created_by: string
           created_at: string
           updated_at: string
@@ -178,6 +183,11 @@ export type Database = {
           template_id?: string | null
           narrative_context?: string | null
           transformation_goal?: string | null
+          difficulty?: 'Apprentice' | 'Journeyman' | 'Expert' | 'Master' | null
+          resources?: Json | null
+          design_notes?: string | null
+          featured?: boolean | null
+          badge_url?: string | null
           created_by: string
           created_at?: string
           updated_at?: string
@@ -198,6 +208,11 @@ export type Database = {
           template_id?: string | null
           narrative_context?: string | null
           transformation_goal?: string | null
+          difficulty?: 'Apprentice' | 'Journeyman' | 'Expert' | 'Master' | null
+          resources?: Json | null
+          design_notes?: string | null
+          featured?: boolean | null
+          badge_url?: string | null
           created_by?: string
           created_at?: string
           updated_at?: string

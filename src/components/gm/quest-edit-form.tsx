@@ -31,6 +31,9 @@ import {
 import { useUpdateQuest, usePublishQuest, useArchiveQuest, useUnpublishQuest, useDeleteQuest } from '@/lib/hooks/use-update-quest'
 import { useCategories } from '@/lib/hooks/use-categories'
 import { ObjectiveEditor } from './objective-editor'
+import { ImageUpload } from '@/components/ui/image-upload'
+import { uploadQuestBadge, removeQuestBadge } from '@/lib/actions/badge'
+import { useQueryClient } from '@tanstack/react-query'
 import { questFormSchema, type QuestFormData, type QuestDifficultyType } from '@/lib/schemas/quest.schema'
 import type { Quest, QuestDbStatus, QuestResource } from '@/lib/types/quest'
 import { Loader2, Save, ArrowLeft, Send, Archive, Trash2, RotateCcw, Plus, X, ExternalLink } from 'lucide-react'
@@ -62,12 +65,34 @@ function getStatusBadgeVariant(status: QuestDbStatus): 'default' | 'secondary' |
 
 export function QuestEditForm({ quest }: QuestEditFormProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { data: categories } = useCategories()
   const updateQuest = useUpdateQuest()
   const publishQuest = usePublishQuest()
   const archiveQuest = useArchiveQuest()
   const unpublishQuest = useUnpublishQuest()
   const deleteQuest = useDeleteQuest()
+
+  // Badge upload handlers
+  const handleBadgeUpload = async (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const result = await uploadQuestBadge(quest.id, formData)
+    if (result.success) {
+      queryClient.invalidateQueries({ queryKey: ['quest', quest.id] })
+      queryClient.invalidateQueries({ queryKey: ['quests'] })
+    }
+    return result
+  }
+
+  const handleBadgeRemove = async () => {
+    const result = await removeQuestBadge(quest.id)
+    if (result.success) {
+      queryClient.invalidateQueries({ queryKey: ['quest', quest.id] })
+      queryClient.invalidateQueries({ queryKey: ['quests'] })
+    }
+    return result
+  }
 
   const {
     register,
@@ -310,20 +335,32 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Title */}
-            <div className="space-y-2">
-              <Label htmlFor="title">
-                Title <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="title"
-                placeholder="Enter quest title"
-                {...register('title')}
-                aria-invalid={!!errors.title}
-              />
-              {errors.title && (
-                <p className="text-sm text-destructive">{errors.title.message}</p>
-              )}
+            {/* Title and Badge */}
+            <div className="flex gap-4">
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="title">
+                  Title <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="title"
+                  placeholder="Enter quest title"
+                  {...register('title')}
+                  aria-invalid={!!errors.title}
+                />
+                {errors.title && (
+                  <p className="text-sm text-destructive">{errors.title.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label>Badge</Label>
+                <ImageUpload
+                  currentImageUrl={quest.badge_url}
+                  onUpload={handleBadgeUpload}
+                  onRemove={handleBadgeRemove}
+                  size="lg"
+                  placeholderText="Badge"
+                />
+              </div>
             </div>
 
             {/* Description */}

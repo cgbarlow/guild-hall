@@ -30,6 +30,8 @@ export default function ProfilePage() {
       </div>
       <ProfileStats totalPoints={profile.total_points ?? 0} questsCompleted={profile.quests_completed ?? 0} />
 
+      <ProfileForm initialData={{ display_name: profile.display_name, bio: profile.bio, avatar_url: profile.avatar_url }} />
+
       {/* Activity Feed (FR9.5) */}
       <ActivityFeed
         activities={activities}
@@ -38,8 +40,6 @@ export default function ProfilePage() {
         emptyMessage="No activity yet. Start a quest to see your progress here!"
         limit={10}
       />
-
-      <ProfileForm initialData={{ display_name: profile.display_name, bio: profile.bio, avatar_url: profile.avatar_url }} />
     </div>
   )
 }

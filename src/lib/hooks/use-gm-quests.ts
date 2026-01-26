@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/auth-context'
 import { getGMQuests } from '@/lib/actions/quests'
 import type { Quest, GMQuestFilters } from '@/lib/types/quest'
+import { getDifficultyOrder } from '@/lib/types/quest'
 
 /**
  * Fetch all quests for GM view using server action (bypasses RLS)
@@ -38,10 +39,19 @@ async function fetchGMQuests(filters?: GMQuestFilters): Promise<Quest[]> {
     filtered = filtered.filter(q => !q.is_template)
   }
 
-  // Sort: featured first, then by created_at descending
+  if (filters?.difficulty) {
+    filtered = filtered.filter(q => q.difficulty === filters.difficulty)
+  }
+
+  // Sort: featured first, then by difficulty (easiest first), then by created_at descending
   filtered.sort((a, b) => {
+    // Featured quests first
     if (a.featured && !b.featured) return -1
     if (!a.featured && b.featured) return 1
+    // Then by difficulty (easiest first)
+    const diffOrder = getDifficultyOrder(a.difficulty) - getDifficultyOrder(b.difficulty)
+    if (diffOrder !== 0) return diffOrder
+    // Then by created_at descending
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   })
 

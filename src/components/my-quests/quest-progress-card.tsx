@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Clock, Award, AlertCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ProgressBar } from './progress-bar'
@@ -37,8 +38,9 @@ export function QuestProgressCard({
     <Link href={`/my-quests/${userQuest.id}`} className="block">
       <Card className={cn('hover:shadow-md hover:border-primary/50 transition-all cursor-pointer', className)}>
         <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-1">
+          <div className="flex gap-4">
+            {/* Left column: status and title */}
+            <div className="flex-1 min-w-0 space-y-1">
               <div className="flex items-center gap-2">
                 <span
                   className={cn(
@@ -59,6 +61,19 @@ export function QuestProgressCard({
                 {userQuest.quest?.title || 'Untitled Quest'}
               </CardTitle>
             </div>
+            {/* Right column: badge image */}
+            {userQuest.quest?.badge_url && (
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 relative">
+                  <Image
+                    src={userQuest.quest.badge_url}
+                    alt="Quest badge"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </CardHeader>
       <CardContent className="space-y-4">

@@ -3,15 +3,26 @@
 import { useQuery } from '@tanstack/react-query'
 import { getPublishedQuests } from '@/lib/actions/quests'
 import type { Quest, QuestFilters } from '@/lib/types/quest'
+import { getDifficultyOrder } from '@/lib/types/quest'
 
 /**
  * Fetch quests using server action (bypasses RLS)
  */
 async function fetchQuests(filters?: QuestFilters): Promise<Quest[]> {
-  return getPublishedQuests({
+  let quests = await getPublishedQuests({
     category_id: filters?.category_id ?? undefined,
     search: filters?.search ?? undefined,
   })
+
+  // Apply difficulty filter client-side
+  if (filters?.difficulty) {
+    quests = quests.filter(q => q.difficulty === filters.difficulty)
+  }
+
+  // Sort by difficulty (easiest first)
+  quests.sort((a, b) => getDifficultyOrder(a.difficulty) - getDifficultyOrder(b.difficulty))
+
+  return quests
 }
 
 /**

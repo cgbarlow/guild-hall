@@ -1,21 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Scroll } from 'lucide-react'
 import { useUserQuests } from '@/lib/hooks/use-user-quests'
-import { QuestProgressCard, QuestStatusFilter } from '@/components/my-quests'
+import { QuestStatusFilter } from '@/components/my-quests'
+import { QuestCard } from '@/components/quests/quest-card'
 import type { Database } from '@/lib/types/database'
 
 type UserQuestStatus = Database['public']['Tables']['user_quests']['Row']['status']
 
+// Status priority for sorting: in_progress first, then accepted, then completed
+const STATUS_PRIORITY: Record<string, number> = {
+  in_progress: 1,
+  accepted: 2,
+  ready_to_claim: 3,
+  awaiting_final_approval: 4,
+  completed: 5,
+  abandoned: 6,
+  expired: 7,
+}
+
 function LoadingSkeleton() {
   return (
-    <div className="space-y-4">
-      {[1, 2, 3].map((i) => (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
         <div key={i} className="rounded-lg border bg-card p-6 animate-pulse">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <div className="h-5 w-20 bg-muted rounded" />
+              <div className="h-5 w-16 bg-muted rounded" />
             </div>
             <div className="h-6 w-3/4 bg-muted rounded" />
             <div className="h-4 w-full bg-muted rounded" />
@@ -48,11 +61,20 @@ export default function MyQuestsPage() {
   // Fetch all user quests
   const { data: allQuests, isLoading, error } = useUserQuests()
 
-  // Filter quests based on selected status
-  const filteredQuests = allQuests?.filter((quest) => {
-    if (statusFilter === 'all') return true
-    return quest.status === statusFilter
-  }) || []
+  // Filter and sort quests based on selected status
+  const filteredQuests = useMemo(() => {
+    const filtered = allQuests?.filter((quest) => {
+      if (statusFilter === 'all') return true
+      return quest.status === statusFilter
+    }) || []
+
+    // Sort by status priority: in_progress, accepted, then completed
+    return filtered.sort((a, b) => {
+      const priorityA = STATUS_PRIORITY[a.status] || 99
+      const priorityB = STATUS_PRIORITY[b.status] || 99
+      return priorityA - priorityB
+    })
+  }, [allQuests, statusFilter])
 
   // Calculate counts for each status
   const counts = {
@@ -98,10 +120,29 @@ export default function MyQuestsPage() {
           </div>
         )
       ) : (
-        <div className="grid gap-4">
-          {filteredQuests.map((userQuest) => (
-            <QuestProgressCard key={userQuest.id} userQuest={userQuest} />
-          ))}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {filteredQuests.map((userQuest) => {
+            // Transform userQuest.quest to QuestCardData format for QuestCard
+            const questData = {
+              id: userQuest.quest?.id || userQuest.quest_id,
+              title: userQuest.quest?.title || 'Unknown Quest',
+              description: userQuest.quest?.description || '',
+              points: userQuest.quest?.points || 0,
+              status: userQuest.quest?.status || 'published',
+              time_limit_days: userQuest.quest?.completion_days || null,
+              badge_url: userQuest.quest?.badge_url || null,
+              category_id: userQuest.quest?.category_id || null,
+            }
+
+            return (
+              <QuestCard
+                key={userQuest.id}
+                quest={questData}
+                userQuestId={userQuest.id}
+                userQuestStatus={userQuest.status}
+              />
+            )
+          })}
         </div>
       )}
     </div>

@@ -44,7 +44,7 @@ export function ObjectiveItem({
   const StatusIcon = statusIcons[statusInfo.icon]
   const isLocked = userObjective.status === 'locked'
   const requiresEvidence = userObjective.objective?.evidence_required
-  const canSubmit = userObjective.status === 'available' && requiresEvidence
+  const canSubmit = (userObjective.status === 'available' || userObjective.status === 'rejected') && requiresEvidence
   const canMarkComplete = userObjective.status === 'available' && !requiresEvidence
   const isCompleted = userObjective.status === 'approved'
 
@@ -157,7 +157,7 @@ export function ObjectiveItem({
                   ) : (
                     <Undo2 className="h-4 w-4" />
                   )}
-                  <span className="ml-1 sr-only sm:not-sr-only">Undo</span>
+                  <span className="ml-1 sr-only sm:not-sr-only">Reset</span>
                 </Button>
               )}
 
@@ -203,7 +203,7 @@ export function ObjectiveItem({
           <AlertDialog open={showUndoConfirm} onOpenChange={setShowUndoConfirm}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Undo Objective?</AlertDialogTitle>
+                <AlertDialogTitle>Reset Objective?</AlertDialogTitle>
                 <AlertDialogDescription>
                   {userObjective.status === 'submitted' ? (
                     <>
@@ -225,7 +225,7 @@ export function ObjectiveItem({
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction onClick={performUndo}>
-                  Undo
+                  Reset
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
