@@ -86,8 +86,8 @@ export function UpdatePasswordForm() {
             </svg>
           </div>
           <div className="grid gap-2">
-            <h2 className="text-lg font-semibold">Password Updated</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-lg font-semibold text-foreground">Password Updated</h2>
+            <p className="text-sm text-foreground/80">
               Your password has been successfully updated. Redirecting to dashboard...
             </p>
           </div>
@@ -99,14 +99,14 @@ export function UpdatePasswordForm() {
   return (
     <div className="grid gap-6">
       <div className="grid gap-2 text-center">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-foreground/80">
           Enter your new password below.
         </p>
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="password">New Password</Label>
+            <Label htmlFor="password" className="text-foreground font-medium">New Password</Label>
             <Input
               id="password"
               type="password"
@@ -119,7 +119,7 @@ export function UpdatePasswordForm() {
             )}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" className="text-foreground font-medium">Confirm Password</Label>
             <Input
               id="confirmPassword"
               type="password"

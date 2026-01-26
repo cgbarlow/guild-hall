@@ -11,7 +11,7 @@ function ResetPasswordContent() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-center mb-6">
+      <h1 className="text-2xl font-bold text-center mb-6 text-foreground">
         {isUpdateMode ? 'Set New Password' : 'Reset Password'}
       </h1>
       {isUpdateMode ? <UpdatePasswordForm /> : <ResetPasswordForm />}
