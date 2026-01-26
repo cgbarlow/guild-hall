@@ -62,9 +62,28 @@ export function Header() {
               GM
             </Link>
           )}
-          <Link href="/settings/privacy" className="text-sm hover:underline">
-            Settings
-          </Link>
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                  <Settings className="h-5 w-5" />
+                  <span className="sr-only">Settings</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link href="/settings/privacy" className="cursor-pointer">
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings/password" className="cursor-pointer">
+                    Change Password
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           {user && <NotificationBell />}
           {user && (
             <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -98,6 +117,11 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link href="/settings/privacy" className="cursor-pointer">
                     Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings/password" className="cursor-pointer">
+                    Change Password
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

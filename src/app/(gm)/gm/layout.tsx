@@ -9,9 +9,9 @@ export default function GMLayout({
 }) {
   return (
     <GMAuthGuard>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <GMHeader />
-        <div className="flex">
+        <div className="flex flex-1">
           <GMSidebar />
           <main className="flex-1 px-4 py-8 lg:px-8">
             {children}

@@ -21,13 +21,13 @@ export default async function DashboardPage() {
   if (user?.id) {
     const { data: profile } = await supabase
       .from('users')
-      .select('display_name, points')
+      .select('display_name, total_points')
       .eq('id', user.id)
       .single()
 
     if (profile) {
-      displayName = (profile as { display_name?: string; points?: number }).display_name || displayName
-      points = (profile as { display_name?: string; points?: number }).points || 0
+      displayName = (profile as { display_name?: string; total_points?: number }).display_name || displayName
+      points = (profile as { display_name?: string; total_points?: number }).total_points || 0
     }
 
     // Fetch user quests for stats

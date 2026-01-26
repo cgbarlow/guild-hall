@@ -9,7 +9,6 @@ import {
   Map,
   User,
   Trophy,
-  Settings,
 } from 'lucide-react'
 
 interface SidebarItem {
@@ -43,11 +42,6 @@ const sidebarItems: SidebarItem[] = [
     href: '/profile',
     label: 'Profile',
     icon: <User className="h-5 w-5" />,
-  },
-  {
-    href: '/settings/appearance',
-    label: 'Settings',
-    icon: <Settings className="h-5 w-5" />,
   },
 ]
 
