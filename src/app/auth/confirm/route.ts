@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   let redirectTo = next
   if (type === 'recovery') {
     redirectTo = '/reset-password?update=true'
-  } else if (type === 'signup' || type === 'email') {
+  } else if (type === 'signup' || type === 'email' || type === 'email_change' || type === 'invite' || type === 'magiclink') {
     redirectTo = '/dashboard'
   }
 
