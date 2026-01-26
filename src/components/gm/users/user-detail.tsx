@@ -1,11 +1,13 @@
 'use client'
 
-import { User, Award, Scroll, Calendar, Mail, Shield } from 'lucide-react'
+import { User, Award, Scroll, Calendar, Mail, Shield, Ban, KeyRound } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { UserWithRole } from '@/lib/hooks/use-all-users'
 import { useUserQuestCounts, useUserQuestHistory } from '@/lib/hooks/use-all-users'
+import { UserActions } from './user-actions'
+import { useAuth } from '@/contexts/auth-context'
 
 interface UserDetailProps {
   user: UserWithRole
@@ -50,9 +52,12 @@ function getQuestStatusBadge(status: string): { label: string; variant: 'default
 }
 
 export function UserDetail({ user }: UserDetailProps) {
+  const { user: currentUser } = useAuth()
   const roleBadge = getRoleBadge(user.role)
   const { data: counts, isLoading: countsLoading } = useUserQuestCounts(user.id)
   const { data: questHistory, isLoading: historyLoading } = useUserQuestHistory(user.id)
+
+  const isCurrentUser = currentUser?.id === user.id
 
   return (
     <div className="space-y-6">
@@ -73,7 +78,7 @@ export function UserDetail({ user }: UserDetailProps) {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <CardTitle className="text-2xl">
                   {user.display_name || 'Anonymous User'}
                 </CardTitle>
@@ -81,6 +86,18 @@ export function UserDetail({ user }: UserDetailProps) {
                   <Shield className="h-3 w-3 mr-1" />
                   {roleBadge.label}
                 </Badge>
+                {user.is_disabled && (
+                  <Badge variant="destructive">
+                    <Ban className="h-3 w-3 mr-1" />
+                    Disabled
+                  </Badge>
+                )}
+                {user.force_password_reset && (
+                  <Badge variant="secondary">
+                    <KeyRound className="h-3 w-3 mr-1" />
+                    Password Reset Required
+                  </Badge>
+                )}
               </div>
               <div className="flex items-center gap-1 text-muted-foreground">
                 <Mail className="h-4 w-4" />
@@ -180,6 +197,9 @@ export function UserDetail({ user }: UserDetailProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* GM Actions */}
+      <UserActions user={user} isCurrentUser={isCurrentUser} />
     </div>
   )
 }

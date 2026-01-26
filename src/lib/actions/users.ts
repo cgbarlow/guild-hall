@@ -25,6 +25,11 @@ export interface UserWithRole {
   created_at: string
   updated_at: string
   role: UserRoleRow['role'] | null
+  // GM admin fields
+  is_disabled: boolean
+  force_password_reset: boolean
+  disabled_at: string | null
+  disabled_by: string | null
 }
 
 export interface GetAllUsersOptions {
@@ -139,6 +144,11 @@ export async function getAllUsers(options: GetAllUsersOptions = {}): Promise<Use
       created_at: item.created_at as string,
       updated_at: item.updated_at as string,
       role,
+      // GM admin fields
+      is_disabled: (item.is_disabled as boolean) ?? false,
+      force_password_reset: (item.force_password_reset as boolean) ?? false,
+      disabled_at: item.disabled_at as string | null,
+      disabled_by: item.disabled_by as string | null,
     }
   })
 
@@ -231,5 +241,10 @@ export async function getUserById(userId: string): Promise<UserWithRole | null> 
     created_at: item.created_at as string,
     updated_at: item.updated_at as string,
     role,
+    // GM admin fields
+    is_disabled: (item.is_disabled as boolean) ?? false,
+    force_password_reset: (item.force_password_reset as boolean) ?? false,
+    disabled_at: item.disabled_at as string | null,
+    disabled_by: item.disabled_by as string | null,
   }
 }
