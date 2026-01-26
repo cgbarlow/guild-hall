@@ -38,7 +38,7 @@ export function RegisterForm() {
           data: {
             full_name: data.displayName,
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/confirm?type=signup`,
         },
       })
 

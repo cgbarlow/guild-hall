@@ -9,10 +9,12 @@ export async function GET(request: Request) {
   const type = requestUrl.searchParams.get('type') as EmailOtpType | null
   const next = requestUrl.searchParams.get('next') ?? '/dashboard'
 
-  // Determine redirect URL
+  // Determine redirect URL based on type
   let redirectUrl = new URL(next, requestUrl.origin)
   if (type === 'recovery') {
     redirectUrl = new URL('/reset-password?update=true', requestUrl.origin)
+  } else if (type === 'signup' || type === 'email') {
+    redirectUrl = new URL('/dashboard', requestUrl.origin)
   }
 
   if (token_hash && type) {
