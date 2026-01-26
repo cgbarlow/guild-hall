@@ -48,8 +48,8 @@ export function ResetPasswordForm() {
     return (
       <Card className="w-full max-w-md border-0 bg-transparent shadow-none">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl font-bold text-foreground">Check your email</CardTitle>
+          <CardDescription className="text-foreground/80">
             We&#39;ve sent you a password reset link. Please check your email.
           </CardDescription>
         </CardHeader>
@@ -67,15 +67,15 @@ export function ResetPasswordForm() {
   return (
     <Card className="w-full max-w-md border-0 bg-transparent shadow-none">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Reset password</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl font-bold text-foreground">Reset password</CardTitle>
+        <CardDescription className="text-foreground/80">
           Enter your email address and we&#39;ll send you a reset link
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-foreground font-medium">Email</Label>
             <Input
               id="email"
               type="email"
@@ -99,9 +99,9 @@ export function ResetPasswordForm() {
           </Button>
         </form>
 
-        <div className="text-center text-sm">
+        <div className="text-center text-sm text-foreground/80">
           Remember your password?{' '}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href="/login" className="text-primary font-medium hover:underline">
             Sign in
           </Link>
         </div>

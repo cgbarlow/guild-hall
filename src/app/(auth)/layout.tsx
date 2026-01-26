@@ -6,6 +6,7 @@ export default function AuthLayout({
   return (
     <div
       className="min-h-screen h-screen flex items-center justify-center p-4"
+      data-theme="warm"
       style={{
         backgroundImage: 'url(/guild-hall.jpg)',
         backgroundSize: 'cover',
@@ -13,7 +14,7 @@ export default function AuthLayout({
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <div className="bg-background/40 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
+      <div className="bg-background/60 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
         {children}
       </div>
     </div>

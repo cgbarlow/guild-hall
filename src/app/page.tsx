@@ -5,6 +5,7 @@ export default function HomePage() {
   return (
     <div
       className="min-h-screen h-screen flex flex-col items-center justify-center p-4"
+      data-theme="warm"
       style={{
         backgroundImage: 'url(/guild-hall.jpg)',
         backgroundSize: 'cover',

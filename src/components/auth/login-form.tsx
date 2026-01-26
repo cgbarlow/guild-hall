@@ -51,8 +51,8 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md border-0 bg-transparent shadow-none">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl font-bold text-foreground">Sign in</CardTitle>
+        <CardDescription className="text-foreground/80">
           Enter your email and password to sign in to your account
         </CardDescription>
       </CardHeader>
@@ -61,10 +61,10 @@ export function LoginForm() {
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+            <span className="w-full border-t border-foreground/20" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
+            <span className="bg-background/60 px-2 text-foreground/70">
               Or continue with
             </span>
           </div>
@@ -77,7 +77,7 @@ export function LoginForm() {
           method="POST"
         >
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-foreground font-medium">Email</Label>
             <Input
               id="email"
               type="email"
@@ -92,10 +92,10 @@ export function LoginForm() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
               <Link
                 href="/reset-password"
-                className="text-sm text-muted-foreground hover:text-primary"
+                className="text-sm text-foreground/70 hover:text-primary"
               >
                 Forgot password?
               </Link>
@@ -122,9 +122,9 @@ export function LoginForm() {
           </Button>
         </form>
 
-        <div className="text-center text-sm">
+        <div className="text-center text-sm text-foreground/80">
           Don&#39;t have an account?{' '}
-          <Link href="/register" className="text-primary hover:underline">
+          <Link href="/register" className="text-primary font-medium hover:underline">
             Sign up
           </Link>
         </div>
