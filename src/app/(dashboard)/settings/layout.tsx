@@ -20,6 +20,12 @@ export default function SettingsLayout({
           Privacy
         </Link>
         <Link
+          href="/settings/password"
+          className="text-sm font-medium hover:text-primary"
+        >
+          Password
+        </Link>
+        <Link
           href="/settings/export"
           className="text-sm font-medium hover:text-primary"
         >
