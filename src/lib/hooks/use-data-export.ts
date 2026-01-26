@@ -18,7 +18,9 @@ export function useDataExport() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
-      const { data, error: rpcError } = await supabase.rpc('export_user_data')
+      const { data, error: rpcError } = await supabase.rpc('export_user_data', {
+        target_user_id: user.id
+      })
       
       if (rpcError) throw new Error(rpcError.message)
 
