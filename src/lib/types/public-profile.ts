@@ -10,6 +10,18 @@ export interface Achievement {
 }
 
 /**
+ * Quest badge earned by completing a quest
+ */
+export interface QuestBadge {
+  id: string
+  quest_id: string
+  quest_title: string
+  badge_url: string
+  completed_at: string
+  formatted_date: string // Pre-formatted to avoid hydration errors
+}
+
+/**
  * Privacy settings for a user profile
  */
 export interface PrivacySettings {
@@ -42,6 +54,7 @@ export interface PublicProfile {
   bio: string | null
   total_points: number
   achievements: Achievement[]
+  quest_badges: QuestBadge[]
   leaderboard_position?: number
   quests_completed: number
 }

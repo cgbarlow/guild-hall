@@ -2,11 +2,12 @@
 
 import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from 'react'
 
-export type Theme = 'light' | 'dark' | 'system'
+export type Theme = 'light' | 'warm' | 'dark' | 'system'
+export type ResolvedTheme = 'light' | 'warm' | 'dark'
 
 interface ThemeContextValue {
   theme: Theme
-  resolvedTheme: 'light' | 'dark'
+  resolvedTheme: ResolvedTheme
   setTheme: (theme: Theme) => void
 }
 
@@ -14,14 +15,14 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 
 const STORAGE_KEY = 'guild-hall-theme'
 
-function getSystemTheme(): 'light' | 'dark' {
+function getSystemTheme(): ResolvedTheme {
   if (typeof window === 'undefined') return 'light'
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function applyThemeClass(theme: 'light' | 'dark') {
+function applyThemeClass(theme: ResolvedTheme) {
   const root = document.documentElement
-  root.classList.remove('light', 'dark')
+  root.classList.remove('light', 'warm', 'dark')
   root.classList.add(theme)
 }
 
@@ -30,9 +31,16 @@ interface ThemeProviderProps {
   defaultTheme?: Theme
 }
 
-export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProviderProps) {
+function resolveTheme(theme: Theme): ResolvedTheme {
+  if (theme === 'system') {
+    return getSystemTheme()
+  }
+  return theme
+}
+
+export function ThemeProvider({ children, defaultTheme = 'warm' }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(defaultTheme)
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('warm')
   const [mounted, setMounted] = useState(false)
 
   // Initialize theme from localStorage on mount
@@ -42,7 +50,7 @@ export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProvid
     const initialTheme = stored || defaultTheme
     setThemeState(initialTheme)
 
-    const resolved = initialTheme === 'system' ? getSystemTheme() : initialTheme
+    const resolved = resolveTheme(initialTheme)
     setResolvedTheme(resolved)
     applyThemeClass(resolved)
   }, [defaultTheme])
@@ -69,7 +77,7 @@ export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProvid
     setThemeState(newTheme)
     localStorage.setItem(STORAGE_KEY, newTheme)
 
-    const resolved = newTheme === 'system' ? getSystemTheme() : newTheme
+    const resolved = resolveTheme(newTheme)
     setResolvedTheme(resolved)
     applyThemeClass(resolved)
   }, [])

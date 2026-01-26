@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Award, Clock, User, Calendar, Zap, ExternalLink, BookOpen } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { QuestStatusBadge } from './quest-status-badge'
@@ -49,7 +50,7 @@ export function QuestDetail({
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-2">
+            <div className="space-y-2 flex-1">
               {quest.category && <CategoryBadge category={quest.category} />}
               <CardTitle className="text-2xl sm:text-3xl">{quest.title}</CardTitle>
               <CardDescription className="flex items-center gap-2">
@@ -57,7 +58,19 @@ export function QuestDetail({
                 Posted on {formatDate(quest.created_at)}
               </CardDescription>
             </div>
-            <QuestStatusBadge status={quest.status} className="self-start" />
+            <div className="flex items-start gap-4">
+              <QuestStatusBadge status={quest.status} className="self-start" />
+              {quest.badge_url && (
+                <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0">
+                  <Image
+                    src={quest.badge_url}
+                    alt={`${quest.title} badge`}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">

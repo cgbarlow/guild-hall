@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, Award, Clock, Calendar, AlertCircle } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -136,7 +137,7 @@ export default function QuestProgressPage() {
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-2">
+            <div className="space-y-2 flex-1">
               <div className="flex items-center gap-2">
                 <span
                   className={cn(
@@ -165,6 +166,16 @@ export default function QuestProgressPage() {
                 Accepted on {formatDate(userQuest.accepted_at)}
               </CardDescription>
             </div>
+            {userQuest.quest?.badge_url && (
+              <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0">
+                <Image
+                  src={userQuest.quest.badge_url}
+                  alt={`${userQuest.quest.title} badge`}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            )}
           </div>
         </CardHeader>
 

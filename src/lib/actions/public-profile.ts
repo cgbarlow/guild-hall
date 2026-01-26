@@ -5,6 +5,7 @@ import type {
   PublicProfile,
   PublicProfileResult,
   Achievement,
+  QuestBadge,
   PrivacySettings,
 } from '@/lib/types/public-profile'
 
@@ -35,6 +36,26 @@ type UserAchievementQueryResult = {
     description: string
     icon: string
   } | null
+}
+
+// Type for completed user quests query result
+type UserQuestQueryResult = {
+  id: string
+  completed_at: string | null
+  quests: {
+    id: string
+    title: string
+    badge_url: string | null
+  } | null
+}
+
+/**
+ * Format date on server to avoid hydration mismatch
+ */
+function formatDateServer(dateString: string): string {
+  const date = new Date(dateString)
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`
 }
 
 /**
@@ -96,11 +117,13 @@ export async function fetchPublicProfile(userId: string): Promise<PublicProfileR
     total_points: userData.total_points ?? 0,
     quests_completed: userData.quests_completed ?? 0,
     achievements: [],
+    quest_badges: [],
   }
 
-  // Fetch achievements if allowed (default to true if no privacy settings)
+  // Fetch badges if allowed (default to true if no privacy settings)
   const showBadges = privacySettings?.show_badges ?? true
   if (showBadges) {
+    // Fetch achievements (keeping for backwards compatibility)
     const { data: rawAchievementsData } = await supabase
       .from('user_achievements')
       .select(`
@@ -127,6 +150,39 @@ export async function fetchPublicProfile(userId: string): Promise<PublicProfileR
         icon: ua.achievements?.icon ?? 'trophy',
         earned_at: ua.earned_at,
       })) as Achievement[]
+    }
+
+    // Fetch quest badges (completed quests with badge images)
+    const { data: rawQuestBadgesData } = await supabase
+      .from('user_quests')
+      .select(`
+        id,
+        completed_at,
+        quests (
+          id,
+          title,
+          badge_url
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'completed')
+      .not('quests.badge_url', 'is', null)
+      .order('completed_at', { ascending: false })
+      .limit(50)
+
+    const questBadgesData = (rawQuestBadgesData || []) as unknown as UserQuestQueryResult[]
+
+    if (questBadgesData.length > 0) {
+      publicProfile.quest_badges = questBadgesData
+        .filter((uq) => uq.quests && uq.quests.badge_url)
+        .map((uq) => ({
+          id: uq.id,
+          quest_id: uq.quests!.id,
+          quest_title: uq.quests!.title,
+          badge_url: uq.quests!.badge_url!,
+          completed_at: uq.completed_at || '',
+          formatted_date: uq.completed_at ? formatDateServer(uq.completed_at) : '',
+        })) as QuestBadge[]
     }
   }
 

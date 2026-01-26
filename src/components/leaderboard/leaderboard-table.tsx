@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/table'
 import { PointsDisplay } from '@/components/common/points-display'
 import { Skeleton } from '@/components/ui/skeleton'
+import { InlineBadges } from './inline-badges'
+import { useLeaderboardBadges, type LeaderboardBadgesMap } from '@/lib/hooks/use-leaderboard-badges'
 import type { LeaderboardEntry } from '@/lib/hooks/use-leaderboard'
 
 interface LeaderboardTableProps {
@@ -48,6 +50,10 @@ export function LeaderboardTable({
   onRowClick,
   className,
 }: LeaderboardTableProps) {
+  // Fetch badges for all leaderboard entries
+  const userIds = entries.map((e) => e.id)
+  const { data: badgesMap = {} } = useLeaderboardBadges(userIds)
+
   if (isLoading) {
     return <LeaderboardTableSkeleton />
   }
@@ -119,17 +125,22 @@ export function LeaderboardTable({
                         <UserIcon className="h-5 w-5 text-muted-foreground" />
                       </div>
                     )}
-                    <div className="flex items-center gap-2">
-                      <span className={cn(
-                        'font-medium',
-                        isCurrentUser && 'text-primary'
-                      )}>
-                        {entry.display_name || 'Anonymous Adventurer'}
-                      </span>
-                      {isCurrentUser && (
-                        <span className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded">
-                          You
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          'font-medium',
+                          isCurrentUser && 'text-primary'
+                        )}>
+                          {entry.display_name || 'Anonymous Adventurer'}
                         </span>
+                        {isCurrentUser && (
+                          <span className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded">
+                            You
+                          </span>
+                        )}
+                      </div>
+                      {badgesMap[entry.id] && badgesMap[entry.id].length > 0 && (
+                        <InlineBadges badges={badgesMap[entry.id]} maxDisplay={5} />
                       )}
                     </div>
                   </div>

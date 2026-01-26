@@ -1,9 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { User, Trophy, ScrollText, TrendingUp } from 'lucide-react'
+import { User, Trophy, ScrollText, TrendingUp, Award } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BadgeShowcase } from '@/components/profile/badge-showcase'
+import { QuestBadgeShowcase } from '@/components/profile/quest-badge-showcase'
 import { cn } from '@/lib/utils'
 import type { PublicProfile } from '@/lib/types/public-profile'
 
@@ -129,15 +129,15 @@ export function PublicProfileCard({ profile, className }: PublicProfileCardProps
           )}
         </div>
 
-        {/* Achievements Section */}
-        {profile.achievements.length > 0 && (
+        {/* Quest Badges Section */}
+        {profile.quest_badges && profile.quest_badges.length > 0 && (
           <div className="space-y-3 pt-4 border-t">
             <h3 className="flex items-center gap-2 font-semibold">
-              <Trophy className="h-5 w-5 text-amber-500" />
-              Achievements
+              <Award className="h-5 w-5 text-amber-500" />
+              Quest Badges
             </h3>
-            <BadgeShowcase
-              achievements={profile.achievements}
+            <QuestBadgeShowcase
+              badges={profile.quest_badges}
               size="sm"
               maxDisplay={10}
             />

@@ -46,7 +46,7 @@ export function ResetPasswordForm() {
 
   if (success) {
     return (
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md border-0 bg-transparent shadow-none">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
           <CardDescription>
@@ -65,7 +65,7 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md border-0 bg-transparent shadow-none">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold">Reset password</CardTitle>
         <CardDescription>

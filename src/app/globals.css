@@ -26,6 +26,29 @@
     --radius: 0.5rem;
   }
 
+  /* Warm theme - Guild Hall Tavern feel */
+  .warm {
+    --background: 47 78% 96%;
+    --foreground: 30 50% 16%;
+    --card: 43 60% 94%;
+    --card-foreground: 30 50% 16%;
+    --popover: 43 60% 94%;
+    --popover-foreground: 30 50% 16%;
+    --primary: 43 85% 38%;
+    --primary-foreground: 43 100% 97%;
+    --secondary: 38 40% 85%;
+    --secondary-foreground: 30 50% 16%;
+    --muted: 38 35% 88%;
+    --muted-foreground: 30 25% 44%;
+    --accent: 40 60% 56%;
+    --accent-foreground: 30 50% 16%;
+    --destructive: 0 55% 50%;
+    --destructive-foreground: 43 100% 97%;
+    --border: 40 35% 75%;
+    --input: 40 35% 80%;
+    --ring: 43 85% 38%;
+  }
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
