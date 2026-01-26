@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <ThemeProvider defaultTheme="system">
+        <ThemeProvider defaultTheme="warm">
           <QueryProvider>
             <AuthProvider>
               <NotificationProvider>{children}</NotificationProvider>
