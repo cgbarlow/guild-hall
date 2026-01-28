@@ -59,7 +59,7 @@ export function QuestDetail({
               </CardDescription>
             </div>
             <div className="flex items-start gap-4">
-              <QuestStatusBadge status={quest.status} className="self-start" />
+              <QuestStatusBadge status={quest.status} isExclusive={quest.is_exclusive} className="self-start" />
               {quest.badge_url && (
                 <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0">
                   <Image

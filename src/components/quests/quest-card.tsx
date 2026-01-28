@@ -26,6 +26,7 @@ interface QuestCardData {
   category_id?: string | null
   category?: Category | null
   difficulty?: QuestDifficulty | null
+  is_exclusive?: boolean
 }
 
 interface QuestCardProps {
@@ -137,7 +138,12 @@ export function QuestCard({ quest, className, userQuestId, userQuestStatus }: Qu
                     </Badge>
                   )}
                 </div>
-                {!userQuestId && !userQuestStatus && <QuestStatusBadge status={displayStatus} />}
+                {!userQuestId && !userQuestStatus && (
+                  <QuestStatusBadge
+                    status={displayStatus}
+                    isExclusive={'is_exclusive' in quest ? quest.is_exclusive : false}
+                  />
+                )}
               </div>
               <CardTitle className="text-lg leading-tight">{quest.title}</CardTitle>
             </div>
