@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, Award, Clock, Swords } from 'lucide-react'
+import { Loader2, Award, Clock, Swords, Lock } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +14,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useAcceptQuest } from '@/lib/hooks/use-accept-quest'
 import type { Quest } from '@/lib/types/quest'
 
@@ -31,20 +33,32 @@ export function AcceptQuestModal({
   disabled,
 }: AcceptQuestModalProps) {
   const [open, setOpen] = useState(false)
+  const [exclusiveCode, setExclusiveCode] = useState('')
 
   const { mutate: acceptQuest, isPending, error } = useAcceptQuest({
     onSuccess: () => {
       setOpen(false)
+      setExclusiveCode('')
       onAccepted?.()
     },
   })
 
   const handleAccept = () => {
-    acceptQuest(quest.id)
+    acceptQuest({
+      questId: quest.id,
+      exclusiveCode: quest.is_exclusive ? exclusiveCode : undefined,
+    })
+  }
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen)
+    if (!newOpen) {
+      setExclusiveCode('')
+    }
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogTrigger asChild>
         {trigger || (
           <Button size="lg" disabled={disabled}>
@@ -55,9 +69,14 @@ export function AcceptQuestModal({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Accept Quest</AlertDialogTitle>
+          <AlertDialogTitle className="flex items-center gap-2">
+            {quest.is_exclusive && <Lock className="h-5 w-5 text-amber-500" />}
+            Accept Quest
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            Are you ready to embark on this quest?
+            {quest.is_exclusive
+              ? 'This is an exclusive quest. Enter the unlock code to proceed.'
+              : 'Are you ready to embark on this quest?'}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -110,6 +129,25 @@ export function AcceptQuestModal({
             </div>
           )}
 
+          {/* Exclusive Quest Code Input */}
+          {quest.is_exclusive && (
+            <div className="space-y-2 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+              <Label htmlFor="exclusive-code" className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                <Lock className="h-4 w-4" />
+                Unlock Code
+              </Label>
+              <Input
+                id="exclusive-code"
+                type="text"
+                placeholder="Enter the secret code"
+                value={exclusiveCode}
+                onChange={(e) => setExclusiveCode(e.target.value)}
+                className="font-mono"
+                disabled={isPending}
+              />
+            </div>
+          )}
+
           {error && (
             <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
               {error.message}
@@ -119,7 +157,10 @@ export function AcceptQuestModal({
 
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleAccept} disabled={isPending}>
+          <AlertDialogAction
+            onClick={handleAccept}
+            disabled={isPending || (quest.is_exclusive && !exclusiveCode.trim())}
+          >
             {isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

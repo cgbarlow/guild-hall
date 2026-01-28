@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { GripVertical, Trash2, ChevronDown, ChevronUp, Link as LinkIcon, FileText, Lock, ExternalLink } from 'lucide-react'
+import { GripVertical, Trash2, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Link as LinkIcon, FileText, Lock, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -36,6 +36,10 @@ interface ObjectiveItemProps {
   allObjectives: Objective[]
   onUpdate: (data: Partial<ObjectiveFormData>) => void
   onDelete: () => void
+  onMoveUp?: () => void
+  onMoveDown?: () => void
+  isFirst?: boolean
+  isLast?: boolean
   isDragging?: boolean
 }
 
@@ -51,6 +55,10 @@ export function ObjectiveItem({
   allObjectives,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
   isDragging,
 }: ObjectiveItemProps) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -106,9 +114,29 @@ export function ObjectiveItem({
     >
       {/* Header - always visible */}
       <div className="flex items-center gap-3">
-        {/* Drag handle */}
-        <div className="cursor-grab text-muted-foreground hover:text-foreground">
-          <GripVertical className="h-5 w-5" />
+        {/* Reorder controls */}
+        <div className="flex flex-col items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 p-0"
+            onClick={onMoveUp}
+            disabled={isFirst}
+            title="Move up"
+          >
+            <ArrowUp className={cn("h-4 w-4", isFirst ? "text-muted-foreground/30" : "text-muted-foreground hover:text-foreground")} />
+          </Button>
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 p-0"
+            onClick={onMoveDown}
+            disabled={isLast}
+            title="Move down"
+          >
+            <ArrowDown className={cn("h-4 w-4", isLast ? "text-muted-foreground/30" : "text-muted-foreground hover:text-foreground")} />
+          </Button>
         </div>
 
         {/* Title and basic info */}

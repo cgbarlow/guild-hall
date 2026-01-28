@@ -5,6 +5,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { NotificationProvider } from "@/providers/notification-provider";
+import { DynamicFavicon } from "@/components/dynamic-favicon";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <DynamicFavicon />
         <ThemeProvider defaultTheme="warm">
           <QueryProvider>
             <AuthProvider>

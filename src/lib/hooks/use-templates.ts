@@ -53,6 +53,8 @@ async function fetchTemplates(): Promise<Quest[]> {
     design_notes: quest.design_notes ?? null,
     featured: quest.featured ?? false,
     badge_url: quest.badge_url ?? null,
+    is_exclusive: (quest as unknown as { is_exclusive?: boolean }).is_exclusive ?? false,
+    exclusive_code: (quest as unknown as { exclusive_code?: string | null }).exclusive_code ?? null,
     created_by: quest.created_by,
     created_at: quest.created_at,
     updated_at: quest.updated_at,

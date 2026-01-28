@@ -91,6 +91,8 @@ export interface Quest {
   design_notes: string | null
   featured: boolean
   badge_url: string | null
+  is_exclusive: boolean
+  exclusive_code: string | null
   created_by: string
   created_at: string
   updated_at: string

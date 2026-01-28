@@ -48,7 +48,7 @@ export function useNotificationSubscription() {
             const notification = payload.new as NotificationRow
             new Notification(notification.title, {
               body: notification.message || undefined,
-              icon: '/favicon.ico',
+              icon: process.env.NEXT_PUBLIC_FAVICON_URL || '/favicon.ico',
             })
           }
         }

@@ -36,7 +36,7 @@ import { uploadQuestBadge, removeQuestBadge } from '@/lib/actions/badge'
 import { useQueryClient } from '@tanstack/react-query'
 import { questFormSchema, type QuestFormData, type QuestDifficultyType } from '@/lib/schemas/quest.schema'
 import type { Quest, QuestDbStatus, QuestResource } from '@/lib/types/quest'
-import { Loader2, Save, ArrowLeft, Send, Archive, Trash2, RotateCcw, Plus, X, ExternalLink } from 'lucide-react'
+import { Loader2, Save, ArrowLeft, Send, Archive, Trash2, RotateCcw, Plus, X, ExternalLink, Lock } from 'lucide-react'
 import Link from 'next/link'
 
 const difficultyOptions: { value: QuestDifficultyType; label: string; description: string }[] = [
@@ -116,11 +116,15 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
       transformation_goal: quest.transformation_goal ?? '',
       is_template: quest.is_template,
       featured: quest.featured ?? false,
+      is_exclusive: quest.is_exclusive ?? false,
+      exclusive_code: quest.exclusive_code ?? '',
     },
   })
 
   const isTemplate = watch('is_template')
   const isFeatured = watch('featured')
+  const isExclusive = watch('is_exclusive')
+  const exclusiveCode = watch('exclusive_code')
   const categoryId = watch('category_id')
   const difficulty = watch('difficulty')
   const resources = watch('resources') ?? []
@@ -616,6 +620,55 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
                 onCheckedChange={(checked) => setValue('is_template', checked, { shouldDirty: true })}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Exclusive Quest Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              Exclusive Quest
+            </CardTitle>
+            <CardDescription>
+              Require a special code to unlock this quest
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="is_exclusive">Enable Exclusive Mode</Label>
+                <p className="text-sm text-muted-foreground">
+                  Users must enter the unlock code to accept this quest
+                </p>
+              </div>
+              <Switch
+                id="is_exclusive"
+                checked={isExclusive}
+                onCheckedChange={(checked) => {
+                  setValue('is_exclusive', checked, { shouldDirty: true })
+                  if (!checked) {
+                    setValue('exclusive_code', '', { shouldDirty: true })
+                  }
+                }}
+              />
+            </div>
+
+            {isExclusive && (
+              <div className="space-y-2">
+                <Label htmlFor="exclusive_code">Unlock Code</Label>
+                <Input
+                  id="exclusive_code"
+                  placeholder="Enter the secret code"
+                  value={exclusiveCode ?? ''}
+                  onChange={(e) => setValue('exclusive_code', e.target.value, { shouldDirty: true })}
+                  className="font-mono"
+                />
+                <p className="text-sm text-muted-foreground">
+                  Share this code with users who should have access to the quest
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

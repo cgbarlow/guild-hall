@@ -20,7 +20,7 @@ async function updateQuest({
 }): Promise<QuestRow> {
   const supabase = createClient()
 
-  const updateData: QuestUpdate & { difficulty?: string; resources?: unknown; design_notes?: string | null; featured?: boolean } = {}
+  const updateData: QuestUpdate & { difficulty?: string; resources?: unknown; design_notes?: string | null; featured?: boolean; is_exclusive?: boolean; exclusive_code?: string | null } = {}
 
   if (data.title !== undefined) updateData.title = data.title
   if (data.description !== undefined) updateData.description = data.description
@@ -37,6 +37,8 @@ async function updateQuest({
   if (data.is_template !== undefined) updateData.is_template = data.is_template
   if (data.template_id !== undefined) updateData.template_id = data.template_id
   if (data.featured !== undefined) updateData.featured = data.featured
+  if (data.is_exclusive !== undefined) updateData.is_exclusive = data.is_exclusive
+  if (data.exclusive_code !== undefined) updateData.exclusive_code = data.exclusive_code
 
   const { data: quest, error } = await (supabase
     .from('quests') as ReturnType<typeof supabase.from>)

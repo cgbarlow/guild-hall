@@ -43,6 +43,8 @@ describe('useCreateQuest', () => {
     transformation_goal: 'Learn to code',
     is_template: false,
     featured: false,
+    is_exclusive: false,
+    exclusive_code: null,
   }
 
   const mockCreatedQuest = {
@@ -112,6 +114,7 @@ describe('useCreateQuest', () => {
       featured: false,
       difficulty: 'Apprentice',
       resources: [],
+      is_exclusive: false,
     }
 
     const minimalCreatedQuest = {

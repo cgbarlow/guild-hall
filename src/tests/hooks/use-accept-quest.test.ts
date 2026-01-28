@@ -29,6 +29,22 @@ function createMockInsertBuilder(data: unknown = null, error: unknown = null) {
   return builder
 }
 
+// Create a chainable mock builder for select operations (quest lookup)
+function createMockSelectBuilder(data: unknown = null, error: unknown = null) {
+  const builder = {
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data, error }),
+  }
+  return builder
+}
+
+// Mock quest data for exclusive check (non-exclusive by default)
+const mockQuestData = {
+  is_exclusive: false,
+  exclusive_code: null,
+}
+
 describe('useAcceptQuest', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -47,8 +63,12 @@ describe('useAcceptQuest', () => {
       accepted_at: new Date().toISOString(),
     }
 
+    const questSelectBuilder = createMockSelectBuilder(mockQuestData)
     const insertBuilder = createMockInsertBuilder(mockUserQuest)
-    mockFrom.mockReturnValue(insertBuilder)
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'quests') return questSelectBuilder
+      return insertBuilder
+    })
 
     const { result } = renderHook(() => useAcceptQuest(), {
       wrapper: createWrapper(),
@@ -90,8 +110,12 @@ describe('useAcceptQuest', () => {
   })
 
   it('should handle database error during quest acceptance', async () => {
+    const questSelectBuilder = createMockSelectBuilder(mockQuestData)
     const insertBuilder = createMockInsertBuilder(null, { message: 'Database error' })
-    mockFrom.mockReturnValue(insertBuilder)
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'quests') return questSelectBuilder
+      return insertBuilder
+    })
 
     const { result } = renderHook(() => useAcceptQuest(), {
       wrapper: createWrapper(),
@@ -116,8 +140,12 @@ describe('useAcceptQuest', () => {
       status: 'accepted',
     }
 
+    const questSelectBuilder = createMockSelectBuilder(mockQuestData)
     const insertBuilder = createMockInsertBuilder(mockUserQuest)
-    mockFrom.mockReturnValue(insertBuilder)
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'quests') return questSelectBuilder
+      return insertBuilder
+    })
 
     const onSuccess = vi.fn()
 

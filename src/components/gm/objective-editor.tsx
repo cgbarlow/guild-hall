@@ -172,6 +172,10 @@ export function ObjectiveEditor({ questId, className }: ObjectiveEditorProps) {
                 allObjectives={objectives}
                 onUpdate={(data) => handleUpdateObjective(objective.id, data)}
                 onDelete={() => handleDeleteObjective(objective.id)}
+                onMoveUp={() => handleMoveUp(index)}
+                onMoveDown={() => handleMoveDown(index)}
+                isFirst={index === 0}
+                isLast={index === objectives.length - 1}
               />
             ))}
           </div>
