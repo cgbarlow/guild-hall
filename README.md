@@ -143,31 +143,31 @@ See [Architecture Decision Records](docs/adrs/) for detailed rationale.
 ### Architecture Decisions (10 ADRs)
 | ADR | Decision |
 |-----|----------|
-| [ADR-000](docs/adrs/ADR-000-ADR-Format.md) | ADR format standard |
-| [ADR-001](docs/adrs/ADR-001-Frontend-Framework.md) | Next.js for frontend |
-| [ADR-002](docs/adrs/ADR-002-Hosting-Platform.md) | Netlify for hosting |
-| [ADR-003](docs/adrs/ADR-003-Backend-Platform.md) | Supabase for backend |
-| [ADR-004](docs/adrs/ADR-004-Styling.md) | Tailwind CSS for styling |
-| [ADR-005](docs/adrs/ADR-005-UI-Components.md) | shadcn/ui for components |
-| [ADR-006](docs/adrs/ADR-006-State-Management.md) | TanStack Query for state |
-| [ADR-007](docs/adrs/ADR-007-Leaderboard-Privacy.md) | Leaderboard privacy controls |
-| [ADR-008](docs/adrs/ADR-008-Role-Based-Access-Control.md) | Custom roles with RLS |
-| [ADR-009](docs/adrs/ADR-009-Smart-Quest-Creator.md) | AI-assisted quest creation (V2) |
+| [ADR-000](docs/adrs/ADR-000-ADR-Format.md) | WH(Y) format for structured decision records |
+| [ADR-001](docs/adrs/ADR-001-Frontend-Framework.md) | Next.js App Router for hybrid SSR/CSR |
+| [ADR-002](docs/adrs/ADR-002-Hosting-Platform.md) | Netlify for Git-based deployments |
+| [ADR-003](docs/adrs/ADR-003-Backend-Platform.md) | Supabase for PostgreSQL, Auth, Realtime |
+| [ADR-004](docs/adrs/ADR-004-Styling.md) | Tailwind CSS utility-first styling |
+| [ADR-005](docs/adrs/ADR-005-UI-Components.md) | shadcn/ui copy-paste components on Radix |
+| [ADR-006](docs/adrs/ADR-006-State-Management.md) | TanStack Query for server state caching |
+| [ADR-007](docs/adrs/ADR-007-Leaderboard-Privacy.md) | Privacy-first with opt-out leaderboards |
+| [ADR-008](docs/adrs/ADR-008-Role-Based-Access-Control.md) | Custom roles table with RLS enforcement |
+| [ADR-009](docs/adrs/ADR-009-Smart-Quest-Creator.md) | LLM-assisted quest creation (V2 feature) |
 
 ### Technical Specifications (11 Specs)
 | Spec | Description |
 |------|-------------|
-| [SPEC-000](docs/specs/SPEC-000-ADR-Template.md) | ADR template standard |
-| [SPEC-001](docs/specs/SPEC-001-Database-Schema.md) | PostgreSQL database schema |
-| [SPEC-002](docs/specs/SPEC-002-Row-Level-Security.md) | Row Level Security policies |
-| [SPEC-003](docs/specs/SPEC-003-Authentication-Flows.md) | Authentication implementation |
-| [SPEC-004](docs/specs/SPEC-004-Realtime-Notifications.md) | Real-time notification system |
-| [SPEC-005](docs/specs/SPEC-005-Leaderboard-Privacy-Rules.md) | Leaderboard and privacy rules |
-| [SPEC-006](docs/specs/SPEC-006-Smart-Quest-Creator.md) | Smart Quest Creator (V2) |
-| [SPEC-007](docs/specs/SPEC-007-Guild-Reference-Builder.md) | Guild reference building |
-| [SPEC-008](docs/specs/SPEC-008-Theme-System.md) | Dark mode theme system |
-| [SPEC-009](docs/specs/SPEC-009-Seed-Data.md) | Test/seed data management |
-| [SPEC-010](docs/specs/SPEC-010-Badge-Style-Guide.md) | Quest badge style guide |
+| [SPEC-000](docs/specs/SPEC-000-ADR-Template.md) | ADR/Spec templates, naming, and guidelines |
+| [SPEC-001](docs/specs/SPEC-001-Database-Schema.md) | 11-table PostgreSQL schema with triggers |
+| [SPEC-002](docs/specs/SPEC-002-Row-Level-Security.md) | RLS policies for all tables by role |
+| [SPEC-003](docs/specs/SPEC-003-Authentication-Flows.md) | Email/OAuth flows, protected routes |
+| [SPEC-004](docs/specs/SPEC-004-Realtime-Notifications.md) | Supabase Realtime + React Query sync |
+| [SPEC-005](docs/specs/SPEC-005-Leaderboard-Privacy-Rules.md) | Privacy controls and data access rules |
+| [SPEC-006](docs/specs/SPEC-006-Smart-Quest-Creator.md) | LLM wizard and generate modes (V2) |
+| [SPEC-007](docs/specs/SPEC-007-Guild-Reference-Builder.md) | Process for building guild documentation |
+| [SPEC-008](docs/specs/SPEC-008-Theme-System.md) | Light/dark/system theme with localStorage |
+| [SPEC-009](docs/specs/SPEC-009-Seed-Data.md) | is_test_data flag and sample quests |
+| [SPEC-010](docs/specs/SPEC-010-Badge-Style-Guide.md) | 5 badge styles with difficulty colours |
 
 ---
 
