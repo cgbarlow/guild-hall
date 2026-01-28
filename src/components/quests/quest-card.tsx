@@ -93,11 +93,28 @@ function getUserQuestStatusDisplay(status: UserQuestStatus): {
   }
 }
 
+/**
+ * Extract the first paragraph from a description
+ */
+function getFirstParagraph(text: string): string {
+  // Split by double newline (paragraph break) or single newline
+  const paragraphBreak = text.indexOf('\n\n')
+  const lineBreak = text.indexOf('\n')
+
+  if (paragraphBreak > 0) {
+    return text.substring(0, paragraphBreak).trim()
+  }
+  if (lineBreak > 0) {
+    return text.substring(0, lineBreak).trim()
+  }
+  return text.trim()
+}
+
 export function QuestCard({ quest, className, userQuestId, userQuestStatus }: QuestCardProps) {
-  // Use short_description if available, otherwise truncate description
+  // Use short_description if available, otherwise show first paragraph of description
   const displayDescription =
     quest.short_description ||
-    (quest.description ? `${quest.description.substring(0, 100)}${quest.description.length > 100 ? '...' : ''}` : 'No description available')
+    (quest.description ? getFirstParagraph(quest.description) : 'No description available')
 
   // Map published status to open for display
   const displayStatus = (quest.status === 'published' ? 'open' : quest.status) as QuestStatus
@@ -166,7 +183,7 @@ export function QuestCard({ quest, className, userQuestId, userQuestStatus }: Qu
           <div className="flex gap-4">
             {/* Left column: description and stats */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+              <p className="text-sm text-muted-foreground mb-4 line-clamp-4">
                 {displayDescription}
               </p>
               <div className="flex items-center gap-4 text-sm">
