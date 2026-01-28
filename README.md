@@ -4,9 +4,10 @@
 
 Guild Hall is a quest-based engagement platform where Game Masters (GMs) create quests for community members to accept and complete. Built on the philosophy that **quests are adventures, not checklists**.
 
-[![Tests](https://img.shields.io/badge/tests-152%20passing-brightgreen)](./src/tests)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](./tsconfig.json)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](./package.json)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](./package.json)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E)](https://supabase.com)
+[![License](https://img.shields.io/badge/license-TBD-lightgrey)](./LICENSE)
 
 ---
 
@@ -20,11 +21,15 @@ Guild Hall is a quest-based engagement platform where Game Masters (GMs) create 
 | OAuth (Google/Apple) | ⏸️ Coming Soon |
 | Bounty Board | ✅ Working |
 | Quest Management | ✅ Working |
+| Quest Badges & Difficulty | ✅ Working |
 | Evidence Submission | ✅ Working |
 | GM Review | ✅ Working |
 | Rewards & Leaderboard | ✅ Working |
+| Achievements | ✅ Working |
 | Notifications | ✅ Working |
 | Dark Mode | ✅ Working |
+| Change Password | ✅ Working |
+| Data Export | ✅ Working |
 
 See [Delivery Report](docs/DELIVERY-REPORT.md) for detailed coverage.
 
@@ -73,24 +78,30 @@ GMs design quests with objectives, deadlines, and rewards. Users browse the **Bo
 
 ### For Users (Questers)
 - Browse available quests on the Bounty Board
+- Filter quests by category and difficulty level
 - Accept quests and track progress
 - Complete objectives with evidence submission (text, links)
 - Request deadline extensions when needed
 - Earn points, badges, and leaderboard ranking
+- Unlock achievements for milestones
 - Control privacy settings (profile visibility, leaderboard opt-out)
+- Change password securely
 - Export personal data (JSON)
 
 ### For Game Masters
 - Create quests with multiple objectives
+- Assign difficulty levels (Apprentice, Journeyman, Master)
+- Upload custom quest badges
 - Configure objective dependencies (linear or flexible)
 - Set acceptance and completion deadlines
 - Review evidence submissions (approve/reject with feedback)
 - Manage deadline extension requests
 - Save quests as templates for reuse
-- View all user progress
+- View all user progress and activity
 
 ### Authentication
 - Email/password ✅
+- Password reset via email ✅
 - Google OAuth (Coming Soon)
 - Apple OAuth (Coming Soon)
 
@@ -98,14 +109,18 @@ GMs design quests with objectives, deadlines, and rewards. Users browse the **Bo
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | Next.js 14 (App Router) |
-| Hosting | Netlify |
-| Backend | Supabase (PostgreSQL, Auth, Realtime) |
-| Styling | Tailwind CSS |
-| UI Components | shadcn/ui |
-| State | React Query |
+| Layer | Technology | Version |
+|-------|------------|---------|
+| Frontend | Next.js (App Router) | 15.2 |
+| Runtime | React | 18 |
+| Backend | Supabase (PostgreSQL, Auth, Realtime) | Latest |
+| Hosting | Netlify | - |
+| Styling | Tailwind CSS | 3.4 |
+| UI Components | shadcn/ui + Radix | Latest |
+| State Management | TanStack Query | 5.x |
+| Forms | React Hook Form + Zod | 7.x |
+| Testing | Vitest + Testing Library | 2.x |
+| Language | TypeScript | 5.x |
 
 See [Architecture Decision Records](docs/adrs/) for detailed rationale.
 
@@ -125,21 +140,24 @@ See [Architecture Decision Records](docs/adrs/) for detailed rationale.
 |----------|-------------|
 | [Implementation Plan](docs/IMPLEMENTATION-PLAN.md) | Phased build plan with deliverables |
 
-### Architecture Decisions
+### Architecture Decisions (10 ADRs)
 | ADR | Decision |
 |-----|----------|
+| [ADR-000](docs/adrs/ADR-000-ADR-Format.md) | ADR format standard |
 | [ADR-001](docs/adrs/ADR-001-Frontend-Framework.md) | Next.js for frontend |
 | [ADR-002](docs/adrs/ADR-002-Hosting-Platform.md) | Netlify for hosting |
 | [ADR-003](docs/adrs/ADR-003-Backend-Platform.md) | Supabase for backend |
 | [ADR-004](docs/adrs/ADR-004-Styling.md) | Tailwind CSS for styling |
 | [ADR-005](docs/adrs/ADR-005-UI-Components.md) | shadcn/ui for components |
-| [ADR-006](docs/adrs/ADR-006-State-Management.md) | React Query for state |
+| [ADR-006](docs/adrs/ADR-006-State-Management.md) | TanStack Query for state |
+| [ADR-007](docs/adrs/ADR-007-Leaderboard-Privacy.md) | Leaderboard privacy controls |
 | [ADR-008](docs/adrs/ADR-008-Role-Based-Access-Control.md) | Custom roles with RLS |
 | [ADR-009](docs/adrs/ADR-009-Smart-Quest-Creator.md) | AI-assisted quest creation (V2) |
 
-### Technical Specifications
+### Technical Specifications (11 Specs)
 | Spec | Description |
 |------|-------------|
+| [SPEC-000](docs/specs/SPEC-000-ADR-Template.md) | ADR template standard |
 | [SPEC-001](docs/specs/SPEC-001-Database-Schema.md) | PostgreSQL database schema |
 | [SPEC-002](docs/specs/SPEC-002-Row-Level-Security.md) | Row Level Security policies |
 | [SPEC-003](docs/specs/SPEC-003-Authentication-Flows.md) | Authentication implementation |
@@ -149,6 +167,7 @@ See [Architecture Decision Records](docs/adrs/) for detailed rationale.
 | [SPEC-007](docs/specs/SPEC-007-Guild-Reference-Builder.md) | Guild reference building |
 | [SPEC-008](docs/specs/SPEC-008-Theme-System.md) | Dark mode theme system |
 | [SPEC-009](docs/specs/SPEC-009-Seed-Data.md) | Test/seed data management |
+| [SPEC-010](docs/specs/SPEC-010-Badge-Style-Guide.md) | Quest badge style guide |
 
 ---
 
@@ -200,7 +219,7 @@ The **Agentics NZ Guild** is the first reference implementation, focused on buil
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/guild-hall.git
+git clone https://github.com/cgbarlow/guild-hall.git
 cd guild-hall
 
 # Install dependencies
@@ -241,17 +260,23 @@ npm run test:watch
 
 # Type checking
 npm run type-check
+
+# Lint
+npm run lint
 ```
 
-**Test Coverage:** 152 tests across 20 test files
+**Test Infrastructure:** 22 test files with Vitest + Testing Library
 
 ### Database Setup
 
 ```bash
+# Login to Supabase CLI
+npx supabase login
+
 # Link to your Supabase project
 npx supabase link --project-ref YOUR_PROJECT_REF
 
-# Push migrations
+# Push migrations (61 migrations)
 npx supabase db push
 
 # (Optional) Load seed data
@@ -269,51 +294,61 @@ The app deploys to Netlify on push to `main`. Configure environment variables in
 ```
 guild-hall/
 ├── src/
-│   ├── app/                    # Next.js App Router pages
+│   ├── app/                    # Next.js App Router (30 pages)
 │   │   ├── (auth)/            # Authentication pages
+│   │   │   ├── login/         # Sign in
+│   │   │   ├── register/      # Sign up
+│   │   │   └── reset-password/# Password reset
 │   │   ├── (dashboard)/       # User dashboard pages
+│   │   │   ├── dashboard/     # Main dashboard
 │   │   │   ├── profile/       # User profile
 │   │   │   ├── quests/        # Bounty board
 │   │   │   ├── my-quests/     # User's active quests
 │   │   │   ├── leaderboard/   # Rankings
 │   │   │   ├── notifications/ # Notification history
-│   │   │   └── settings/      # Privacy, appearance, export
-│   │   └── (gm)/              # Game Master pages
-│   │       └── gm/
-│   │           ├── quests/    # Quest management
-│   │           ├── review/    # Evidence review
-│   │           ├── extensions/# Extension requests
-│   │           ├── users/     # User overview
-│   │           └── templates/ # Quest templates
-│   ├── components/            # React components
-│   │   ├── ui/               # shadcn/ui components
+│   │   │   └── settings/      # Privacy, appearance, password, export
+│   │   ├── (gm)/              # Game Master pages
+│   │   │   └── gm/
+│   │   │       ├── quests/    # Quest management (CRUD)
+│   │   │       ├── review/    # Evidence review queue
+│   │   │       ├── extensions/# Extension requests
+│   │   │       ├── users/     # User overview
+│   │   │       ├── templates/ # Quest templates
+│   │   │       └── smart-creator/ # AI quest creator (V2)
+│   │   └── users/[id]/        # Public user profiles
+│   ├── components/            # React components (100+)
+│   │   ├── ui/               # shadcn/ui components (17)
 │   │   ├── auth/             # Auth forms
-│   │   ├── quests/           # Quest display
-│   │   ├── my-quests/        # Quest progress
-│   │   ├── profile/          # Profile components
-│   │   ├── achievements/     # Badges, achievements
-│   │   ├── leaderboard/      # Rankings table
+│   │   ├── quests/           # Quest display, filters
+│   │   ├── my-quests/        # Quest progress, evidence
+│   │   ├── profile/          # Profile, avatar, badges
+│   │   ├── achievements/     # Achievement modals, toasts
+│   │   ├── activity/         # Activity feed
+│   │   ├── leaderboard/      # Rankings table, badges
 │   │   ├── notifications/    # Bell, dropdown
 │   │   ├── settings/         # Settings forms
 │   │   ├── gm/               # GM dashboard components
-│   │   └── layout/           # Header, navigation
+│   │   └── layout/           # Header, sidebars
 │   ├── lib/
-│   │   ├── hooks/            # TanStack Query hooks
-│   │   ├── actions/          # Server actions
+│   │   ├── hooks/            # TanStack Query hooks (40)
+│   │   ├── actions/          # Server actions (15)
 │   │   ├── schemas/          # Zod validation
 │   │   ├── types/            # TypeScript types
 │   │   ├── utils/            # Utilities
 │   │   └── supabase/         # Supabase clients
 │   ├── providers/            # React context providers
-│   └── tests/                # Test infrastructure
+│   └── tests/                # Test infrastructure (22 files)
 │       ├── mocks/            # Supabase mocks, fixtures
 │       ├── hooks/            # Hook tests
 │       └── components/       # Component tests
 ├── docs/                      # Documentation
-│   ├── adrs/                 # Architecture Decision Records
-│   └── specs/                # Technical specifications
+│   ├── adrs/                 # Architecture Decision Records (10)
+│   ├── specs/                # Technical specifications (11)
+│   ├── guilds/               # Reference guild implementations
+│   ├── plans/                # Deployment plans
+│   └── mock-ups/             # UI mockup prompts
 └── supabase/
-    ├── migrations/           # 41 database migrations
+    ├── migrations/           # Database migrations (61)
     └── seed/                 # Sample data (Agentics-NZ)
 ```
 
