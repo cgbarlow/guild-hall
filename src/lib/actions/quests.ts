@@ -4,6 +4,24 @@ import { createServiceClient } from '@/lib/supabase/server'
 import type { Quest, QuestWithRelations, Objective, Category, QuestStatus, QuestDifficulty, QuestResource } from '@/lib/types/quest'
 
 /**
+ * Extract the first paragraph from a description for short display
+ */
+function getFirstParagraph(text: string | null): string | null {
+  if (!text) return null
+  // Split by double newline (paragraph break) or single newline
+  const paragraphBreak = text.indexOf('\n\n')
+  const lineBreak = text.indexOf('\n')
+
+  if (paragraphBreak > 0) {
+    return text.substring(0, paragraphBreak).trim()
+  }
+  if (lineBreak > 0) {
+    return text.substring(0, lineBreak).trim()
+  }
+  return text.trim()
+}
+
+/**
  * Fetch all published quests (server action using service role)
  */
 export async function getPublishedQuests(filters?: {
@@ -42,7 +60,7 @@ export async function getPublishedQuests(filters?: {
     id: quest.id as string,
     title: quest.title as string,
     description: quest.description as string | null,
-    short_description: (quest.description as string)?.substring(0, 100) || null,
+    short_description: getFirstParagraph(quest.description as string | null),
     status: quest.status as QuestStatus,
     points: quest.points as number,
     xp_reward: quest.points as number,
@@ -117,7 +135,7 @@ export async function getQuestById(questId: string): Promise<QuestWithRelations 
     id: quest.id as string,
     title: quest.title as string,
     description: quest.description as string | null,
-    short_description: (quest.description as string)?.substring(0, 100) || null,
+    short_description: getFirstParagraph(quest.description as string | null),
     status: quest.status as QuestStatus,
     points: quest.points as number,
     xp_reward: quest.points as number,
@@ -169,7 +187,7 @@ export async function getGMQuests(): Promise<Quest[]> {
     id: quest.id as string,
     title: quest.title as string,
     description: quest.description as string | null,
-    short_description: (quest.description as string)?.substring(0, 100) || null,
+    short_description: getFirstParagraph(quest.description as string | null),
     status: quest.status as QuestStatus,
     points: quest.points as number,
     xp_reward: quest.points as number,
