@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { ArrowLeft, Award, Clock, Calendar, AlertCircle } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ProgressBar, ObjectiveChecklist } from '@/components/my-quests'
+import { ProgressBar, ObjectiveChecklist, AbandonQuestButton } from '@/components/my-quests'
 import { ClaimRewardButton } from '@/components/my-quests/claim-reward-button'
 import { useUserQuests, getUserQuestStatusInfo } from '@/lib/hooks/use-user-quests'
 import { useUserObjectives } from '@/lib/hooks/use-user-objectives'
@@ -292,6 +292,16 @@ export default function QuestProgressPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Abandon Quest - only for active quests */}
+      {(userQuest.status === 'accepted' || userQuest.status === 'in_progress') && (
+        <div className="flex justify-center pt-4">
+          <AbandonQuestButton
+            userQuestId={userQuestId}
+            questTitle={userQuest.quest?.title || 'Quest'}
+          />
+        </div>
+      )}
     </div>
   )
 }
