@@ -47,7 +47,8 @@ export function AcceptQuestModal({
     },
   })
 
-  const handleAccept = () => {
+  const handleAccept = (e: React.MouseEvent) => {
+    e.preventDefault()
     acceptQuest({
       questId: quest.id,
       exclusiveCode: quest.is_exclusive ? exclusiveCode : undefined,

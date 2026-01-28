@@ -62,9 +62,13 @@ export default function MyQuestsPage() {
   const { data: allQuests, isLoading, error } = useUserQuests()
 
   // Filter and sort quests based on selected status
+  // By default, hide abandoned and expired quests
   const filteredQuests = useMemo(() => {
     const filtered = allQuests?.filter((quest) => {
-      if (statusFilter === 'all') return true
+      // Always hide abandoned and expired from the default "all" view
+      if (statusFilter === 'all') {
+        return quest.status !== 'abandoned' && quest.status !== 'expired'
+      }
       return quest.status === statusFilter
     }) || []
 
@@ -76,9 +80,9 @@ export default function MyQuestsPage() {
     })
   }, [allQuests, statusFilter])
 
-  // Calculate counts for each status
+  // Calculate counts for each status (exclude abandoned/expired from "all")
   const counts = {
-    all: allQuests?.length || 0,
+    all: allQuests?.filter((q) => q.status !== 'abandoned' && q.status !== 'expired').length || 0,
     in_progress: allQuests?.filter((q) => q.status === 'in_progress').length || 0,
     accepted: allQuests?.filter((q) => q.status === 'accepted').length || 0,
     completed: allQuests?.filter((q) => q.status === 'completed').length || 0,
