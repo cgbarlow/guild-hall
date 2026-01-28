@@ -56,8 +56,44 @@ async function acceptQuest(params: string | AcceptQuestParams): Promise<UserQues
     }
   }
 
-  // Insert into user_quests with 'accepted' status
-  // Type assertion to bypass Supabase type inference issues
+  // Check if user already has this quest (might be abandoned/expired)
+  const { data: existingQuest } = await (supabase
+    .from('user_quests') as ReturnType<typeof supabase.from>)
+    .select('id, status')
+    .eq('user_id', user.id)
+    .eq('quest_id', questId)
+    .single()
+
+  const existing = existingQuest as { id: string; status: string } | null
+
+  if (existing) {
+    // If quest was abandoned or expired, re-accept it
+    if (existing.status === 'abandoned' || existing.status === 'expired') {
+      const { data: updatedQuest, error: updateError } = await (supabase
+        .from('user_quests') as ReturnType<typeof supabase.from>)
+        .update({
+          status: 'accepted',
+          accepted_at: new Date().toISOString(),
+          abandoned_at: null,
+          started_at: null,
+          completed_at: null,
+        } as Record<string, unknown>)
+        .eq('id', existing.id)
+        .select()
+        .single()
+
+      if (updateError || !updatedQuest) {
+        throw new Error(updateError?.message || 'Failed to re-accept quest')
+      }
+
+      return updatedQuest as UserQuest
+    }
+
+    // Quest is already active
+    throw new Error('You have already accepted this quest')
+  }
+
+  // Insert new user_quest with 'accepted' status
   const { data: userQuest, error: insertError } = await (supabase
     .from('user_quests') as ReturnType<typeof supabase.from>)
     .insert({
@@ -84,11 +120,13 @@ export function useAcceptQuest(options?: AcceptQuestOptions) {
 
   return useMutation({
     mutationFn: acceptQuest,
-    onSuccess: (data) => {
-      // Invalidate relevant queries
+    onSuccess: async (data) => {
+      // Invalidate and refetch user quests before redirecting
+      // This prevents the "Quest not found" flash on the destination page
+      await queryClient.invalidateQueries({ queryKey: ['userQuests'] })
+      await queryClient.refetchQueries({ queryKey: ['userQuests'] })
       queryClient.invalidateQueries({ queryKey: ['quest', data.quest_id] })
       queryClient.invalidateQueries({ queryKey: ['quests'] })
-      queryClient.invalidateQueries({ queryKey: ['userQuests'] })
 
       options?.onSuccess?.(data)
     },
