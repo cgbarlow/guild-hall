@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Loader2, Award, Clock, Swords, Lock } from 'lucide-react'
 import {
   AlertDialog,
@@ -32,14 +33,17 @@ export function AcceptQuestModal({
   trigger,
   disabled,
 }: AcceptQuestModalProps) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [exclusiveCode, setExclusiveCode] = useState('')
 
   const { mutate: acceptQuest, isPending, error } = useAcceptQuest({
-    onSuccess: () => {
+    onSuccess: (userQuest) => {
       setOpen(false)
       setExclusiveCode('')
       onAccepted?.()
+      // Redirect to the user's quest page
+      router.push(`/my-quests/${userQuest.id}`)
     },
   })
 

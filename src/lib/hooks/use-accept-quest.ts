@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/types/database'
 
 export interface AcceptQuestOptions {
-  onSuccess?: () => void
+  onSuccess?: (userQuest: UserQuest) => void
   onError?: (error: Error) => void
 }
 
@@ -90,7 +90,7 @@ export function useAcceptQuest(options?: AcceptQuestOptions) {
       queryClient.invalidateQueries({ queryKey: ['quests'] })
       queryClient.invalidateQueries({ queryKey: ['userQuests'] })
 
-      options?.onSuccess?.()
+      options?.onSuccess?.(data)
     },
     onError: (error: Error) => {
       options?.onError?.(error)
