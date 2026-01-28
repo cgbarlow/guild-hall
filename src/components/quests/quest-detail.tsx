@@ -167,7 +167,8 @@ export function QuestDetail({
             <div className="pt-4 border-t">
               <AcceptQuestButton
                 questId={quest.id}
-                onAccept={onAccept}
+                quest={quest}
+                useModal={true}
                 disabled={!onAccept}
               />
             </div>
