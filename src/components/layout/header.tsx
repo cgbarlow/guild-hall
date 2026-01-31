@@ -27,6 +27,7 @@ export function Header() {
 
   const logoUrl = process.env.NEXT_PUBLIC_GUILD_LOGO_URL
   const guildName = process.env.NEXT_PUBLIC_GUILD_NAME
+  const guildLink = process.env.NEXT_PUBLIC_GUILD_LINK
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -37,23 +38,47 @@ export function Header() {
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-3 text-xl">
-          <span className="font-bold">Guild Hall</span>
+        <div className="flex items-center gap-3 text-xl">
+          <Link href="/dashboard">
+            <span className="font-bold">Guild Hall</span>
+          </Link>
           {guildName && (
             <>
-              {logoUrl && (
-                <Image
-                  src={logoUrl}
-                  alt="Guild Logo"
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 object-contain"
-                />
+              {guildLink ? (
+                <a
+                  href={guildLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:opacity-80"
+                >
+                  {logoUrl && (
+                    <Image
+                      src={logoUrl}
+                      alt="Guild Logo"
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 object-contain"
+                    />
+                  )}
+                  <span className="font-normal text-lg hidden sm:inline">{guildName}</span>
+                </a>
+              ) : (
+                <>
+                  {logoUrl && (
+                    <Image
+                      src={logoUrl}
+                      alt="Guild Logo"
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 object-contain"
+                    />
+                  )}
+                  <span className="font-normal text-lg hidden sm:inline">{guildName}</span>
+                </>
               )}
-              <span className="font-normal text-lg hidden sm:inline">{guildName}</span>
             </>
           )}
-        </Link>
+        </div>
 
         {/* Desktop navigation */}
         <nav className="hidden md:flex items-center gap-4">
