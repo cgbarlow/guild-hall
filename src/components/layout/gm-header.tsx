@@ -50,6 +50,7 @@ export function GMHeader() {
 
   const logoUrl = process.env.NEXT_PUBLIC_GUILD_LOGO_URL
   const guildName = process.env.NEXT_PUBLIC_GUILD_NAME
+  const guildLink = process.env.NEXT_PUBLIC_GUILD_LINK
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -61,23 +62,47 @@ export function GMHeader() {
     <header className="border-b bg-primary/5">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/gm" className="flex items-center gap-3 text-xl">
-            <span className="font-bold">Guild Hall</span>
+          <div className="flex items-center gap-3 text-xl">
+            <Link href="/gm">
+              <span className="font-bold">Guild Hall</span>
+            </Link>
             {guildName && (
               <>
-                {logoUrl && (
-                  <Image
-                    src={logoUrl}
-                    alt="Guild Logo"
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 object-contain"
-                  />
+                {guildLink ? (
+                  <a
+                    href={guildLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 hover:opacity-80"
+                  >
+                    {logoUrl && (
+                      <Image
+                        src={logoUrl}
+                        alt="Guild Logo"
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 object-contain"
+                      />
+                    )}
+                    <span className="font-normal text-lg hidden sm:inline">{guildName}</span>
+                  </a>
+                ) : (
+                  <>
+                    {logoUrl && (
+                      <Image
+                        src={logoUrl}
+                        alt="Guild Logo"
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 object-contain"
+                      />
+                    )}
+                    <span className="font-normal text-lg hidden sm:inline">{guildName}</span>
+                  </>
                 )}
-                <span className="font-normal text-lg hidden sm:inline">{guildName}</span>
               </>
             )}
-          </Link>
+          </div>
           <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded">
             GM
           </span>
