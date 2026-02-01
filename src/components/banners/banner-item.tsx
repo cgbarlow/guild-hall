@@ -2,6 +2,7 @@
 
 import { X, Info, CheckCircle, AlertTriangle, PartyPopper } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { linkifyText } from '@/lib/utils/linkify'
 import { Button } from '@/components/ui/button'
 import type { BannerWithStatus, BannerVariant } from '@/lib/types/banner'
 import { BANNER_VARIANT_STYLES } from '@/lib/types/banner'
@@ -46,7 +47,7 @@ export function BannerItem({ banner, onDismiss, dismissing }: BannerItemProps) {
           </h4>
         )}
         <p className={cn('text-sm', styles.text, banner.title && 'mt-1')}>
-          {banner.message}
+          {linkifyText(banner.message)}
         </p>
       </div>
 
