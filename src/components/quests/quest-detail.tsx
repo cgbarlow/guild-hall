@@ -69,7 +69,9 @@ export function QuestDetail({
               </CardDescription>
             </div>
             <div className="flex items-start gap-4">
-              <QuestStatusBadge status={quest.status} isExclusive={quest.is_exclusive} isLocked={hasPrerequisites && !prerequisitesMet} className="self-start" />
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <QuestStatusBadge status={quest.status} isExclusive={quest.is_exclusive} isLocked={hasPrerequisites && !prerequisitesMet} />
+              </div>
               {quest.badge_url && (
                 <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0">
                   <Image

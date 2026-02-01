@@ -36,13 +36,14 @@ export function QuestStatusBadge({ status, isExclusive, isLocked, className }: Q
   const mainStyleKey = mainStatus
 
   return (
-    <div className={cn('flex items-center gap-1.5', className)}>
+    <>
       {/* Main status badge (Open/Locked/etc) */}
       <span
         data-testid="quest-status-badge"
         className={cn(
           'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold',
-          statusStyles[mainStyleKey] || statusStyles.open
+          statusStyles[mainStyleKey] || statusStyles.open,
+          className
         )}
       >
         {mainStatus === 'locked' && <Lock className="h-3 w-3" />}
@@ -61,6 +62,6 @@ export function QuestStatusBadge({ status, isExclusive, isLocked, className }: Q
           Exclusive
         </span>
       )}
-    </div>
+    </>
   )
 }
