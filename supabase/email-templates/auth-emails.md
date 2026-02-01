@@ -58,7 +58,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
+        <a href="https://agentics-nz.fly.dev" style="color: #666666;">Visit Agentics NZ</a>
       </p>
     </div>
   </div>
@@ -124,7 +124,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
+        <a href="https://agentics-nz.fly.dev" style="color: #666666;">Visit Agentics NZ</a>
       </p>
     </div>
   </div>
@@ -189,7 +189,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
+        <a href="https://agentics-nz.fly.dev" style="color: #666666;">Visit Agentics NZ</a>
       </p>
     </div>
   </div>
@@ -254,7 +254,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
+        <a href="https://agentics-nz.fly.dev" style="color: #666666;">Visit Agentics NZ</a>
       </p>
     </div>
   </div>
@@ -319,7 +319,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
+        <a href="https://agentics-nz.fly.dev" style="color: #666666;">Visit Agentics NZ</a>
       </p>
     </div>
   </div>
@@ -384,7 +384,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
+        <a href="https://agentics-nz.fly.dev" style="color: #666666;">Visit Agentics NZ</a>
       </p>
     </div>
   </div>

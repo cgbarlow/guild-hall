@@ -56,6 +56,8 @@ const BRAND = {
   error: '#dc2626',
 }
 
+const LOGO_URL = 'https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png'
+
 function getBaseTemplate(content: string, previewText: string): string {
   return `
 <!DOCTYPE html>
@@ -64,16 +66,14 @@ function getBaseTemplate(content: string, previewText: string): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>${GUILD_NAME}</title>
+  <title>Guild Hall - ${GUILD_NAME}</title>
   <!--[if !mso]><!-->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <!--<![endif]-->
   <style>
     body { margin: 0; padding: 0; background-color: ${BRAND.cream}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
     .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
-    .header { background-color: ${BRAND.gold}; padding: 24px; text-align: center; }
-    .header img { max-height: 60px; }
-    .header h1 { color: #ffffff; margin: 12px 0 0 0; font-size: 24px; }
+    .header { background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0; }
     .content { padding: 32px 24px; color: ${BRAND.textDark}; }
     .hero { text-align: center; padding: 24px 0; }
     .hero-icon { font-size: 48px; }
@@ -101,8 +101,13 @@ function getBaseTemplate(content: string, previewText: string): string {
 
   <div class="container">
     <div class="header">
-      ${GUILD_LOGO_URL ? `<img src="${GUILD_LOGO_URL}" alt="${GUILD_NAME}" />` : ''}
-      <h1>${GUILD_NAME}</h1>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
+          <td style="text-align: center;"><img src="${LOGO_URL}" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
+          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">${GUILD_NAME}</td>
+        </tr>
+      </table>
     </div>
 
     <div class="content">
@@ -113,7 +118,7 @@ function getBaseTemplate(content: string, previewText: string): string {
       <p>This email was sent by ${GUILD_NAME}</p>
       <p>
         <a href="${APP_URL}/settings/privacy" style="color: #666666;">Email Preferences</a> |
-        <a href="${APP_URL}" style="color: #666666;">Visit ${GUILD_NAME}</a>
+        <a href="https://agentics-nz.fly.dev" style="color: #666666;">Visit Agentics NZ</a>
       </p>
     </div>
   </div>
