@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -11,23 +11,31 @@ export function PrivacyForm() {
   const { data: settings, isLoading } = usePrivacySettings()
   const updateSettings = useUpdatePrivacySettings()
   const [error, setError] = useState<string | null>(null)
+  const [initialized, setInitialized] = useState(false)
 
   const [formData, setFormData] = useState({
-    show_profile: settings?.show_profile ?? true,
-    show_stats: settings?.show_stats ?? true,
-    show_activity: settings?.show_activity ?? true,
-    allow_guild_invites: settings?.allow_guild_invites ?? true,
+    show_profile: true,
+    show_stats: true,
+    show_activity: true,
+    allow_guild_invites: true,
+    email_notifications: true,
   })
 
   // Update form when settings load
-  if (settings && formData.show_profile !== settings.show_profile) {
-    setFormData({
-      show_profile: settings.show_profile,
-      show_stats: settings.show_stats,
-      show_activity: settings.show_activity,
-      allow_guild_invites: settings.allow_guild_invites,
-    })
-  }
+  useEffect(() => {
+    if (settings && !initialized) {
+      // Cast to include email_notifications which may not be in generated types yet
+      const settingsWithEmail = settings as typeof settings & { email_notifications?: boolean }
+      setFormData({
+        show_profile: settings.show_profile,
+        show_stats: settings.show_stats,
+        show_activity: settings.show_activity,
+        allow_guild_invites: settings.allow_guild_invites,
+        email_notifications: settingsWithEmail.email_notifications ?? true,
+      })
+      setInitialized(true)
+    }
+  }, [settings, initialized])
 
   const handleToggle = (field: keyof typeof formData) => {
     setFormData((prev) => ({ ...prev, [field]: !prev[field] }))
@@ -101,6 +109,29 @@ export function PrivacyForm() {
               checked={formData.allow_guild_invites}
               onCheckedChange={() => handleToggle('allow_guild_invites')}
             />
+          </div>
+
+          <div className="border-t my-6" />
+
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-medium">Email Notifications</h3>
+              <p className="text-sm text-muted-foreground">Control email notifications from Guild Hall</p>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="email_notifications">Receive Email Notifications</Label>
+                <p className="text-sm text-muted-foreground">
+                  Get emails for quest approvals, completions, and messages from GMs
+                </p>
+              </div>
+              <Switch
+                id="email_notifications"
+                checked={formData.email_notifications}
+                onCheckedChange={() => handleToggle('email_notifications')}
+              />
+            </div>
           </div>
 
           {error && (

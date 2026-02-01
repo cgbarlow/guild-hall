@@ -1,6 +1,6 @@
 # Guild Hall — Product Roadmap
 
-> Last Updated: 2025-01-24
+> Last Updated: 2025-02-01
 
 ---
 
@@ -129,6 +129,12 @@
 - [ ] See who else accepted a quest
 - [ ] CSV data export
 - [ ] Enhanced profile customization
+- [ ] Personal quests with private XP tracking (#6)
+
+#### Guild Structure
+- [ ] Chapter support (subguilds) (#8)
+- [ ] Chapter-specific quests and members
+- [ ] Chapter leaderboards
 
 ### V2 Success Criteria
 - [ ] Smart Quest Creator reduces quest creation time by 50%

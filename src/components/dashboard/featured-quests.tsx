@@ -44,7 +44,8 @@ export function FeaturedQuests() {
           <QuestList
             quests={quests || []}
             isLoading={isLoading}
-            activeQuestIds={activeQuestIds}
+            activeQuestIds={activeQuestIds?.activeQuestIds}
+            completedQuestIds={activeQuestIds?.completedQuestIds}
           />
         )}
       </CardContent>
