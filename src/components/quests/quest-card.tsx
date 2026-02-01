@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Clock, Award, Play, CheckCircle2, Hourglass, CircleDot, Lock } from 'lucide-react'
+import { Clock, Award, Play, CheckCircle2, Hourglass, CircleDot, Lock, Star } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { QuestStatusBadge } from './quest-status-badge'
@@ -27,6 +27,7 @@ interface QuestCardData {
   category?: Category | null
   difficulty?: QuestDifficulty | null
   is_exclusive?: boolean
+  featured?: boolean
 }
 
 interface QuestCardProps {
@@ -150,6 +151,12 @@ export function QuestCard({ quest, className, userQuestId, userQuestStatus, isLo
             <div className="flex-1 min-w-0">
               {/* All badges in a single wrapping row */}
               <div className="flex items-center gap-1.5 flex-wrap mb-2">
+                {'featured' in quest && quest.featured && (
+                  <Badge variant="default" className="bg-amber-500 hover:bg-amber-500 text-white">
+                    <Star className="h-3 w-3 mr-1 fill-current" />
+                    Featured
+                  </Badge>
+                )}
                 {quest.category && <CategoryBadge category={quest.category} />}
                 {quest.difficulty && <DifficultyBadge difficulty={quest.difficulty} />}
                 {userQuestId && !userQuestStatus && (
