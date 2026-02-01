@@ -2,6 +2,7 @@
 
 import { ScrollText } from 'lucide-react'
 import { QuestCard } from './quest-card'
+import { useLockedQuests } from '@/lib/hooks/use-locked-quests'
 import type { Quest } from '@/lib/types/quest'
 import { cn } from '@/lib/utils'
 
@@ -52,6 +53,8 @@ function EmptyState() {
 }
 
 export function QuestList({ quests, isLoading, className, activeQuestIds }: QuestListProps) {
+  const { data: lockedQuests } = useLockedQuests()
+
   if (isLoading) {
     return <QuestListSkeleton />
   }
@@ -62,13 +65,22 @@ export function QuestList({ quests, isLoading, className, activeQuestIds }: Ques
 
   return (
     <div className={cn('grid gap-4 sm:grid-cols-2 lg:grid-cols-3', className)}>
-      {quests.map((quest) => (
-        <QuestCard
-          key={quest.id}
-          quest={quest}
-          userQuestId={activeQuestIds?.get(quest.id)}
-        />
-      ))}
+      {quests.map((quest) => {
+        const userQuestId = activeQuestIds?.get(quest.id)
+        // Only show as locked if user hasn't already accepted this quest
+        const isLocked = !userQuestId && lockedQuests?.isLocked(quest.id)
+        const incompletePrerequisites = isLocked ? lockedQuests?.getIncompletePrerequisites(quest.id) : undefined
+
+        return (
+          <QuestCard
+            key={quest.id}
+            quest={quest}
+            userQuestId={userQuestId}
+            isLocked={isLocked}
+            incompletePrerequisites={incompletePrerequisites}
+          />
+        )
+      })}
     </div>
   )
 }
