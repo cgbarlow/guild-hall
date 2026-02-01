@@ -19,19 +19,30 @@ export function PrivacyForm() {
     show_activity: true,
     allow_guild_invites: true,
     email_notifications: true,
+    email_quest_updates: true,
+    email_quest_completion: true,
+    email_gm_messages: true,
   })
 
   // Update form when settings load
   useEffect(() => {
     if (settings && !initialized) {
-      // Cast to include email_notifications which may not be in generated types yet
-      const settingsWithEmail = settings as typeof settings & { email_notifications?: boolean }
+      // Cast to include email fields which may not be in generated types yet
+      const settingsWithEmail = settings as typeof settings & {
+        email_notifications?: boolean
+        email_quest_updates?: boolean
+        email_quest_completion?: boolean
+        email_gm_messages?: boolean
+      }
       setFormData({
         show_profile: settings.show_profile,
         show_stats: settings.show_stats,
         show_activity: settings.show_activity,
         allow_guild_invites: settings.allow_guild_invites,
         email_notifications: settingsWithEmail.email_notifications ?? true,
+        email_quest_updates: settingsWithEmail.email_quest_updates ?? true,
+        email_quest_completion: settingsWithEmail.email_quest_completion ?? true,
+        email_gm_messages: settingsWithEmail.email_gm_messages ?? true,
       })
       setInitialized(true)
     }
@@ -116,14 +127,14 @@ export function PrivacyForm() {
           <div className="space-y-4">
             <div>
               <h3 className="text-sm font-medium">Email Notifications</h3>
-              <p className="text-sm text-muted-foreground">Control email notifications from Guild Hall</p>
+              <p className="text-sm text-muted-foreground">Control which emails you receive from Guild Hall</p>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="email_notifications">Receive Email Notifications</Label>
+                <Label htmlFor="email_notifications">Enable Email Notifications</Label>
                 <p className="text-sm text-muted-foreground">
-                  Get emails for quest approvals, completions, and messages from GMs
+                  Master toggle - turn off to disable all email notifications
                 </p>
               </div>
               <Switch
@@ -132,6 +143,52 @@ export function PrivacyForm() {
                 onCheckedChange={() => handleToggle('email_notifications')}
               />
             </div>
+
+            {formData.email_notifications && (
+              <div className="ml-4 space-y-4 border-l-2 border-muted pl-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="email_quest_updates">Quest Progress Updates</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Objective approvals, rejections, and extension responses
+                    </p>
+                  </div>
+                  <Switch
+                    id="email_quest_updates"
+                    checked={formData.email_quest_updates}
+                    onCheckedChange={() => handleToggle('email_quest_updates')}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="email_quest_completion">Quest Completions</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Celebration emails when you complete a quest
+                    </p>
+                  </div>
+                  <Switch
+                    id="email_quest_completion"
+                    checked={formData.email_quest_completion}
+                    onCheckedChange={() => handleToggle('email_quest_completion')}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="email_gm_messages">Game Master Messages</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Private messages sent by Game Masters
+                    </p>
+                  </div>
+                  <Switch
+                    id="email_gm_messages"
+                    checked={formData.email_gm_messages}
+                    onCheckedChange={() => handleToggle('email_gm_messages')}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {error && (
