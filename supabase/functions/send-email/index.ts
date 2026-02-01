@@ -1,14 +1,16 @@
 // Supabase Edge Function: send-email
 // Sends transactional emails for Guild Hall notifications
-// Uses Resend API for email delivery
+// Uses Mailjet API for email delivery
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
+const MAILJET_API_KEY = Deno.env.get('MAILJET_API_KEY')
+const MAILJET_SECRET_KEY = Deno.env.get('MAILJET_SECRET_KEY')
 const GUILD_NAME = Deno.env.get('GUILD_NAME') || 'Guild Hall'
 const GUILD_LOGO_URL = Deno.env.get('GUILD_LOGO_URL') || ''
 const APP_URL = Deno.env.get('APP_URL') || 'https://guild-hall.app'
 const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'noreply@guild-hall.app'
+const FROM_NAME = Deno.env.get('FROM_NAME') || GUILD_NAME
 
 // Email types
 type EmailType =
@@ -329,8 +331,8 @@ serve(async (req) => {
   }
 
   try {
-    if (!RESEND_API_KEY) {
-      console.error('RESEND_API_KEY not configured')
+    if (!MAILJET_API_KEY || !MAILJET_SECRET_KEY) {
+      console.error('Mailjet credentials not configured')
       return new Response(
         JSON.stringify({ error: 'Email service not configured' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -348,24 +350,39 @@ serve(async (req) => {
 
     const { subject, html } = getEmailContent(payload)
 
-    // Send email via Resend
-    const response = await fetch('https://api.resend.com/emails', {
+    // Mailjet uses Basic Auth with API_KEY:SECRET_KEY
+    const authHeader = btoa(`${MAILJET_API_KEY}:${MAILJET_SECRET_KEY}`)
+
+    // Send email via Mailjet API v3.1
+    const response = await fetch('https://api.mailjet.com/v3.1/send', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Authorization': `Basic ${authHeader}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: `${GUILD_NAME} <${FROM_EMAIL}>`,
-        to: [payload.to],
-        subject,
-        html,
+        Messages: [
+          {
+            From: {
+              Email: FROM_EMAIL,
+              Name: FROM_NAME,
+            },
+            To: [
+              {
+                Email: payload.to,
+                Name: payload.user_name,
+              },
+            ],
+            Subject: subject,
+            HTMLPart: html,
+          },
+        ],
       }),
     })
 
     if (!response.ok) {
       const errorData = await response.text()
-      console.error('Resend API error:', errorData)
+      console.error('Mailjet API error:', errorData)
       return new Response(
         JSON.stringify({ error: 'Failed to send email', details: errorData }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
@@ -375,8 +392,12 @@ serve(async (req) => {
     const result = await response.json()
     console.log('Email sent successfully:', result)
 
+    // Mailjet returns Messages array with status
+    const messageResult = result.Messages?.[0]
+    const messageId = messageResult?.To?.[0]?.MessageID
+
     return new Response(
-      JSON.stringify({ success: true, id: result.id }),
+      JSON.stringify({ success: true, id: messageId, status: messageResult?.Status }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     )
   } catch (error) {
