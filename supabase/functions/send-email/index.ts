@@ -20,6 +20,7 @@ type EmailType =
   | 'extension_approved'
   | 'extension_denied'
   | 'private_message'
+  | 'gm_review_needed'
 
 interface EmailPayload {
   type: EmailType
@@ -43,6 +44,10 @@ interface EmailPayload {
   // Quest completion
   points_earned?: number
   badge_url?: string
+  // GM review notification
+  review_type?: 'submission' | 'extension'
+  submitter_name?: string
+  pending_count?: number
 }
 
 // Brand colors from the Guild Hall theme
@@ -312,6 +317,46 @@ function getEmailContent(payload: EmailPayload): { subject: string; html: string
           </p>
           `,
           `New message from ${payload.gm_name || 'your Game Master'}`
+        ),
+      }
+
+    case 'gm_review_needed':
+      const reviewTypeText = payload.review_type === 'extension' ? 'extension request' : 'submission'
+      const reviewTypeIcon = payload.review_type === 'extension' ? '⏰' : '📋'
+      const pendingText = payload.pending_count && payload.pending_count > 1
+        ? `You have ${payload.pending_count} items waiting for review.`
+        : ''
+      return {
+        subject: `${reviewTypeIcon} New ${reviewTypeText} awaiting your review`,
+        html: getBaseTemplate(
+          `
+          <div class="hero">
+            <div class="hero-icon">${reviewTypeIcon}</div>
+            <div class="hero-text">Review Needed</div>
+            <p>A guild member needs your attention</p>
+          </div>
+
+          <p>Hey ${payload.user_name},</p>
+
+          <p><strong>${payload.submitter_name}</strong> has submitted ${payload.review_type === 'extension' ? 'an extension request' : 'evidence'} for review:</p>
+
+          <div class="feedback-box">
+            <strong>Quest:</strong> ${payload.quest_title}<br>
+            ${payload.objective_title ? `<strong>Objective:</strong> ${payload.objective_title}<br>` : ''}
+            <strong>Type:</strong> ${payload.review_type === 'extension' ? 'Extension Request' : 'Evidence Submission'}
+          </div>
+
+          ${pendingText ? `<p style="color: ${BRAND.warning}; font-weight: 500;">${pendingText}</p>` : ''}
+
+          <p style="text-align: center;">
+            <a href="${APP_URL}/gm/reviews" class="button">Review Now</a>
+          </p>
+
+          <p style="text-align: center; font-size: 14px; color: #666666;">
+            Quick action keeps adventurers motivated!
+          </p>
+          `,
+          `${payload.submitter_name} submitted ${reviewTypeText === 'extension request' ? 'an' : 'a'} ${reviewTypeText} for "${payload.quest_title}"`
         ),
       }
 
