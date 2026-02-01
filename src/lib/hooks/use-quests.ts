@@ -19,14 +19,8 @@ async function fetchQuests(filters?: QuestFilters): Promise<Quest[]> {
     quests = quests.filter(q => q.difficulty === filters.difficulty)
   }
 
-  // Sort: featured first, then by difficulty (easiest first)
-  quests.sort((a, b) => {
-    // Featured quests come first
-    if (a.featured && !b.featured) return -1
-    if (!a.featured && b.featured) return 1
-    // Then sort by difficulty
-    return getDifficultyOrder(a.difficulty) - getDifficultyOrder(b.difficulty)
-  })
+  // Sort by difficulty (easiest first)
+  quests.sort((a, b) => getDifficultyOrder(a.difficulty) - getDifficultyOrder(b.difficulty))
 
   return quests
 }
