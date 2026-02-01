@@ -114,7 +114,7 @@ function getBaseTemplate(content: string, previewText: string): string {
       <p>This email was sent by ${GUILD_NAME}</p>
       <p>
         <a href="${APP_URL}/settings/privacy" style="color: #666666;">Email Preferences</a> |
-        <a href="https://agentics-nz.fly.dev" style="color: #666666;">Visit Agentics NZ</a>
+        <a href="${APP_URL}" style="color: #666666;">Visit ${GUILD_NAME}</a>
       </p>
     </div>
   </div>
@@ -195,12 +195,13 @@ function getEmailContent(payload: EmailPayload): { subject: string; html: string
         html: getBaseTemplate(
           `
           <div class="hero">
-            <div class="hero-icon">🏆</div>
+            ${payload.badge_url
+              ? `<img src="${payload.badge_url}" alt="Quest Badge" class="badge-img" style="max-width: 150px; margin-bottom: 16px;" />`
+              : `<div class="hero-icon">🏆</div>`
+            }
             <div class="hero-text">VICTORY!</div>
             <p>You have completed the quest!</p>
           </div>
-
-          ${payload.badge_url ? `<img src="${payload.badge_url}" alt="Quest Badge" class="badge-img" />` : ''}
 
           <p>Congratulations, ${payload.user_name}!</p>
 
