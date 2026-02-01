@@ -24,12 +24,8 @@ DECLARE
   v_edge_url TEXT;
   v_request_body JSONB;
 BEGIN
-  -- Get edge function URL from vault or use default
-  -- In production, set this via: SELECT vault.create_secret('edge_function_url', 'https://...');
-  v_edge_url := COALESCE(
-    current_setting('app.edge_function_url', true),
-    'https://your-project.supabase.co/functions/v1/send-email'
-  );
+  -- Edge function URL for this project
+  v_edge_url := 'https://wifxbkyvvnocolyqqroj.supabase.co/functions/v1/send-email';
 
   -- Build request body
   v_request_body := jsonb_build_object(
@@ -44,13 +40,13 @@ BEGIN
     PERFORM net.http_post(
       url := v_edge_url,
       headers := jsonb_build_object(
-        'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || current_setting('app.service_role_key', true)
+        'Content-Type', 'application/json'
       ),
       body := v_request_body
     );
   EXCEPTION WHEN OTHERS THEN
     -- Log error but don't fail the transaction
+    -- pg_net may not be enabled, which is OK - emails just won't send
     RAISE WARNING 'Failed to send email notification: %', SQLERRM;
   END;
 END;
