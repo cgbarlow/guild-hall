@@ -41,7 +41,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
       <p>Welcome to the guild! Before you can embark on your quests, please verify your email address by clicking the button below:</p>
 
       <p style="text-align: center; margin: 32px 0;">
-        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Verify Email Address</a>
+        <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Verify Email Address</a>
       </p>
 
       <p>If you didn't create an account with Guild Hall, you can safely ignore this email.</p>
@@ -103,7 +103,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
       <p>Click the button below to accept your invitation and create your adventurer profile:</p>
 
       <p style="text-align: center; margin: 32px 0;">
-        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Accept Invitation</a>
+        <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Accept Invitation</a>
       </p>
 
       <p>If you weren't expecting this invitation, you can safely ignore this email.</p>
@@ -163,7 +163,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
       <p>Click the magic link below to instantly enter the guild hall. No password required!</p>
 
       <p style="text-align: center; margin: 32px 0;">
-        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Enter the Guild Hall</a>
+        <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=magiclink" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Enter the Guild Hall</a>
       </p>
 
       <p style="font-size: 14px; color: #666666;">This link will expire in 24 hours and can only be used once.</p>
@@ -221,12 +221,12 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
       <p>Greetings, adventurer!</p>
 
-      <p>We received a request to change the email address associated with your Guild Hall account.</p>
+      <p>We received a request to change the email address associated with your Guild Hall account from {{ .Email }} to {{ .NewEmail }}.</p>
 
       <p>Click the button below to confirm this change:</p>
 
       <p style="text-align: center; margin: 32px 0;">
-        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Confirm New Email</a>
+        <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Confirm New Email</a>
       </p>
 
       <p style="font-size: 14px; color: #666666;">If you didn't request this change, please ignore this email or contact support immediately.</p>
@@ -287,7 +287,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
       <p>Click the button below to set a new password:</p>
 
       <p style="text-align: center; margin: 32px 0;">
-        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Reset Password</a>
+        <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Reset Password</a>
       </p>
 
       <p style="font-size: 14px; color: #666666;">This link will expire in 24 hours. If you didn't request a password reset, you can safely ignore this email.</p>
@@ -343,12 +343,10 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
       <p>Greetings, adventurer!</p>
 
-      <p>For your security, we need to verify your identity before proceeding with your request.</p>
-
-      <p>Click the button below to confirm:</p>
+      <p>For your security, we need to verify your identity. Enter the following code:</p>
 
       <p style="text-align: center; margin: 32px 0;">
-        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Verify My Identity</a>
+        <span style="display: inline-block; background-color: #F5F0E6; color: #3D2E1F; padding: 16px 32px; font-size: 24px; font-weight: bold; font-family: monospace; border-radius: 6px; letter-spacing: 4px;">{{ .Token }}</span>
       </p>
 
       <p style="font-size: 14px; color: #666666;">If you didn't initiate this request, please secure your account immediately by changing your password.</p>
@@ -378,4 +376,9 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 4. Copy the **Body** HTML into the body field
 5. Save
 
-The `{{ .ConfirmationURL }}` placeholder is automatically replaced by Supabase with the correct link.
+### Template Variables Used:
+- `{{ .SiteURL }}` - Your site URL (configured in Supabase)
+- `{{ .TokenHash }}` - The verification token
+- `{{ .Token }}` - OTP code (for reauthentication)
+- `{{ .Email }}` - Current email (for email change)
+- `{{ .NewEmail }}` - New email (for email change)
