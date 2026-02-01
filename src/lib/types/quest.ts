@@ -53,6 +53,7 @@ export interface QuestResource {
 export interface QuestPrerequisite {
   prerequisite_quest_id: string
   prerequisite_title: string
+  prerequisite_difficulty: QuestDifficulty | null
   is_completed: boolean
 }
 

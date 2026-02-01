@@ -3,7 +3,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/contexts/auth-context'
-import type { QuestPrerequisite } from '@/lib/types/quest'
+import type { QuestPrerequisite, QuestDifficulty } from '@/lib/types/quest'
+import { getDifficultyOrder } from '@/lib/types/quest'
 
 /**
  * Fetch prerequisites for a quest with user completion status
@@ -26,7 +27,11 @@ export function useQuestPrerequisites(questId: string | undefined) {
           )
 
           if (!error && data) {
-            return data as QuestPrerequisite[]
+            const rpcResults = data as QuestPrerequisite[]
+            // Sort by difficulty (easiest first)
+            return rpcResults.sort((a, b) =>
+              getDifficultyOrder(a.prerequisite_difficulty) - getDifficultyOrder(b.prerequisite_difficulty)
+            )
           }
         } catch {
           // Function doesn't exist yet, fall through to fallback
@@ -38,7 +43,7 @@ export function useQuestPrerequisites(questId: string | undefined) {
         .from('quest_prerequisites')
         .select(`
           prerequisite_quest_id,
-          quests:prerequisite_quest_id (title)
+          quests:prerequisite_quest_id (title, difficulty)
         `)
         .eq('quest_id', questId)
 
@@ -48,11 +53,17 @@ export function useQuestPrerequisites(questId: string | undefined) {
         return []
       }
 
-      return (prereqs || []).map((p: { prerequisite_quest_id: string; quests: { title: string } | null }) => ({
+      const results = (prereqs || []).map((p: { prerequisite_quest_id: string; quests: { title: string; difficulty: QuestDifficulty | null } | null }) => ({
         prerequisite_quest_id: p.prerequisite_quest_id,
         prerequisite_title: p.quests?.title || 'Unknown Quest',
+        prerequisite_difficulty: p.quests?.difficulty || null,
         is_completed: false, // We don't know without user context
       }))
+
+      // Sort by difficulty (easiest first)
+      return results.sort((a, b) =>
+        getDifficultyOrder(a.prerequisite_difficulty) - getDifficultyOrder(b.prerequisite_difficulty)
+      )
     },
     enabled: !!questId,
   })
