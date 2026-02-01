@@ -23,13 +23,9 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
     <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
-          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
-          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
-        </tr>
-      </table>
+      <span style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</span>
+      <img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle; margin: 0 8px;">
+      <span style="font-size: 18px; color: #3D2E1F;">Agentics NZ</span>
     </div>
 
     <!-- Content -->
@@ -87,13 +83,9 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
     <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
-          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
-          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
-        </tr>
-      </table>
+      <span style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</span>
+      <img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle; margin: 0 8px;">
+      <span style="font-size: 18px; color: #3D2E1F;">Agentics NZ</span>
     </div>
 
     <!-- Content -->
@@ -153,13 +145,9 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
     <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
-          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
-          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
-        </tr>
-      </table>
+      <span style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</span>
+      <img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle; margin: 0 8px;">
+      <span style="font-size: 18px; color: #3D2E1F;">Agentics NZ</span>
     </div>
 
     <!-- Content -->
@@ -218,13 +206,9 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
     <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
-          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
-          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
-        </tr>
-      </table>
+      <span style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</span>
+      <img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle; margin: 0 8px;">
+      <span style="font-size: 18px; color: #3D2E1F;">Agentics NZ</span>
     </div>
 
     <!-- Content -->
@@ -283,13 +267,9 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
     <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
-          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
-          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
-        </tr>
-      </table>
+      <span style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</span>
+      <img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle; margin: 0 8px;">
+      <span style="font-size: 18px; color: #3D2E1F;">Agentics NZ</span>
     </div>
 
     <!-- Content -->
@@ -348,13 +328,9 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
     <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
-          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
-          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
-        </tr>
-      </table>
+      <span style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</span>
+      <img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle; margin: 0 8px;">
+      <span style="font-size: 18px; color: #3D2E1F;">Agentics NZ</span>
     </div>
 
     <!-- Content -->

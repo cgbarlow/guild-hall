@@ -101,13 +101,9 @@ function getBaseTemplate(content: string, previewText: string): string {
 
   <div class="container">
     <div class="header">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
-          <td style="text-align: center;"><img src="${LOGO_URL}" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
-          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">${GUILD_NAME}</td>
-        </tr>
-      </table>
+      <span style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</span>
+      <img src="${LOGO_URL}" alt="Logo" style="height: 28px; vertical-align: middle; margin: 0 8px;">
+      <span style="font-size: 18px; color: #3D2E1F;">${GUILD_NAME}</span>
     </div>
 
     <div class="content">
