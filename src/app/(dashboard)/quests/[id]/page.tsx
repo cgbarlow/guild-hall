@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { QuestDetail } from '@/components/quests/quest-detail'
 import { useQuest } from '@/lib/hooks/use-quest'
 import { useAcceptQuest } from '@/lib/hooks/use-accept-quest'
+import { useUserActiveQuestIds } from '@/lib/hooks/use-user-active-quest-ids'
 
 function LoadingSkeleton() {
   return (
@@ -45,6 +46,7 @@ export default function QuestDetailPage() {
   const questId = params.id as string
 
   const { data: quest, isLoading, error } = useQuest(questId)
+  const { data: userQuests } = useUserActiveQuestIds()
   const acceptQuestMutation = useAcceptQuest({
     onSuccess: () => {
       // Navigate to my-quests to see the active quest
@@ -68,14 +70,19 @@ export default function QuestDetailPage() {
     return <ErrorState message="This quest does not exist." />
   }
 
-  // Quest is available if it's published and user hasn't already accepted it
-  const canAccept = quest.status === 'published'
+  // Check if user has already completed or is taking this quest
+  const isCompleted = userQuests?.isCompleted(questId) ?? false
+  const isActive = userQuests?.getActiveUserQuestId(questId) !== undefined
+
+  // Quest is available if it's published and user hasn't already accepted/completed it
+  const canAccept = quest.status === 'published' && !isCompleted && !isActive
 
   return (
     <QuestDetail
       quest={quest}
       onAccept={handleAcceptQuest}
       canAccept={canAccept}
+      userCompleted={isCompleted}
     />
   )
 }

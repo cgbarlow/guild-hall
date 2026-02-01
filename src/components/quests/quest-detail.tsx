@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Award, Clock, User, Calendar, Zap, ExternalLink, BookOpen, Lock } from 'lucide-react'
+import { ArrowLeft, Award, Clock, User, Calendar, Zap, ExternalLink, BookOpen, Lock, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +18,8 @@ interface QuestDetailProps {
   quest: QuestWithRelations
   onAccept?: (questId: string) => Promise<void>
   canAccept?: boolean
+  /** Whether the current user has already completed this quest */
+  userCompleted?: boolean
   className?: string
 }
 
@@ -33,6 +35,7 @@ export function QuestDetail({
   quest,
   onAccept,
   canAccept = true,
+  userCompleted = false,
   className,
 }: QuestDetailProps) {
   // Fetch prerequisites with completion status
@@ -42,9 +45,10 @@ export function QuestDetail({
   // Quest is available if it's published (for users to accept)
   const isOpen = quest.status === 'published' || quest.status === 'open'
 
-  // User can accept if prerequisites are met
+  // User can accept if prerequisites are met and they haven't completed it
   const hasPrerequisites = prerequisites && prerequisites.length > 0
   const prerequisitesMet = canAcceptPrereqs !== false
+  const isLocked = hasPrerequisites && !prerequisitesMet && !userCompleted
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -70,7 +74,14 @@ export function QuestDetail({
             </div>
             <div className="flex items-start gap-4">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <QuestStatusBadge status={quest.status} isExclusive={quest.is_exclusive} isLocked={hasPrerequisites && !prerequisitesMet} />
+                {userCompleted ? (
+                  <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-purple-100 text-purple-700 border-purple-300">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Completed
+                  </span>
+                ) : (
+                  <QuestStatusBadge status={quest.status} isExclusive={quest.is_exclusive} isLocked={isLocked} />
+                )}
               </div>
               {quest.badge_url && (
                 <div className="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0">
@@ -145,7 +156,13 @@ export function QuestDetail({
           {quest.objectives && quest.objectives.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-3">Objectives</h3>
-              <ObjectivesList objectives={quest.objectives} />
+              <ObjectivesList
+                objectives={quest.objectives}
+                userProgress={userCompleted
+                  ? new Map(quest.objectives.map(o => [o.id, { status: 'approved' as const }]))
+                  : undefined
+                }
+              />
             </div>
           )}
 
@@ -174,13 +191,25 @@ export function QuestDetail({
             </div>
           )}
 
-          {/* Prerequisites */}
-          {hasPrerequisites && (
+          {/* Prerequisites - only show if not completed */}
+          {hasPrerequisites && !userCompleted && (
             <PrerequisitesDisplay prerequisites={prerequisites} />
           )}
 
+          {/* Completed message */}
+          {userCompleted && (
+            <div className="pt-4 border-t">
+              <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                <CheckCircle2 className="h-5 w-5" />
+                <span className="font-medium">
+                  You have already completed this quest!
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Accept button */}
-          {isOpen && canAccept && (
+          {isOpen && canAccept && !userCompleted && (
             <div className="pt-4 border-t">
               {prerequisitesMet ? (
                 <AcceptQuestButton
@@ -201,7 +230,7 @@ export function QuestDetail({
           )}
 
           {/* Status message for non-open quests */}
-          {!isOpen && (
+          {!isOpen && !userCompleted && (
             <div className="pt-4 border-t">
               <p className="text-sm text-muted-foreground">
                 {quest.status === 'in_progress' && 'This quest is currently in progress.'}

@@ -12,6 +12,8 @@ interface QuestListProps {
   className?: string
   /** Map of questId -> userQuestId for quests the user is actively taking */
   activeQuestIds?: Map<string, string>
+  /** Set of questIds the user has completed */
+  completedQuestIds?: Set<string>
 }
 
 function QuestListSkeleton() {
@@ -52,7 +54,7 @@ function EmptyState() {
   )
 }
 
-export function QuestList({ quests, isLoading, className, activeQuestIds }: QuestListProps) {
+export function QuestList({ quests, isLoading, className, activeQuestIds, completedQuestIds }: QuestListProps) {
   const { data: lockedQuests } = useLockedQuests()
 
   if (isLoading) {
@@ -67,8 +69,9 @@ export function QuestList({ quests, isLoading, className, activeQuestIds }: Ques
     <div className={cn('grid gap-4 sm:grid-cols-2 lg:grid-cols-3', className)}>
       {quests.map((quest) => {
         const userQuestId = activeQuestIds?.get(quest.id)
-        // Only show as locked if user hasn't already accepted this quest
-        const isLocked = !userQuestId && lockedQuests?.isLocked(quest.id)
+        const isCompleted = completedQuestIds?.has(quest.id) ?? false
+        // Only show as locked if user hasn't already accepted or completed this quest
+        const isLocked = !userQuestId && !isCompleted && lockedQuests?.isLocked(quest.id)
         const incompletePrerequisites = isLocked ? lockedQuests?.getIncompletePrerequisites(quest.id) : undefined
 
         return (
@@ -77,6 +80,7 @@ export function QuestList({ quests, isLoading, className, activeQuestIds }: Ques
             quest={quest}
             userQuestId={userQuestId}
             isLocked={isLocked}
+            isCompleted={isCompleted}
             incompletePrerequisites={incompletePrerequisites}
           />
         )

@@ -38,6 +38,8 @@ interface QuestCardProps {
   userQuestStatus?: UserQuestStatus
   /** If true, quest is locked due to unmet prerequisites */
   isLocked?: boolean
+  /** If true, user has already completed this quest */
+  isCompleted?: boolean
   /** Incomplete prerequisites (for showing "Complete X first" message) */
   incompletePrerequisites?: QuestPrerequisite[]
 }
@@ -114,14 +116,14 @@ function getFirstParagraph(text: string): string {
   return text.trim()
 }
 
-export function QuestCard({ quest, className, userQuestId, userQuestStatus, isLocked, incompletePrerequisites }: QuestCardProps) {
+export function QuestCard({ quest, className, userQuestId, userQuestStatus, isLocked, isCompleted, incompletePrerequisites }: QuestCardProps) {
   // Use short_description if available, otherwise show first paragraph of description
   const displayDescription =
     quest.short_description ||
     (quest.description ? getFirstParagraph(quest.description) : 'No description available')
 
-  // Map published status to open for display
-  const displayStatus = (quest.status === 'published' ? 'open' : quest.status) as QuestStatus
+  // Map published status to open for display, or completed if user has completed
+  const displayStatus = isCompleted ? 'completed' : (quest.status === 'published' ? 'open' : quest.status) as QuestStatus
 
   // If user is actively taking this quest, link to their quest progress page
   const href = userQuestId ? `/my-quests/${userQuestId}` : `/quests/${quest.id}`
@@ -138,6 +140,7 @@ export function QuestCard({ quest, className, userQuestId, userQuestStatus, isLo
           'h-full transition-all hover:shadow-md hover:border-primary/50',
           userQuestId && 'border-primary/30 bg-primary/5',
           isLocked && 'opacity-75 border-muted',
+          isCompleted && 'border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-950/20',
           className
         )}
       >

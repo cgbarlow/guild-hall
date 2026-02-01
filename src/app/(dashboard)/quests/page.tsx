@@ -23,7 +23,7 @@ export default function QuestsPage() {
     search: debouncedSearch || undefined,
     difficulty: selectedDifficulty ?? undefined,
   })
-  const { data: activeQuestIds } = useUserActiveQuestIds()
+  const { data: userQuests } = useUserActiveQuestIds()
 
   return (
     <div className="space-y-6">
@@ -63,7 +63,12 @@ export default function QuestsPage() {
           </p>
         </div>
       ) : (
-        <QuestList quests={quests || []} isLoading={questsLoading} activeQuestIds={activeQuestIds} />
+        <QuestList
+          quests={quests || []}
+          isLoading={questsLoading}
+          activeQuestIds={userQuests?.activeQuestIds}
+          completedQuestIds={userQuests?.completedQuestIds}
+        />
       )}
     </div>
   )
