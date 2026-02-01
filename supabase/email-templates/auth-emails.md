@@ -8,7 +8,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
 **Subject:**
 ```
-🏰 Welcome to Agentics NZ - Verify Your Email
+🏰 Welcome to Guild Hall - Verify Your Email
 ```
 
 **Body:**
@@ -22,8 +22,14 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 <body style="margin: 0; padding: 0; background-color: #FDF8E8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
-    <div style="background-color: #B8860B; padding: 24px; text-align: center;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Agentics NZ</h1>
+    <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
+          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
+          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
+        </tr>
+      </table>
     </div>
 
     <!-- Content -->
@@ -42,7 +48,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
         <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #B8860B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">Verify Email Address</a>
       </p>
 
-      <p>If you didn't create an account with Agentics NZ, you can safely ignore this email.</p>
+      <p>If you didn't create an account with Guild Hall, you can safely ignore this email.</p>
 
       <p>May your quests be legendary!</p>
       <p><em>— The Guild Masters</em></p>
@@ -52,7 +58,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.com" style="color: #666666;">Visit Agentics NZ</a>
+        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
       </p>
     </div>
   </div>
@@ -66,7 +72,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
 **Subject:**
 ```
-⚔️ You've Been Summoned to Agentics NZ
+⚔️ You've Been Summoned to Guild Hall
 ```
 
 **Body:**
@@ -80,8 +86,14 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 <body style="margin: 0; padding: 0; background-color: #FDF8E8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
-    <div style="background-color: #B8860B; padding: 24px; text-align: center;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Agentics NZ</h1>
+    <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
+          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
+          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
+        </tr>
+      </table>
     </div>
 
     <!-- Content -->
@@ -94,7 +106,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
       <p>Hail, future adventurer!</p>
 
-      <p>You have been summoned to join <strong>Agentics NZ</strong>. A world of quests, achievements, and glory awaits you!</p>
+      <p>You have been summoned to join <strong>Guild Hall</strong>. A world of quests, achievements, and glory awaits you!</p>
 
       <p>Click the button below to accept your invitation and create your adventurer profile:</p>
 
@@ -112,7 +124,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.com" style="color: #666666;">Visit Agentics NZ</a>
+        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
       </p>
     </div>
   </div>
@@ -126,7 +138,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
 **Subject:**
 ```
-🗝️ Your Agentics NZ Portal Key
+🗝️ Your Guild Hall Portal Key
 ```
 
 **Body:**
@@ -140,8 +152,14 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 <body style="margin: 0; padding: 0; background-color: #FDF8E8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
-    <div style="background-color: #B8860B; padding: 24px; text-align: center;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Agentics NZ</h1>
+    <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
+          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
+          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
+        </tr>
+      </table>
     </div>
 
     <!-- Content -->
@@ -171,7 +189,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.com" style="color: #666666;">Visit Agentics NZ</a>
+        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
       </p>
     </div>
   </div>
@@ -199,8 +217,14 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 <body style="margin: 0; padding: 0; background-color: #FDF8E8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
-    <div style="background-color: #B8860B; padding: 24px; text-align: center;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Agentics NZ</h1>
+    <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
+          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
+          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
+        </tr>
+      </table>
     </div>
 
     <!-- Content -->
@@ -213,7 +237,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
       <p>Greetings, adventurer!</p>
 
-      <p>We received a request to change the email address associated with your Agentics NZ account.</p>
+      <p>We received a request to change the email address associated with your Guild Hall account.</p>
 
       <p>Click the button below to confirm this change:</p>
 
@@ -230,7 +254,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.com" style="color: #666666;">Visit Agentics NZ</a>
+        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
       </p>
     </div>
   </div>
@@ -244,7 +268,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
 **Subject:**
 ```
-🔒 Reset Your Agentics NZ Password
+🔒 Reset Your Guild Hall Password
 ```
 
 **Body:**
@@ -258,8 +282,14 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 <body style="margin: 0; padding: 0; background-color: #FDF8E8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
-    <div style="background-color: #B8860B; padding: 24px; text-align: center;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Agentics NZ</h1>
+    <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
+          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
+          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
+        </tr>
+      </table>
     </div>
 
     <!-- Content -->
@@ -272,7 +302,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
       <p>Greetings, adventurer!</p>
 
-      <p>We received a request to reset the password for your Agentics NZ account.</p>
+      <p>We received a request to reset the password for your Guild Hall account.</p>
 
       <p>Click the button below to set a new password:</p>
 
@@ -289,7 +319,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.com" style="color: #666666;">Visit Agentics NZ</a>
+        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
       </p>
     </div>
   </div>
@@ -303,7 +333,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 
 **Subject:**
 ```
-🛡️ Verify Your Identity - Agentics NZ
+🛡️ Verify Your Identity - Guild Hall
 ```
 
 **Body:**
@@ -317,8 +347,14 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
 <body style="margin: 0; padding: 0; background-color: #FDF8E8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
     <!-- Header -->
-    <div style="background-color: #B8860B; padding: 24px; text-align: center;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Agentics NZ</h1>
+    <div style="background-color: #F5F0E6; padding: 16px 24px; border-bottom: 1px solid #E5DDD0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size: 18px; font-weight: 600; color: #3D2E1F;">Guild Hall</td>
+          <td style="text-align: center;"><img src="https://cdn.disco.co/media/agentics-logo-enhanced-removebg-preview_2949fb89-758d-4d9d-ae30-a51cea979427.png" alt="Logo" style="height: 28px; vertical-align: middle;"></td>
+          <td style="text-align: right; font-size: 18px; font-weight: 600; color: #3D2E1F;">Agentics NZ</td>
+        </tr>
+      </table>
     </div>
 
     <!-- Content -->
@@ -348,7 +384,7 @@ Copy each template into **Supabase Dashboard → Authentication → Email Templa
     <div style="background-color: #f5f5f5; padding: 24px; text-align: center; font-size: 12px; color: #666666;">
       <p style="margin: 0;">This email was sent by Agentics NZ</p>
       <p style="margin: 8px 0 0 0;">
-        <a href="https://guild-hall.netlify.com" style="color: #666666;">Visit Agentics NZ</a>
+        <a href="https://guild-hall.netlify.app" style="color: #666666;">Visit Guild Hall</a>
       </p>
     </div>
   </div>
