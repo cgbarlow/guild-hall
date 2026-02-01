@@ -165,16 +165,11 @@ export function QuestCard({ quest, className, userQuestId, userQuestStatus, isLo
                     </Badge>
                   )}
                 </div>
-                {isLocked && (
-                  <Badge variant="outline" className="text-muted-foreground border-muted-foreground/50">
-                    <Lock className="h-3 w-3 mr-1" />
-                    Locked
-                  </Badge>
-                )}
-                {!userQuestId && !userQuestStatus && !isLocked && (
+                {!userQuestId && !userQuestStatus && (
                   <QuestStatusBadge
                     status={displayStatus}
                     isExclusive={'is_exclusive' in quest ? quest.is_exclusive : false}
+                    isLocked={isLocked}
                   />
                 )}
               </div>
