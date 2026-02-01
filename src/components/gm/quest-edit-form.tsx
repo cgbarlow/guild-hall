@@ -31,6 +31,8 @@ import {
 import { useUpdateQuest, usePublishQuest, useArchiveQuest, useUnpublishQuest, useDeleteQuest } from '@/lib/hooks/use-update-quest'
 import { useCategories } from '@/lib/hooks/use-categories'
 import { ObjectiveEditor } from './objective-editor'
+import { PrerequisiteSelector } from './prerequisite-selector'
+import { QuestionEditor } from './question-editor'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { uploadQuestBadge, removeQuestBadge } from '@/lib/actions/badge'
 import { useQueryClient } from '@tanstack/react-query'
@@ -490,6 +492,12 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
 
       {/* Objectives Editor - outside form for separate saves */}
       <ObjectiveEditor questId={quest.id} />
+
+      {/* Prerequisites Selector - outside form for separate saves */}
+      <PrerequisiteSelector questId={quest.id} />
+
+      {/* Challenge Questions Editor - outside form for separate saves */}
+      <QuestionEditor questId={quest.id} />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* Resources */}

@@ -8,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { ProgressBar, ObjectiveChecklist, AbandonQuestButton } from '@/components/my-quests'
 import { ClaimRewardButton } from '@/components/my-quests/claim-reward-button'
+import { QuestionChallenge } from '@/components/quests/question-challenge'
 import { useUserQuests, getUserQuestStatusInfo } from '@/lib/hooks/use-user-quests'
 import { useUserObjectives } from '@/lib/hooks/use-user-objectives'
+import { useAllQuestionsAnswered } from '@/lib/hooks/use-quest-questions'
 import { cn } from '@/lib/utils'
 
 function LoadingSkeleton() {
@@ -87,6 +89,9 @@ export default function QuestProgressPage() {
     userQuest ? userQuestId : undefined
   )
 
+  // Check if all questions are answered (for quests with challenge questions)
+  const { data: allQuestionsAnswered } = useAllQuestionsAnswered(userQuestId)
+
   const isLoading = questsLoading || objectivesLoading
 
   if (isLoading) {
@@ -117,6 +122,9 @@ export default function QuestProgressPage() {
   const isReadyToClaim = userQuest.status === 'ready_to_claim'
   const isAwaitingApproval = userQuest.status === 'awaiting_final_approval'
   const isCompleted = userQuest.status === 'completed'
+
+  // User can claim only if all questions are answered (if there are questions)
+  const canClaimReward = isReadyToClaim && (allQuestionsAnswered !== false)
 
   const handleSubmitEvidence = (objectiveId: string) => {
     // Navigate to evidence submission - to be implemented in Phase 4.4
@@ -250,15 +258,29 @@ export default function QuestProgressPage() {
             </div>
           )}
 
+          {/* Challenge Questions (if any) */}
+          {(userQuest.status === 'in_progress' || userQuest.status === 'ready_to_claim') && (
+            <QuestionChallenge
+              userQuestId={userQuestId}
+              questTitle={userQuest.quest?.title || 'Quest'}
+            />
+          )}
+
           {/* Actions */}
           <div className="pt-4 border-t flex flex-wrap gap-3">
-            {isReadyToClaim && (
+            {canClaimReward && (
               <ClaimRewardButton
                 userQuestId={userQuestId}
                 questTitle={userQuest.quest?.title || 'Quest'}
                 points={userQuest.quest?.points || 0}
                 requiresApproval={userQuest.quest?.requires_final_approval}
               />
+            )}
+            {isReadyToClaim && !canClaimReward && (
+              <div className="flex items-center gap-2 text-amber-600 font-medium">
+                <AlertCircle className="h-5 w-5" />
+                <span>Answer all challenge questions to claim your reward</span>
+              </div>
             )}
             {isAwaitingApproval && (
               <div className="flex items-center gap-2 text-purple-600 font-medium">

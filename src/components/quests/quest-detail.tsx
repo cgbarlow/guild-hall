@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Award, Clock, User, Calendar, Zap, ExternalLink, BookOpen } from 'lucide-react'
+import { ArrowLeft, Award, Clock, User, Calendar, Zap, ExternalLink, BookOpen, Lock } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,6 +9,8 @@ import { QuestStatusBadge } from './quest-status-badge'
 import { CategoryBadge } from './category-badge'
 import { ObjectivesList } from './objectives-list'
 import { AcceptQuestButton } from './accept-quest-button'
+import { PrerequisitesDisplay } from './prerequisites-display'
+import { useQuestPrerequisites, useCanAcceptQuest } from '@/lib/hooks/use-quest-prerequisites'
 import type { QuestWithRelations } from '@/lib/types/quest'
 import { cn } from '@/lib/utils'
 
@@ -33,8 +35,16 @@ export function QuestDetail({
   canAccept = true,
   className,
 }: QuestDetailProps) {
+  // Fetch prerequisites with completion status
+  const { data: prerequisites } = useQuestPrerequisites(quest.id)
+  const { data: canAcceptPrereqs } = useCanAcceptQuest(quest.id)
+
   // Quest is available if it's published (for users to accept)
   const isOpen = quest.status === 'published' || quest.status === 'open'
+
+  // User can accept if prerequisites are met
+  const hasPrerequisites = prerequisites && prerequisites.length > 0
+  const prerequisitesMet = canAcceptPrereqs !== false
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -162,15 +172,29 @@ export function QuestDetail({
             </div>
           )}
 
+          {/* Prerequisites */}
+          {hasPrerequisites && (
+            <PrerequisitesDisplay prerequisites={prerequisites} />
+          )}
+
           {/* Accept button */}
           {isOpen && canAccept && (
             <div className="pt-4 border-t">
-              <AcceptQuestButton
-                questId={quest.id}
-                quest={quest}
-                useModal={true}
-                disabled={!onAccept}
-              />
+              {prerequisitesMet ? (
+                <AcceptQuestButton
+                  questId={quest.id}
+                  quest={quest}
+                  useModal={true}
+                  disabled={!onAccept}
+                />
+              ) : (
+                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                  <Lock className="h-5 w-5" />
+                  <span className="font-medium">
+                    Complete the prerequisite quests above to unlock this quest
+                  </span>
+                </div>
+              )}
             </div>
           )}
 
