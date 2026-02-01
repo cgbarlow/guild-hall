@@ -114,7 +114,7 @@ function getBaseTemplate(content: string, previewText: string): string {
       <p>This email was sent by ${GUILD_NAME}</p>
       <p>
         <a href="${APP_URL}/settings/privacy" style="color: #666666;">Email Preferences</a> |
-        <a href="${APP_URL}" style="color: #666666;">Visit ${GUILD_NAME}</a>
+        <a href="${APP_URL}" style="color: #666666;">Visit ${GUILD_NAME} Guild</a>
       </p>
     </div>
   </div>
