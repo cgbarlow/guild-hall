@@ -5,6 +5,8 @@ import { QuestList } from '@/components/quests/quest-list'
 import { QuestFilters } from '@/components/quests/quest-filters'
 import { QuestSearch } from '@/components/quests/quest-search'
 import { DifficultyFilter } from '@/components/quests/difficulty-filter'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 import { useQuests } from '@/lib/hooks/use-quests'
 import { useCategories } from '@/lib/hooks/use-categories'
 import { useDebounce } from '@/lib/hooks/use-debounce'
@@ -16,6 +18,7 @@ export default function QuestsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedDifficulty, setSelectedDifficulty] = useState<QuestDifficulty | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [hideCompleted, setHideCompleted] = useState(false)
   const debouncedSearch = useDebounce(searchQuery, 300)
 
   const { data: categories = [], isLoading: categoriesLoading } = useCategories({ onlyWithQuests: true })
@@ -55,10 +58,22 @@ export default function QuestsPage() {
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
           />
-          <DifficultyFilter
-            selectedDifficulty={selectedDifficulty}
-            onDifficultyChange={setSelectedDifficulty}
-          />
+          <div className="flex flex-wrap items-center gap-4">
+            <DifficultyFilter
+              selectedDifficulty={selectedDifficulty}
+              onDifficultyChange={setSelectedDifficulty}
+            />
+            <div className="flex items-center gap-2">
+              <Switch
+                id="hide-completed"
+                checked={hideCompleted}
+                onCheckedChange={setHideCompleted}
+              />
+              <Label htmlFor="hide-completed" className="text-sm cursor-pointer">
+                Hide completed quests
+              </Label>
+            </div>
+          </div>
         </div>
       )}
 
@@ -75,6 +90,8 @@ export default function QuestsPage() {
           activeQuestIds={activeQuestIds}
           userQuestStatuses={userQuestStatuses}
           questLockStatuses={questLockStatuses}
+          hideCompleted={hideCompleted}
+          sortByLockedStatus={true}
         />
       )}
     </div>
