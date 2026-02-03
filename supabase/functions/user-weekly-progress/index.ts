@@ -54,6 +54,11 @@ interface TierProgress {
   progressPercent: number
 }
 
+interface UnclaimedBadge {
+  questTitle: string
+  questId: string
+}
+
 interface UserEmailData {
   displayName: string
   nextSteps: NextStep[]
@@ -62,6 +67,7 @@ interface UserEmailData {
   tierProgress: TierProgress
   encouragementMessage: string
   weekRange: { start: string; end: string }
+  unclaimedBadges: UnclaimedBadge[]
 }
 
 const corsHeaders = {
@@ -399,12 +405,43 @@ async function gatherUserData(
     tierProgress
   )
 
+  // Get unclaimed badges (completed quests with badges that haven't been claimed)
+  let unclaimedBadges: UnclaimedBadge[] = []
+  try {
+    // Find completed quests with badges that haven't been claimed yet
+    const { data: completedQuests } = await supabase
+      .from('user_quests')
+      .select(`
+        quest_id,
+        badge_claimed,
+        quests!inner(id, title, badge_url)
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'completed')
+      .eq('badge_claimed', false)
+      .not('quests.badge_url', 'is', null)
+      .limit(5)
+
+    unclaimedBadges = (completedQuests || [])
+      .map((item) => {
+        const quest = item.quests as Record<string, unknown>
+        return {
+          questTitle: (quest?.title as string) || 'Quest',
+          questId: (quest?.id as string) || item.quest_id,
+        }
+      })
+      .filter((badge) => badge.questId)
+  } catch (badgeError) {
+    console.error('[gatherUserData] Error fetching unclaimed badges:', badgeError)
+  }
+
   return {
     nextSteps,
     recommendedAction,
     progress,
     tierProgress,
     encouragementMessage,
+    unclaimedBadges,
   }
 }
 
@@ -453,6 +490,7 @@ function renderWeeklyEmail(data: UserEmailData, baseUrl: string): string {
     tierProgress,
     encouragementMessage,
     weekRange,
+    unclaimedBadges,
   } = data
 
   let content = `
@@ -481,6 +519,21 @@ function renderWeeklyEmail(data: UserEmailData, baseUrl: string): string {
     </div>`
   }
 
+  // Unclaimed Badges
+  if (unclaimedBadges && unclaimedBadges.length > 0) {
+    content += `
+    <div class="card" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b;">
+      <p class="section-title" style="color: #92400e;">&#127942; Badges Ready to Claim</p>
+      <p style="color: #78350f; margin-bottom: 12px;">You've earned badges that are waiting to be claimed!</p>
+      ${unclaimedBadges.map((badge) => `
+        <div class="list-item" style="background: rgba(255,255,255,0.7); border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+          <strong style="color: #92400e;">${escapeHtml(badge.questTitle)}</strong>
+        </div>
+      `).join('')}
+      <a href="${baseUrl}/my-quests" class="button" style="background: #f59e0b;">Claim Your Badges</a>
+    </div>`
+  }
+
   // Next Steps
   if (nextSteps.length > 0) {
     content += `
@@ -497,18 +550,14 @@ function renderWeeklyEmail(data: UserEmailData, baseUrl: string): string {
     </div>`
   }
 
-  // Weekly Stats
+  // Weekly Stats - simplified to show what matters to users
   content += `
     <div class="card">
       <p class="section-title">This Week's Progress</p>
       <div class="stat-grid">
         <div class="stat-item">
-          <div class="stat-value">${progress.objectivesSubmitted}</div>
-          <div class="stat-label">Objectives Submitted</div>
-        </div>
-        <div class="stat-item">
           <div class="stat-value">${progress.objectivesApproved}</div>
-          <div class="stat-label">Objectives Approved</div>
+          <div class="stat-label">Objectives Completed</div>
         </div>
         <div class="stat-item">
           <div class="stat-value">${progress.questsCompleted}</div>

@@ -13,6 +13,7 @@ import {
 import { PointsDisplay } from '@/components/common/points-display'
 import { Skeleton } from '@/components/ui/skeleton'
 import { InlineBadges } from './inline-badges'
+import { TierBadge } from './tier-badge'
 import { useLeaderboardBadges, type LeaderboardBadgesMap } from '@/lib/hooks/use-leaderboard-badges'
 import type { LeaderboardEntry } from '@/lib/hooks/use-leaderboard'
 
@@ -100,13 +101,16 @@ export function LeaderboardTable({
                 )}
                 onClick={() => onRowClick?.(entry)}
               >
-                {/* Rank */}
+                {/* Rank with Tier */}
                 <TableCell>
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center justify-center gap-2">
                     {rankIcon || (
                       <span className="text-lg font-semibold text-muted-foreground">
                         {entry.rank}
                       </span>
+                    )}
+                    {entry.tier && (
+                      <TierBadge tier={entry.tier} size="sm" />
                     )}
                   </div>
                 </TableCell>

@@ -45,6 +45,7 @@ describe('useCreateQuest', () => {
     featured: false,
     is_exclusive: false,
     exclusive_code: null,
+    is_side_quest: false,
   }
 
   const mockCreatedQuest = {
@@ -115,6 +116,7 @@ describe('useCreateQuest', () => {
       difficulty: 'Apprentice',
       resources: [],
       is_exclusive: false,
+      is_side_quest: false,
     }
 
     const minimalCreatedQuest = {

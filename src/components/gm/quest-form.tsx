@@ -19,8 +19,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useCreateQuest } from '@/lib/hooks/use-create-quest'
 import { useCategories } from '@/lib/hooks/use-categories'
 import { questFormSchema, type QuestFormData } from '@/lib/schemas/quest.schema'
-import { Loader2, Save, ArrowLeft } from 'lucide-react'
+import { Loader2, Save, ArrowLeft, Star, Swords } from 'lucide-react'
 import Link from 'next/link'
+import type { QuestDifficulty } from '@/lib/types/quest'
+
+const DIFFICULTY_LEVELS: QuestDifficulty[] = ['Apprentice', 'Journeyman', 'Expert', 'Master']
 
 interface QuestFormProps {
   initialData?: Partial<QuestFormData>
@@ -50,12 +53,14 @@ export function QuestForm({ initialData, onSuccess }: QuestFormProps) {
       narrative_context: '',
       transformation_goal: '',
       is_template: false,
+      is_side_quest: false,
       ...initialData,
     },
   })
 
   const isTemplate = watch('is_template')
   const categoryId = watch('category_id')
+  const isSideQuest = watch('is_side_quest')
 
   const onSubmit = async (data: QuestFormData) => {
     try {
@@ -134,6 +139,63 @@ export function QuestForm({ initialData, onSuccess }: QuestFormProps) {
               <p className="text-sm text-destructive">{errors.category_id.message}</p>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Quest Type & Difficulty */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quest Type & Difficulty</CardTitle>
+          <CardDescription>
+            Set the quest type and difficulty level
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Side Quest Toggle */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-amber-500" />
+                <Label htmlFor="is_side_quest">Side Quest</Label>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Side quests are special bonus tasks that earn extra kudos. They appear in a dedicated section on the Bounty Board.
+              </p>
+            </div>
+            <Switch
+              id="is_side_quest"
+              checked={isSideQuest}
+              onCheckedChange={(checked) => setValue('is_side_quest', checked)}
+            />
+          </div>
+
+          {/* Difficulty Selector (hidden for side quests) */}
+          {!isSideQuest && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Swords className="h-4 w-4" />
+                <Label htmlFor="difficulty">Difficulty Level</Label>
+              </div>
+              <Select
+                value={watch('difficulty') || 'Apprentice'}
+                onValueChange={(value) => setValue('difficulty', value as QuestDifficulty)}
+              >
+                <SelectTrigger id="difficulty">
+                  <SelectValue placeholder="Select difficulty" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DIFFICULTY_LEVELS.map((level) => (
+                    <SelectItem key={level} value={level}>
+                      {level}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground">
+                Higher difficulty quests provide more challenge and prestige
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

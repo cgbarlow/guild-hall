@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { QuestList } from '@/components/quests/quest-list'
+import { SideQuestSection } from '@/components/quests/side-quest-section'
 import { QuestFilters } from '@/components/quests/quest-filters'
 import { QuestSearch } from '@/components/quests/quest-search'
 import { DifficultyFilter } from '@/components/quests/difficulty-filter'
@@ -84,15 +85,28 @@ export default function QuestsPage() {
           </p>
         </div>
       ) : (
-        <QuestList
-          quests={quests || []}
-          isLoading={questsLoading}
-          activeQuestIds={activeQuestIds}
-          userQuestStatuses={userQuestStatuses}
-          questLockStatuses={questLockStatuses}
-          hideCompleted={hideCompleted}
-          sortByLockedStatus={true}
-        />
+        <div className="space-y-8">
+          {/* Side Quests Section - shown above main quests */}
+          <SideQuestSection
+            quests={quests || []}
+            isLoading={questsLoading}
+            activeQuestIds={activeQuestIds}
+            userQuestStatuses={userQuestStatuses}
+            questLockStatuses={questLockStatuses}
+            hideCompleted={hideCompleted}
+          />
+
+          {/* Main Quest List - filter out side quests */}
+          <QuestList
+            quests={(quests || []).filter(q => !(q as any).is_side_quest)}
+            isLoading={questsLoading}
+            activeQuestIds={activeQuestIds}
+            userQuestStatuses={userQuestStatuses}
+            questLockStatuses={questLockStatuses}
+            hideCompleted={hideCompleted}
+            sortByLockedStatus={true}
+          />
+        </div>
       )}
     </div>
   )

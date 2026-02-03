@@ -27,6 +27,7 @@ interface QuestCardData {
   category?: Category | null
   difficulty?: QuestDifficulty | null
   is_exclusive?: boolean
+  is_side_quest?: boolean
 }
 
 interface QuestCardProps {
@@ -159,7 +160,10 @@ export function QuestCard({ quest, className, userQuestId, userQuestStatus, isLo
           {/* Row 2: Tags and status badges */}
           <div className="flex items-center gap-2 flex-wrap">
             {quest.category && <CategoryBadge category={quest.category} />}
-            {quest.difficulty && <DifficultyBadge difficulty={quest.difficulty} />}
+            {/* Don't show difficulty for side quests */}
+            {quest.difficulty && !('is_side_quest' in quest && quest.is_side_quest) && (
+              <DifficultyBadge difficulty={quest.difficulty} />
+            )}
             {userQuestId && !userQuestStatus && (
               <Badge variant="default" className="bg-green-600 hover:bg-green-600">
                 <Play className="h-3 w-3 mr-1" />

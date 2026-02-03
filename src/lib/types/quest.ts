@@ -118,6 +118,7 @@ export interface Quest {
   badge_url: string | null
   is_exclusive: boolean
   exclusive_code: string | null
+  is_side_quest: boolean
   created_by: string
   created_at: string
   updated_at: string
@@ -146,6 +147,7 @@ export interface QuestFilters {
   search?: string
   is_template?: boolean
   difficulty?: QuestDifficulty | null
+  is_side_quest?: boolean
 }
 
 // GM-specific quest filters

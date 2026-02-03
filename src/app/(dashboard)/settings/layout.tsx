@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 
 const SETTINGS_TABS = [
   { href: '/settings', label: 'General' },
+  { href: '/settings/email', label: 'Email' },
   { href: '/settings/privacy', label: 'Privacy' },
   { href: '/settings/password', label: 'Password' },
   { href: '/settings/export', label: 'Data Export' },

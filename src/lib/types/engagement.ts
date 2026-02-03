@@ -224,6 +224,27 @@ export const DAYS_OF_WEEK = [
   { value: 6, label: 'Saturday' },
 ]
 
+// Granular email preferences for different notification types
+export interface UserEmailPreferences {
+  user_id: string
+  // Quest related
+  quest_accepted_email: boolean
+  quest_completed_email: boolean
+  // Objective related
+  objective_submitted_email: boolean
+  objective_approved_email: boolean
+  objective_rejected_email: boolean
+  // Achievement related
+  badge_earned_email: boolean
+  badge_ready_to_claim_email: boolean
+  // Progress related
+  weekly_progress_email: boolean
+  deadline_reminder_email: boolean
+  // Timestamps
+  created_at: string
+  updated_at: string
+}
+
 // ============================================================
 // Enriched Stats
 // ============================================================

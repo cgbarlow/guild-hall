@@ -73,6 +73,7 @@ export const questSchema = z.object({
     .max(50, 'Exclusive code must be 50 characters or less')
     .nullable()
     .optional(),
+  is_side_quest: z.boolean().optional().default(false),
 })
 
 /**
@@ -105,6 +106,7 @@ export const createQuestSchema = z.object({
   featured: z.boolean().optional().default(false),
   is_exclusive: z.boolean().optional().default(false),
   exclusive_code: z.string().max(50).nullable().optional(),
+  is_side_quest: z.boolean().optional().default(false),
 })
 
 /**
