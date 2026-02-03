@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useCreateQuest } from '@/lib/hooks/use-create-quest'
 import { useCategories } from '@/lib/hooks/use-categories'
 import { questFormSchema, type QuestFormData } from '@/lib/schemas/quest.schema'
-import { Loader2, Save, ArrowLeft, Star, Swords } from 'lucide-react'
+import { Loader2, Save, ArrowLeft, Star, Swords, Plus, X, ExternalLink, Lock } from 'lucide-react'
 import Link from 'next/link'
 import type { QuestDifficulty } from '@/lib/types/quest'
 
@@ -54,6 +54,11 @@ export function QuestForm({ initialData, onSuccess }: QuestFormProps) {
       transformation_goal: '',
       is_template: false,
       is_side_quest: false,
+      resources: [],
+      design_notes: '',
+      featured: false,
+      is_exclusive: false,
+      exclusive_code: '',
       ...initialData,
     },
   })
@@ -61,6 +66,26 @@ export function QuestForm({ initialData, onSuccess }: QuestFormProps) {
   const isTemplate = watch('is_template')
   const categoryId = watch('category_id')
   const isSideQuest = watch('is_side_quest')
+  const isFeatured = watch('featured')
+  const isExclusive = watch('is_exclusive')
+  const exclusiveCode = watch('exclusive_code')
+  const resources = watch('resources') ?? []
+
+  const addResource = () => {
+    const newResources = [...resources, { title: '', url: '' }]
+    setValue('resources', newResources)
+  }
+
+  const removeResource = (index: number) => {
+    const newResources = resources.filter((_, i) => i !== index)
+    setValue('resources', newResources)
+  }
+
+  const updateResource = (index: number, field: 'title' | 'url', value: string) => {
+    const newResources = [...resources]
+    newResources[index] = { ...newResources[index], [field]: value }
+    setValue('resources', newResources)
+  }
 
   const onSubmit = async (data: QuestFormData) => {
     try {
@@ -315,20 +340,101 @@ export function QuestForm({ initialData, onSuccess }: QuestFormProps) {
         </CardContent>
       </Card>
 
-      {/* Template Option */}
+      {/* Resources */}
       <Card>
         <CardHeader>
-          <CardTitle>Template Settings</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <ExternalLink className="h-5 w-5" />
+            Resources
+          </CardTitle>
           <CardDescription>
-            Save this quest as a reusable template
+            Links to helpful resources for completing the quest
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {resources.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No resources added yet
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {resources.map((resource, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="flex-1 grid gap-2 sm:grid-cols-2">
+                    <Input
+                      placeholder="Resource title"
+                      value={resource.title}
+                      onChange={(e) => updateResource(index, 'title', e.target.value)}
+                    />
+                    <Input
+                      placeholder="https://..."
+                      type="url"
+                      value={resource.url}
+                      onChange={(e) => updateResource(index, 'url', e.target.value)}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeResource(index)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+          <Button type="button" variant="outline" onClick={addResource} className="w-full">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Resource
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Design Notes (GM Only) */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Design Notes</CardTitle>
+          <CardDescription>
+            Internal notes about quest design (not visible to adventurers)
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <Textarea
+            id="design_notes"
+            placeholder="Add notes about quest design, rationale, or implementation details..."
+            className="min-h-[120px]"
+            {...register('design_notes')}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Visibility Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Visibility Settings</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="featured">Featured Quest</Label>
+              <p className="text-sm text-muted-foreground">
+                Featured quests appear on the user dashboard
+              </p>
+            </div>
+            <Switch
+              id="featured"
+              checked={isFeatured}
+              onCheckedChange={(checked) => setValue('featured', checked)}
+            />
+          </div>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="is_template">Save as Template</Label>
               <p className="text-sm text-muted-foreground">
-                Templates can be cloned to create new quests quickly
+                Templates can be cloned to create new quests
               </p>
             </div>
             <Switch
@@ -337,6 +443,55 @@ export function QuestForm({ initialData, onSuccess }: QuestFormProps) {
               onCheckedChange={(checked) => setValue('is_template', checked)}
             />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Exclusive Quest Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="h-5 w-5" />
+            Exclusive Quest
+          </CardTitle>
+          <CardDescription>
+            Require a special code to unlock this quest
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="is_exclusive">Enable Exclusive Mode</Label>
+              <p className="text-sm text-muted-foreground">
+                Users must enter the unlock code to accept this quest
+              </p>
+            </div>
+            <Switch
+              id="is_exclusive"
+              checked={isExclusive}
+              onCheckedChange={(checked) => {
+                setValue('is_exclusive', checked)
+                if (!checked) {
+                  setValue('exclusive_code', '')
+                }
+              }}
+            />
+          </div>
+
+          {isExclusive && (
+            <div className="space-y-2">
+              <Label htmlFor="exclusive_code">Unlock Code</Label>
+              <Input
+                id="exclusive_code"
+                placeholder="Enter the secret code"
+                value={exclusiveCode ?? ''}
+                onChange={(e) => setValue('exclusive_code', e.target.value)}
+                className="font-mono"
+              />
+              <p className="text-sm text-muted-foreground">
+                Share this code with users who should have access to the quest
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

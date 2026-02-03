@@ -38,7 +38,7 @@ import { uploadQuestBadge, removeQuestBadge } from '@/lib/actions/badge'
 import { useQueryClient } from '@tanstack/react-query'
 import { questFormSchema, type QuestFormData, type QuestDifficultyType } from '@/lib/schemas/quest.schema'
 import type { Quest, QuestDbStatus, QuestResource } from '@/lib/types/quest'
-import { Loader2, Save, ArrowLeft, Send, Archive, Trash2, RotateCcw, Plus, X, ExternalLink, Lock } from 'lucide-react'
+import { Loader2, Save, ArrowLeft, Send, Archive, Trash2, RotateCcw, Plus, X, ExternalLink, Lock, Star, Swords } from 'lucide-react'
 import Link from 'next/link'
 
 const difficultyOptions: { value: QuestDifficultyType; label: string; description: string }[] = [
@@ -120,6 +120,7 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
       featured: quest.featured ?? false,
       is_exclusive: quest.is_exclusive ?? false,
       exclusive_code: quest.exclusive_code ?? '',
+      is_side_quest: quest.is_side_quest ?? false,
     },
   })
 
@@ -129,6 +130,7 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
   const exclusiveCode = watch('exclusive_code')
   const categoryId = watch('category_id')
   const difficulty = watch('difficulty')
+  const isSideQuest = watch('is_side_quest')
   const resources = watch('resources') ?? []
 
   const addResource = () => {
@@ -404,28 +406,54 @@ export function QuestEditForm({ quest }: QuestEditFormProps) {
               </Select>
             </div>
 
-            {/* Difficulty */}
-            <div className="space-y-2">
-              <Label htmlFor="difficulty">Difficulty</Label>
-              <Select
-                value={difficulty}
-                onValueChange={(value) => setValue('difficulty', value as QuestDifficultyType, { shouldDirty: true })}
-              >
-                <SelectTrigger id="difficulty">
-                  <SelectValue placeholder="Select difficulty" />
-                </SelectTrigger>
-                <SelectContent>
-                  {difficultyOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex flex-col">
-                        <span>{option.label}</span>
-                        <span className="text-xs text-muted-foreground">{option.description}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {/* Side Quest Toggle */}
+            <div className="flex items-center justify-between py-2">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-amber-500" />
+                  <Label htmlFor="is_side_quest">Side Quest</Label>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Side quests are special bonus tasks that earn extra kudos
+                </p>
+              </div>
+              <Switch
+                id="is_side_quest"
+                checked={isSideQuest}
+                onCheckedChange={(checked) => setValue('is_side_quest', checked, { shouldDirty: true })}
+              />
             </div>
+
+            {/* Difficulty (hidden for side quests) */}
+            {!isSideQuest && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Swords className="h-4 w-4" />
+                  <Label htmlFor="difficulty">Difficulty</Label>
+                </div>
+                <Select
+                  value={difficulty}
+                  onValueChange={(value) => setValue('difficulty', value as QuestDifficultyType, { shouldDirty: true })}
+                >
+                  <SelectTrigger id="difficulty">
+                    <SelectValue placeholder="Select difficulty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {difficultyOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex flex-col">
+                          <span>{option.label}</span>
+                          <span className="text-xs text-muted-foreground">{option.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  Higher difficulty quests provide more challenge and prestige
+                </p>
+              </div>
+            )}
 
             {/* Points */}
             <div className="grid gap-4 sm:grid-cols-2">
