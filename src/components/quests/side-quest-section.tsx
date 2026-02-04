@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Star, ScrollText } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { QuestCard } from './quest-card'
 import type { Quest, QuestPrerequisite } from '@/lib/types/quest'
 import { cn } from '@/lib/utils'
@@ -23,34 +23,6 @@ interface SideQuestSectionProps {
   questLockStatuses?: Map<string, QuestLockStatus>
   /** Hide quests the user has completed */
   hideCompleted?: boolean
-}
-
-function SideQuestSkeleton() {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className="rounded-lg border-2 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-6 animate-pulse"
-        >
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="h-4 w-4 bg-amber-200 rounded" />
-              <div className="h-4 w-16 bg-amber-200 rounded" />
-            </div>
-            <div className="h-6 w-3/4 bg-muted rounded" />
-            <div className="space-y-2">
-              <div className="h-4 w-full bg-muted rounded" />
-              <div className="h-4 w-2/3 bg-muted rounded" />
-            </div>
-            <div className="flex gap-4 pt-2">
-              <div className="h-4 w-16 bg-muted rounded" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
 }
 
 export function SideQuestSection({
@@ -81,20 +53,9 @@ export function SideQuestSection({
       .filter((q) => !hideCompleted || !q.isCompleted)
   }, [quests, userQuestStatuses, questLockStatuses, hideCompleted])
 
-  if (isLoading) {
-    return (
-      <section className={cn('space-y-4', className)}>
-        <div className="flex items-center gap-2">
-          <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
-          <h2 className="text-xl font-semibold">Side Quests</h2>
-        </div>
-        <SideQuestSkeleton />
-      </section>
-    )
-  }
-
-  // Don't render section if no side quests
-  if (sideQuests.length === 0) {
+  // Don't render section if loading or no side quests
+  // This prevents the "flash" of the section heading before we know if there are any side quests
+  if (isLoading || sideQuests.length === 0) {
     return null
   }
 

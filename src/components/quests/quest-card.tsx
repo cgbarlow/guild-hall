@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Clock, Award, Play, CheckCircle2, Hourglass, CircleDot, Lock } from 'lucide-react'
+import { Clock, Award, Play, CheckCircle2, Hourglass, CircleDot, Lock, Star } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { QuestStatusBadge } from './quest-status-badge'
@@ -160,9 +160,14 @@ export function QuestCard({ quest, className, userQuestId, userQuestStatus, isLo
           {/* Row 2: Tags and status badges */}
           <div className="flex items-center gap-2 flex-wrap">
             {quest.category && <CategoryBadge category={quest.category} />}
-            {/* Don't show difficulty for side quests */}
-            {quest.difficulty && !('is_side_quest' in quest && quest.is_side_quest) && (
-              <DifficultyBadge difficulty={quest.difficulty} />
+            {/* Show Side Quest badge instead of difficulty for side quests */}
+            {'is_side_quest' in quest && quest.is_side_quest ? (
+              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-700">
+                <Star className="h-3 w-3 mr-1 fill-amber-500 text-amber-500" />
+                Side Quest
+              </Badge>
+            ) : (
+              quest.difficulty && <DifficultyBadge difficulty={quest.difficulty} />
             )}
             {userQuestId && !userQuestStatus && (
               <Badge variant="default" className="bg-green-600 hover:bg-green-600">
