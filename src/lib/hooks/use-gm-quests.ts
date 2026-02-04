@@ -43,6 +43,10 @@ async function fetchGMQuests(filters?: GMQuestFilters): Promise<Quest[]> {
     filtered = filtered.filter(q => q.difficulty === filters.difficulty)
   }
 
+  if (filters?.is_side_quest !== undefined) {
+    filtered = filtered.filter(q => q.is_side_quest === filters.is_side_quest)
+  }
+
   // Sort: featured first, then by difficulty (easiest first), then by created_at descending
   filtered.sort((a, b) => {
     // Featured quests first

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Clock, Award, Edit, MoreVertical, Archive, Trash2, Sparkles } from 'lucide-react'
+import { Clock, Award, Edit, MoreVertical, Archive, Trash2, Sparkles, Star } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -79,7 +79,15 @@ export function GMQuestCard({ quest, className, onArchive, onDelete }: GMQuestCa
             <div className="flex items-start justify-between gap-3 mb-1.5">
               <div className="flex items-center gap-2 flex-wrap">
                 {quest.category && <CategoryBadge category={quest.category} className="flex-shrink-0" />}
-                {quest.difficulty && <DifficultyBadge difficulty={quest.difficulty} className="flex-shrink-0" />}
+                {/* Show Side Quest badge instead of difficulty for side quests */}
+                {quest.is_side_quest ? (
+                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-700 flex-shrink-0">
+                    <Star className="h-3 w-3 mr-1 fill-amber-500 text-amber-500" />
+                    Side Quest
+                  </Badge>
+                ) : (
+                  quest.difficulty && <DifficultyBadge difficulty={quest.difficulty} className="flex-shrink-0" />
+                )}
                 {quest.featured && (
                   <Badge variant="outline" className="border-amber-500 text-amber-600 bg-amber-50 flex-shrink-0">
                     <Sparkles className="h-3 w-3 mr-1" />

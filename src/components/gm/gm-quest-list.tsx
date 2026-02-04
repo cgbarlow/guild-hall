@@ -7,7 +7,7 @@ import { StatusFilter } from './status-filter'
 import { DifficultyFilter } from '@/components/quests/difficulty-filter'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Star } from 'lucide-react'
 import Link from 'next/link'
 import type { QuestDbStatus, QuestDifficulty } from '@/lib/types/quest'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -43,12 +43,14 @@ export function GMQuestList({ className }: GMQuestListProps) {
   // Default to 'published' filter per ADR-012
   const [statusFilter, setStatusFilter] = useState<QuestDbStatus | 'all'>('published')
   const [difficultyFilter, setDifficultyFilter] = useState<QuestDifficulty | null>(null)
+  const [sideQuestFilter, setSideQuestFilter] = useState<boolean | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   const { data: quests, isLoading, error } = useGMQuests({
     status: statusFilter === 'all' ? undefined : statusFilter,
     search: searchQuery || undefined,
     difficulty: difficultyFilter ?? undefined,
+    is_side_quest: sideQuestFilter ?? undefined,
   })
 
   const handleArchive = (questId: string) => {
@@ -89,10 +91,21 @@ export function GMQuestList({ className }: GMQuestListProps) {
             </Link>
           </Button>
         </div>
-        <DifficultyFilter
-          selectedDifficulty={difficultyFilter}
-          onDifficultyChange={setDifficultyFilter}
-        />
+        <div className="flex flex-wrap items-center gap-4">
+          <DifficultyFilter
+            selectedDifficulty={difficultyFilter}
+            onDifficultyChange={setDifficultyFilter}
+          />
+          <Button
+            variant={sideQuestFilter === true ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSideQuestFilter(sideQuestFilter === true ? null : true)}
+            className={sideQuestFilter === true ? 'bg-amber-500 hover:bg-amber-600' : ''}
+          >
+            <Star className={`h-4 w-4 mr-1 ${sideQuestFilter === true ? 'fill-white' : ''}`} />
+            Side Quests
+          </Button>
+        </div>
       </div>
 
       {/* Error state */}
@@ -109,11 +122,11 @@ export function GMQuestList({ className }: GMQuestListProps) {
       {!isLoading && !error && quests?.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="text-muted-foreground mb-4">
-            {searchQuery || statusFilter !== 'all' || difficultyFilter !== null
+            {searchQuery || statusFilter !== 'all' || difficultyFilter !== null || sideQuestFilter !== null
               ? 'No quests match your filters'
               : 'No quests yet'}
           </div>
-          {!searchQuery && statusFilter === 'all' && (
+          {!searchQuery && statusFilter === 'all' && difficultyFilter === null && sideQuestFilter === null && (
             <Button asChild>
               <Link href="/gm/quests/new">
                 <Plus className="mr-2 h-4 w-4" />
@@ -121,13 +134,14 @@ export function GMQuestList({ className }: GMQuestListProps) {
               </Link>
             </Button>
           )}
-          {(searchQuery || statusFilter !== 'all' || difficultyFilter !== null) && (
+          {(searchQuery || statusFilter !== 'all' || difficultyFilter !== null || sideQuestFilter !== null) && (
             <Button
               variant="outline"
               onClick={() => {
                 setSearchQuery('')
                 setStatusFilter('all')
                 setDifficultyFilter(null)
+                setSideQuestFilter(null)
               }}
             >
               Clear Filters

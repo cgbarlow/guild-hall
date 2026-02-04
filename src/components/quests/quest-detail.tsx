@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Award, Clock, User, Calendar, Zap, ExternalLink, BookOpen } from 'lucide-react'
+import { ArrowLeft, Award, Clock, User, Calendar, Zap, ExternalLink, BookOpen, Star } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -76,7 +76,16 @@ export function QuestDetail({
         <CardContent className="space-y-6">
           {/* Quest stats */}
           <div className="flex flex-wrap gap-6">
-            {quest.difficulty && (
+            {/* Show Side Quest tag instead of difficulty for side quests */}
+            {quest.is_side_quest ? (
+              <div className="flex items-center gap-2">
+                <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Quest Type</p>
+                  <p className="text-lg font-semibold text-amber-600">Side Quest</p>
+                </div>
+              </div>
+            ) : quest.difficulty && (
               <div className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-purple-500" />
                 <div>
@@ -128,6 +137,30 @@ export function QuestDetail({
               {quest.description || 'No description provided.'}
             </p>
           </div>
+
+          {/* Narrative Context */}
+          {quest.narrative_context && (
+            <div className="rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 p-4">
+              <h3 className="text-sm font-semibold text-purple-800 dark:text-purple-300 mb-2">
+                The Story
+              </h3>
+              <p className="text-sm text-purple-700 dark:text-purple-200 whitespace-pre-wrap">
+                {quest.narrative_context}
+              </p>
+            </div>
+          )}
+
+          {/* Transformation Goal */}
+          {quest.transformation_goal && (
+            <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 p-4">
+              <h3 className="text-sm font-semibold text-emerald-800 dark:text-emerald-300 mb-2">
+                What You&apos;ll Achieve
+              </h3>
+              <p className="text-sm text-emerald-700 dark:text-emerald-200 whitespace-pre-wrap">
+                {quest.transformation_goal}
+              </p>
+            </div>
+          )}
 
           {/* Objectives */}
           {quest.objectives && quest.objectives.length > 0 && (
