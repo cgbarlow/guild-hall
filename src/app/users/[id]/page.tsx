@@ -7,6 +7,9 @@ interface PageProps {
   params: Promise<{
     id: string
   }>
+  searchParams: Promise<{
+    newBadge?: string
+  }>
 }
 
 /**
@@ -44,8 +47,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  * Accessible without authentication
  * Respects user privacy settings
  */
-export default async function PublicProfilePage({ params }: PageProps) {
+export default async function PublicProfilePage({ params, searchParams }: PageProps) {
   const { id } = await params
+  const { newBadge } = await searchParams
   const result = await fetchPublicProfile(id)
 
   // Handle different result statuses
@@ -66,7 +70,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
         <main className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8 sm:py-12">
             <div className="mx-auto max-w-2xl">
-              <PublicProfileCard profile={result.data} />
+              <PublicProfileCard profile={result.data} highlightBadgeId={newBadge} />
             </div>
           </div>
         </main>

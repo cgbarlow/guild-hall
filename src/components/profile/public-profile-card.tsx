@@ -102,6 +102,7 @@ function getAchievementIcon(iconName: string, className?: string) {
 
 interface PublicProfileCardProps {
   profile: PublicProfile
+  highlightBadgeId?: string
   className?: string
 }
 
@@ -109,7 +110,7 @@ interface PublicProfileCardProps {
  * Public profile display card
  * Shows user avatar, name, bio, stats, and achievements (if allowed)
  */
-export function PublicProfileCard({ profile, className }: PublicProfileCardProps) {
+export function PublicProfileCard({ profile, highlightBadgeId, className }: PublicProfileCardProps) {
   return (
     <Card className={cn('overflow-hidden', className)}>
       {/* Header with gradient background */}
@@ -184,6 +185,7 @@ export function PublicProfileCard({ profile, className }: PublicProfileCardProps
               badges={profile.quest_badges}
               size="sm"
               maxDisplay={10}
+              highlightBadgeId={highlightBadgeId}
             />
           </div>
         )}

@@ -18,6 +18,7 @@ import { useClaimQuest } from '@/lib/hooks/use-claim-quest'
 
 interface ClaimRewardButtonProps {
   userQuestId: string
+  visibleBy: string
   questTitle: string
   points: number
   requiresApproval?: boolean
@@ -27,6 +28,7 @@ interface ClaimRewardButtonProps {
 
 export function ClaimRewardButton({
   userQuestId,
+  visibleBy,
   questTitle,
   points,
   requiresApproval = false,
@@ -54,11 +56,11 @@ export function ClaimRewardButton({
           status: 'success',
           pointsAwarded: claimResult.pointsAwarded,
         })
-        // If quest has a badge, redirect to profile to show it
+        // If quest has a badge, redirect to user page to show it
         if (badgeUrl) {
           // Short delay to show success message before redirecting
           setTimeout(() => {
-            router.push(`/profile?newBadge=${userQuestId}`)
+            router.push(`/users/${visibleBy}?newBadge=${userQuestId}`)
           }, 1500)
         }
       } else if (claimResult.status === 'awaiting_final_approval') {
