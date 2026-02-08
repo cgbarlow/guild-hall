@@ -62,7 +62,20 @@ export function EngagementDashboard({
   const { data: quote, isLoading: isLoadingQuote } = usePhilosophyQuote()
 
   // Fetch nudge banner
-  const { nudge, dismiss: dismissNudge, isLoading: isLoadingNudge } = useNudgeBanner(userId)
+  // Skip nudges that duplicate other dashboard components:
+  // - approved_ready & deadline_soon: ContextualGreeting already shows these
+  // - quest_recommendation: YourPathSection handles this (when no active quests)
+  const hasNoActiveQuests = initialActiveQuests.length === 0
+  const skipPriorities: Array<'approved_ready' | 'deadline_soon' | 'celebration' | 'quest_recommendation'> = [
+    'approved_ready',  // Duplicates ContextualGreeting's "objectives ready to progress" message
+    'deadline_soon',   // Duplicates ContextualGreeting's deadline warning
+    ...(hasNoActiveQuests ? ['quest_recommendation' as const] : []), // YourPathSection handles this
+  ]
+  const { nudge, dismiss: dismissNudge, isLoading: isLoadingNudge } = useNudgeBanner(
+    userId,
+    true, // enableNudges
+    skipPriorities
+  )
 
   // Fetch quest recommendation (only if no active quests)
   const { recommendation, isLoading: isLoadingRecommendation } = useQuestRecommendation(

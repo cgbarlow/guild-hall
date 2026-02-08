@@ -5,6 +5,31 @@ import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { NudgeBannerData, NudgePriority } from '@/lib/types/engagement'
 
+/**
+ * Check if user can accept a quest (all prerequisites completed)
+ */
+async function canAcceptQuest(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  questId: string
+): Promise<boolean> {
+  try {
+    const { data, error } = await (supabase.rpc as CallableFunction)(
+      'can_accept_quest',
+      { p_user_id: userId, p_quest_id: questId }
+    )
+
+    if (error) {
+      // Function might not exist, assume can accept
+      return true
+    }
+
+    return data as boolean
+  } catch {
+    return true // Assume can accept if function doesn't exist
+  }
+}
+
 // Session storage key for dismissed nudges
 const NUDGE_DISMISSED_KEY = 'guild-hall-nudge-dismissed'
 
@@ -163,7 +188,7 @@ async function fetchNudgeContext(userId: string): Promise<NudgeContext> {
 
   const userQuestIds = (userQuestsData as Array<{ quest_id: string }> | null)?.map(q => q.quest_id) ?? []
 
-  // Fetch recommended quest (featured quest user hasn't accepted)
+  // Fetch recommended quest (featured quest user hasn't accepted AND can accept)
   let featuredQuestsQuery = supabase
     .from('quests')
     .select('id, title')
@@ -174,7 +199,8 @@ async function fetchNudgeContext(userId: string): Promise<NudgeContext> {
     featuredQuestsQuery = featuredQuestsQuery.not('id', 'in', `(${userQuestIds.map(id => `'${id}'`).join(',')})`)
   }
 
-  const { data: featuredQuestsData } = await featuredQuestsQuery.limit(1)
+  // Fetch multiple featured quests to check prerequisites
+  const { data: featuredQuestsData } = await featuredQuestsQuery.limit(5)
   const featuredQuests = featuredQuestsData as Array<{ id: string; title: string }> | null
 
   const upcomingDeadlines = (deadlines || []).map((d: any) => ({
@@ -183,9 +209,17 @@ async function fetchNudgeContext(userId: string): Promise<NudgeContext> {
     days_remaining: Math.ceil((new Date(d.deadline).getTime() - now.getTime()) / (24 * 60 * 60 * 1000)),
   }))
 
-  const recommendedQuest = featuredQuests && featuredQuests.length > 0
-    ? { id: featuredQuests[0].id, title: featuredQuests[0].title }
-    : null
+  // Find first featured quest user can actually accept (prerequisites met)
+  let recommendedQuest: { id: string; title: string } | null = null
+  if (featuredQuests && featuredQuests.length > 0) {
+    for (const quest of featuredQuests) {
+      const canAccept = await canAcceptQuest(supabase, userId, quest.id)
+      if (canAccept) {
+        recommendedQuest = { id: quest.id, title: quest.title }
+        break
+      }
+    }
+  }
 
   return {
     approvedObjectivesCount: approvedCount || 0,
@@ -198,8 +232,15 @@ async function fetchNudgeContext(userId: string): Promise<NudgeContext> {
 
 /**
  * Hook to get the current nudge banner (if any)
+ * @param userId - The user's ID
+ * @param enableNudges - Whether nudges are enabled (default: true)
+ * @param skipPriorities - Array of nudge priorities to skip (to avoid duplication with other components)
  */
-export function useNudgeBanner(userId: string | undefined, enableNudges: boolean = true) {
+export function useNudgeBanner(
+  userId: string | undefined,
+  enableNudges: boolean = true,
+  skipPriorities: NudgePriority[] = []
+) {
   const [dismissed, setDismissed] = useState<NudgePriority[]>([])
 
   // Load dismissed state on mount
@@ -234,8 +275,11 @@ export function useNudgeBanner(userId: string | undefined, enableNudges: boolean
     // Check if this nudge was dismissed
     if (dismissed.includes(recommended.priority)) return null
 
+    // Skip priorities that are handled by other components (e.g., ContextualGreeting, YourPathSection)
+    if (skipPriorities.includes(recommended.priority)) return null
+
     return recommended
-  }, [context, enableNudges, dismissed])
+  }, [context, enableNudges, dismissed, skipPriorities])
 
   // Dismiss handler
   const handleDismiss = () => {
