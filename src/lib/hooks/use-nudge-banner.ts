@@ -39,6 +39,7 @@ interface NudgeContext {
   activeQuestsCount: number
   recommendedQuest: { id: string; title: string } | null
   recentMilestone: { type: 'tier' | 'quest' | 'streak'; message: string } | null
+  badgesReadyToClaim: Array<{ user_quest_id: string; quest_title: string; badge_url: string }>
 }
 
 /**
@@ -96,7 +97,19 @@ export function getRecommendedAction(context: NudgeContext): NudgeBannerData | n
     }
   }
 
-  // Priority 2: Approaching deadline (< 3 days)
+  // Priority 2: Badge ready to claim (quest completed with badge)
+  if (context.badgesReadyToClaim && context.badgesReadyToClaim.length > 0) {
+    const badge = context.badgesReadyToClaim[0]
+    return {
+      priority: 'badge_ready_to_claim',
+      message: `You've earned a badge for "${badge.quest_title}"! Claim your reward.`,
+      actionUrl: `/my-quests/${badge.user_quest_id}`,
+      actionLabel: 'Claim Badge',
+      variant: 'celebration',
+    }
+  }
+
+  // Priority 3: Approaching deadline (< 3 days)
   const urgentDeadline = context.upcomingDeadlines.find(d => d.days_remaining <= 3)
   if (urgentDeadline) {
     return {
@@ -160,6 +173,23 @@ async function fetchNudgeContext(userId: string): Promise<NudgeContext> {
       .in('user_quest_id', activeQuestIds)
     approvedCount = count ?? 0
   }
+
+  // Fetch quests ready to claim that have badges
+  const { data: badgeQuestsData } = await supabase
+    .from('user_quests')
+    .select('id, quests!inner(title, badge_url)')
+    .eq('user_id', userId)
+    .eq('status', 'ready_to_claim')
+    .not('quests.badge_url', 'is', null)
+    .limit(5)
+
+  const badgesReadyToClaim = (badgeQuestsData || [])
+    .filter((q: any) => q.quests?.badge_url)
+    .map((q: any) => ({
+      user_quest_id: q.id,
+      quest_title: q.quests?.title || 'Unknown Quest',
+      badge_url: q.quests?.badge_url,
+    }))
 
   // Fetch upcoming deadlines
   const { data: deadlines } = await supabase
@@ -227,6 +257,7 @@ async function fetchNudgeContext(userId: string): Promise<NudgeContext> {
     activeQuestsCount: activeCount || 0,
     recommendedQuest,
     recentMilestone: null, // Could be extended to check recent achievements
+    badgesReadyToClaim,
   }
 }
 

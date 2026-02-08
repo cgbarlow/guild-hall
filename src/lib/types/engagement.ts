@@ -164,6 +164,7 @@ export type NudgePriority =
   | 'deadline_soon'
   | 'celebration'
   | 'quest_recommendation'
+  | 'badge_ready_to_claim'
 
 export interface NudgeBannerData {
   priority: NudgePriority
