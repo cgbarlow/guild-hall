@@ -49,7 +49,13 @@ function ProfileContent() {
           {profile.bio && <p className="text-muted-foreground mt-1">{profile.bio}</p>}
         </div>
       </div>
-      <ProfileStats totalPoints={profile.total_points ?? 0} questsCompleted={profile.quests_completed ?? 0} tierName={tierInfo?.tier?.name} />
+      <ProfileStats
+          totalPoints={profile.total_points ?? 0}
+          questsCompleted={profile.quests_completed ?? 0}
+          tierName={tierInfo?.tier?.name}
+          tierIcon={tierInfo?.tier?.icon}
+          tierColor={tierInfo?.tier?.color}
+        />
 
       {/* Quest Badges Section */}
       <Card ref={badgeSectionRef}>

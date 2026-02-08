@@ -1,7 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { User, Trophy, ScrollText, TrendingUp, Award, Star, Zap, Target, Crown, Medal, Flame, Sparkles } from 'lucide-react'
+import { User, Trophy, ScrollText, Award, Star, Zap, Target, Crown, Medal, Flame, Sparkles, Sprout, TreeDeciduous, Trees, Mountain } from 'lucide-react'
+import { TIER_COLOR_STYLES } from '@/lib/types/engagement'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { QuestBadgeShowcase } from '@/components/profile/quest-badge-showcase'
 import { cn } from '@/lib/utils'
@@ -67,19 +68,36 @@ interface StatCardProps {
   icon: React.ReactNode
   label: string
   value: string | number
+  iconColorClass?: string
 }
 
 /**
  * Small stat display component
  */
-function StatCard({ icon, label, value }: StatCardProps) {
+function StatCard({ icon, label, value, iconColorClass }: StatCardProps) {
   return (
     <div className="flex flex-col items-center gap-1 rounded-lg bg-muted/50 p-3">
-      <div className="text-muted-foreground">{icon}</div>
+      <div className={iconColorClass || 'text-muted-foreground'}>{icon}</div>
       <span className="text-xl font-bold">{value}</span>
       <span className="text-xs text-muted-foreground">{label}</span>
     </div>
   )
+}
+
+/**
+ * Map tier icon names to Lucide icons
+ */
+function getTierIcon(iconName: string, className?: string) {
+  const icons: Record<string, React.ReactNode> = {
+    sprout: <Sprout className={className} />,
+    treedeciduous: <TreeDeciduous className={className} />,
+    trees: <Trees className={className} />,
+    mountain: <Mountain className={className} />,
+    crown: <Crown className={className} />,
+    trophy: <Trophy className={className} />,
+    star: <Star className={className} />,
+  }
+  return icons[iconName.toLowerCase()] || <Sprout className={className} />
 }
 
 /**
@@ -111,6 +129,10 @@ interface PublicProfileCardProps {
  * Shows user avatar, name, bio, stats, and achievements (if allowed)
  */
 export function PublicProfileCard({ profile, highlightBadgeId, className }: PublicProfileCardProps) {
+  // Get tier color styling
+  const tierColor = profile.tier_color ?? 'green'
+  const tierColorStyles = TIER_COLOR_STYLES[tierColor] ?? TIER_COLOR_STYLES.green
+
   return (
     <Card className={cn('overflow-hidden', className)}>
       {/* Header with gradient background */}
@@ -130,9 +152,10 @@ export function PublicProfileCard({ profile, highlightBadgeId, className }: Publ
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-4">
           <StatCard
-            icon={<TrendingUp className="h-5 w-5" />}
+            icon={getTierIcon(profile.tier_icon ?? 'Sprout', 'h-5 w-5')}
             label="Skill Tier"
             value={profile.tier_name ?? 'Apprentice'}
+            iconColorClass={tierColorStyles.text}
           />
           <StatCard
             icon={<Trophy className="h-5 w-5" />}

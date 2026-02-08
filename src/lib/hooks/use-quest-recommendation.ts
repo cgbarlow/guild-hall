@@ -73,16 +73,28 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
 
   const userPoints = (userData as unknown as { total_points: number | null } | null)?.total_points ?? 0
 
-  // Get current tier based on points
-  const { data: tierData } = await supabase
-    .from('skill_tiers')
+  // Get current tier based on points from skill_tier_config table
+  const { data: tierData } = await (supabase as unknown as {
+    from: (table: string) => {
+      select: (columns: string) => {
+        lte: (column: string, value: number) => {
+          order: (column: string, options: { ascending: boolean }) => {
+            limit: (count: number) => {
+              single: () => Promise<{ data: unknown; error: unknown }>
+            }
+          }
+        }
+      }
+    }
+  })
+    .from('skill_tier_config')
     .select('name')
     .lte('min_points', userPoints)
     .order('min_points', { ascending: false })
     .limit(1)
     .single()
 
-  const userTierName = (tierData as unknown as { name: string } | null)?.name ?? 'Apprentice'
+  const userTierName = (tierData as { name: string } | null)?.name ?? 'Apprentice'
 
   // Get user's quest history to determine preferences (excluding abandoned quests)
   const { data: userQuestsData } = await supabase

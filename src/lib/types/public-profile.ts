@@ -58,6 +58,8 @@ export interface PublicProfile {
   leaderboard_position?: number
   quests_completed: number
   tier_name?: string
+  tier_icon?: string
+  tier_color?: string
 }
 
 /**

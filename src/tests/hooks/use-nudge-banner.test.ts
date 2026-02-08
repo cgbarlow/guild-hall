@@ -50,6 +50,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -68,6 +69,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -85,6 +87,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: { type: 'tier' as const, message: 'You reached Expert tier!' },
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -101,6 +104,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 0,
         recommendedQuest: { id: 'q1', title: 'Agent Swarm Commander' },
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -117,6 +121,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -135,6 +140,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -151,6 +157,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: { type: 'tier' as const, message: 'Celebration!' },
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -165,6 +172,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 0,
         recommendedQuest: { id: 'q1', title: 'Test Quest' },
         recentMilestone: { type: 'quest' as const, message: 'Quest completed!' },
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -179,6 +187,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: { id: 'q1', title: 'Test Quest' },
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -195,6 +204,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -210,6 +220,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -226,6 +237,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -243,6 +255,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -260,6 +273,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: null,
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
@@ -275,6 +289,7 @@ describe('getRecommendedAction', () => {
         activeQuestsCount: 1,
         recommendedQuest: null,
         recentMilestone: { type: 'tier' as const, message: 'Celebration!' },
+        badgesReadyToClaim: [],
       }
 
       const result = getRecommendedAction(context)
