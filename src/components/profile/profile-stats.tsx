@@ -1,25 +1,8 @@
 'use client'
 
-import { Sprout, TreeDeciduous, Trees, Mountain, Crown, Trophy, Star, Swords } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TIER_COLOR_STYLES } from '@/lib/types/engagement'
-
-/**
- * Map tier icon names to Lucide icons
- */
-function getTierIcon(iconName: string, className?: string) {
-  const icons: Record<string, React.ReactNode> = {
-    sprout: <Sprout className={className} />,
-    treedeciduous: <TreeDeciduous className={className} />,
-    trees: <Trees className={className} />,
-    mountain: <Mountain className={className} />,
-    crown: <Crown className={className} />,
-    trophy: <Trophy className={className} />,
-    star: <Star className={className} />,
-    swords: <Swords className={className} />,
-  }
-  return icons[iconName.toLowerCase()] || <Swords className={className} />
-}
+import { getTierIcon } from '@/lib/utils/tier-icons'
 
 interface ProfileStatsProps {
   totalPoints: number
@@ -30,7 +13,8 @@ interface ProfileStatsProps {
 }
 
 export function ProfileStats({ totalPoints, questsCompleted, tierName, tierIcon, tierColor }: ProfileStatsProps) {
-  // Get tier color styling
+  // Get tier icon and color styling
+  const TierIcon = getTierIcon(tierIcon ?? 'Swords')
   const colorKey = tierColor ?? 'green'
   const tierColorStyles = TIER_COLOR_STYLES[colorKey] ?? TIER_COLOR_STYLES.green
 
@@ -43,7 +27,7 @@ export function ProfileStats({ totalPoints, questsCompleted, tierName, tierIcon,
         <CardContent>
           <div className="flex items-center gap-2">
             <span className={tierColorStyles.text}>
-              {getTierIcon(tierIcon ?? 'Sprout', 'h-6 w-6')}
+              <TierIcon className="h-6 w-6" />
             </span>
             <span className="text-2xl font-bold">
               {tierName || 'Apprentice'}

@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { User, Trophy, ScrollText, Award, Star, Zap, Target, Crown, Medal, Flame, Sparkles, Sprout, TreeDeciduous, Trees, Mountain, Swords } from 'lucide-react'
+import { User, Trophy, ScrollText, Award, Star, Zap, Target, Crown, Medal, Flame, Sparkles } from 'lucide-react'
 import { TIER_COLOR_STYLES } from '@/lib/types/engagement'
+import { getTierIcon } from '@/lib/utils/tier-icons'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { QuestBadgeShowcase } from '@/components/profile/quest-badge-showcase'
 import { cn } from '@/lib/utils'
@@ -85,23 +86,6 @@ function StatCard({ icon, label, value, iconColorClass }: StatCardProps) {
 }
 
 /**
- * Map tier icon names to Lucide icons
- */
-function getTierIcon(iconName: string, className?: string) {
-  const icons: Record<string, React.ReactNode> = {
-    sprout: <Sprout className={className} />,
-    treedeciduous: <TreeDeciduous className={className} />,
-    trees: <Trees className={className} />,
-    mountain: <Mountain className={className} />,
-    crown: <Crown className={className} />,
-    trophy: <Trophy className={className} />,
-    star: <Star className={className} />,
-    swords: <Swords className={className} />,
-  }
-  return icons[iconName.toLowerCase()] || <Swords className={className} />
-}
-
-/**
  * Map achievement icon names to Lucide icons
  */
 function getAchievementIcon(iconName: string, className?: string) {
@@ -130,7 +114,8 @@ interface PublicProfileCardProps {
  * Shows user avatar, name, bio, stats, and achievements (if allowed)
  */
 export function PublicProfileCard({ profile, highlightBadgeId, className }: PublicProfileCardProps) {
-  // Get tier color styling
+  // Get tier icon and color styling
+  const TierIcon = getTierIcon(profile.tier_icon ?? 'Swords')
   const tierColor = profile.tier_color ?? 'green'
   const tierColorStyles = TIER_COLOR_STYLES[tierColor] ?? TIER_COLOR_STYLES.green
 
@@ -153,7 +138,7 @@ export function PublicProfileCard({ profile, highlightBadgeId, className }: Publ
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-4">
           <StatCard
-            icon={getTierIcon(profile.tier_icon ?? 'Sprout', 'h-5 w-5')}
+            icon={<TierIcon className="h-5 w-5" />}
             label="Skill Tier"
             value={profile.tier_name ?? 'Apprentice'}
             iconColorClass={tierColorStyles.text}

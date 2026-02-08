@@ -1,18 +1,9 @@
 'use client'
 
-import { Sprout, TreeDeciduous, Trees, Mountain, Crown, Swords } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TIER_COLOR_STYLES } from '@/lib/types/engagement'
+import { getTierIcon } from '@/lib/utils/tier-icons'
 import type { LeaderboardTierInfo } from '@/lib/hooks/use-leaderboard'
-
-const TIER_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Sprout,
-  TreeDeciduous,
-  Trees,
-  Mountain,
-  Crown,
-  Swords,
-}
 
 interface TierBadgeProps {
   tier: LeaderboardTierInfo
@@ -22,7 +13,7 @@ interface TierBadgeProps {
 }
 
 export function TierBadge({ tier, size = 'sm', showName = false, className }: TierBadgeProps) {
-  const Icon = TIER_ICONS[tier.icon] || Sprout
+  const Icon = getTierIcon(tier.icon)
   const colorStyles = TIER_COLOR_STYLES[tier.color] || TIER_COLOR_STYLES.green
 
   const sizeClasses = {
