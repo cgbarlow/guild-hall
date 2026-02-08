@@ -1,6 +1,6 @@
 'use client'
 
-import { Sprout, TreeDeciduous, Trees, Mountain, Crown, Trophy, Star } from 'lucide-react'
+import { Sprout, TreeDeciduous, Trees, Mountain, Crown, Trophy, Star, Swords } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TIER_COLOR_STYLES } from '@/lib/types/engagement'
 
@@ -16,8 +16,9 @@ function getTierIcon(iconName: string, className?: string) {
     crown: <Crown className={className} />,
     trophy: <Trophy className={className} />,
     star: <Star className={className} />,
+    swords: <Swords className={className} />,
   }
-  return icons[iconName.toLowerCase()] || <Sprout className={className} />
+  return icons[iconName.toLowerCase()] || <Swords className={className} />
 }
 
 interface ProfileStatsProps {

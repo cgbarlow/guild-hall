@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { User, Trophy, ScrollText, Award, Star, Zap, Target, Crown, Medal, Flame, Sparkles, Sprout, TreeDeciduous, Trees, Mountain } from 'lucide-react'
+import { User, Trophy, ScrollText, Award, Star, Zap, Target, Crown, Medal, Flame, Sparkles, Sprout, TreeDeciduous, Trees, Mountain, Swords } from 'lucide-react'
 import { TIER_COLOR_STYLES } from '@/lib/types/engagement'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { QuestBadgeShowcase } from '@/components/profile/quest-badge-showcase'
@@ -96,8 +96,9 @@ function getTierIcon(iconName: string, className?: string) {
     crown: <Crown className={className} />,
     trophy: <Trophy className={className} />,
     star: <Star className={className} />,
+    swords: <Swords className={className} />,
   }
-  return icons[iconName.toLowerCase()] || <Sprout className={className} />
+  return icons[iconName.toLowerCase()] || <Swords className={className} />
 }
 
 /**
