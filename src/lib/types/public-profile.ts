@@ -57,6 +57,7 @@ export interface PublicProfile {
   quest_badges: QuestBadge[]
   leaderboard_position?: number
   quests_completed: number
+  tier_name?: string
 }
 
 /**

@@ -108,16 +108,29 @@ export async function fetchPublicProfile(userId: string): Promise<PublicProfileR
     return { status: 'private' }
   }
 
+  // Get user's tier based on points
+  const userPoints = userData.total_points ?? 0
+  const { data: tierData } = await supabase
+    .from('skill_tiers')
+    .select('name')
+    .lte('min_points', userPoints)
+    .order('min_points', { ascending: false })
+    .limit(1)
+    .single()
+
+  const tierName = (tierData as { name: string } | null)?.name ?? 'Apprentice'
+
   // Build the public profile
   const publicProfile: PublicProfile = {
     id: userData.id,
     display_name: userData.display_name ?? DEFAULT_DISPLAY_NAME,
     avatar_url: userData.avatar_url,
     bio: userData.bio,
-    total_points: userData.total_points ?? 0,
+    total_points: userPoints,
     quests_completed: userData.quests_completed ?? 0,
     achievements: [],
     quest_badges: [],
+    tier_name: tierName,
   }
 
   // Fetch badges if allowed (default to true if no privacy settings)

@@ -128,7 +128,12 @@ export function PublicProfileCard({ profile, highlightBadgeId, className }: Publ
 
       <CardContent className="space-y-6">
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-3 gap-4">
+          <StatCard
+            icon={<TrendingUp className="h-5 w-5" />}
+            label="Skill Tier"
+            value={profile.tier_name ?? 'Apprentice'}
+          />
           <StatCard
             icon={<Trophy className="h-5 w-5" />}
             label="Points"
@@ -139,13 +144,6 @@ export function PublicProfileCard({ profile, highlightBadgeId, className }: Publ
             label="Quests"
             value={profile.quests_completed}
           />
-          {profile.leaderboard_position !== undefined && (
-            <StatCard
-              icon={<TrendingUp className="h-5 w-5" />}
-              label="Rank"
-              value={`#${profile.leaderboard_position}`}
-            />
-          )}
         </div>
 
         {/* Achievements Section */}

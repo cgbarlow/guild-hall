@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useProfile } from '@/lib/hooks/use-profile'
 import { useUserActivity } from '@/lib/hooks/use-user-activity'
 import { useUserQuestBadges } from '@/lib/hooks/use-user-quest-badges'
-import { useUserRank } from '@/lib/hooks/use-user-rank'
+import { useUserTier } from '@/lib/hooks/use-skill-tiers'
 
 function ProfileContent() {
   const searchParams = useSearchParams()
@@ -23,7 +23,7 @@ function ProfileContent() {
   const { data: profile, isLoading, error } = useProfile()
   const { data: activities = [], isLoading: activitiesLoading } = useUserActivity({ limit: 10 })
   const { data: badges = [], isLoading: badgesLoading } = useUserQuestBadges(profile?.id)
-  const { data: rank } = useUserRank(profile?.id)
+  const { tierInfo } = useUserTier(profile?.total_points ?? undefined)
 
   // Scroll to badge section when coming from badge claim
   useEffect(() => {
@@ -49,7 +49,7 @@ function ProfileContent() {
           {profile.bio && <p className="text-muted-foreground mt-1">{profile.bio}</p>}
         </div>
       </div>
-      <ProfileStats totalPoints={profile.total_points ?? 0} questsCompleted={profile.quests_completed ?? 0} rank={rank} />
+      <ProfileStats totalPoints={profile.total_points ?? 0} questsCompleted={profile.quests_completed ?? 0} tierName={tierInfo?.tier?.name} />
 
       {/* Quest Badges Section */}
       <Card ref={badgeSectionRef}>

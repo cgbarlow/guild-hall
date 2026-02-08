@@ -5,19 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 interface ProfileStatsProps {
   totalPoints: number
   questsCompleted: number
-  rank?: number | null
+  tierName?: string | null
 }
 
-export function ProfileStats({ totalPoints, questsCompleted, rank }: ProfileStatsProps) {
+export function ProfileStats({ totalPoints, questsCompleted, tierName }: ProfileStatsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Guild Rank</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">Skill Tier</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {rank ? `#${rank}` : '-'}
+            {tierName || 'Apprentice'}
           </div>
         </CardContent>
       </Card>
