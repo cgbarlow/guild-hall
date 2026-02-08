@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { X, ArrowRight, Clock, PartyPopper, Lightbulb } from 'lucide-react'
+import { X, ArrowRight, Clock, PartyPopper, Lightbulb, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { NudgeBannerData, NudgePriority } from '@/lib/types/engagement'
@@ -35,6 +35,12 @@ const PRIORITY_STYLES: Record<NudgePriority, {
     border: 'border-green-200 dark:border-green-800',
     text: 'text-green-800 dark:text-green-200',
     icon: Lightbulb,
+  },
+  badge_ready_to_claim: {
+    bg: 'bg-gradient-to-r from-purple-50 via-fuchsia-50 to-purple-50 dark:from-purple-950/30 dark:via-fuchsia-950/30 dark:to-purple-950/30',
+    border: 'border-purple-300 dark:border-purple-700',
+    text: 'text-purple-900 dark:text-purple-100',
+    icon: Award,
   },
 }
 
