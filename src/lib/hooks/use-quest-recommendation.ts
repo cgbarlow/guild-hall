@@ -3,11 +3,31 @@
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { QuestRecommendation } from '@/lib/types/engagement'
+import { DIFFICULTY_ORDER, type QuestDifficulty } from '@/lib/types/quest'
 
 interface RecommendationResult {
   recommendation: QuestRecommendation | null
   isLoading: boolean
   error: unknown
+}
+
+// Map tier names to difficulty levels for filtering
+const TIER_TO_MAX_DIFFICULTY: Record<string, number> = {
+  'Apprentice': 1,  // Can do Apprentice quests
+  'Journeyman': 2,  // Can do Apprentice + Journeyman
+  'Expert': 3,      // Can do up to Expert
+  'Master': 4,      // Can do up to Master
+  'Legend': 4,      // Can do all quests
+}
+
+/**
+ * Check if quest difficulty is appropriate for user's tier
+ */
+function isQuestAppropriateForTier(questDifficulty: QuestDifficulty | null, userTierName: string): boolean {
+  if (!questDifficulty) return true // No difficulty set = open to all
+  const maxDifficulty = TIER_TO_MAX_DIFFICULTY[userTierName] ?? 1
+  const questLevel = DIFFICULTY_ORDER[questDifficulty] ?? 1
+  return questLevel <= maxDifficulty
 }
 
 /**
@@ -39,9 +59,30 @@ async function canAcceptQuest(supabase: ReturnType<typeof createClient>, userId:
  * 3. Most popular quests by acceptance rate
  *
  * Excludes quests that are locked by prerequisites
+ * Filters by user's tier - only recommends quests at or below their level
  */
 async function fetchQuestRecommendation(userId: string): Promise<QuestRecommendation | null> {
   const supabase = createClient()
+
+  // Get user's current tier from their points
+  const { data: userData } = await supabase
+    .from('users')
+    .select('total_points')
+    .eq('id', userId)
+    .single()
+
+  const userPoints = (userData as { total_points: number | null })?.total_points ?? 0
+
+  // Get current tier based on points
+  const { data: tierData } = await supabase
+    .from('skill_tiers')
+    .select('name')
+    .lte('min_points', userPoints)
+    .order('min_points', { ascending: false })
+    .limit(1)
+    .single()
+
+  const userTierName = (tierData as { name: string } | null)?.name ?? 'Apprentice'
 
   // Get user's quest history to determine preferences (excluding abandoned quests)
   const { data: userQuestsData } = await supabase
@@ -57,10 +98,10 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
     userQuests?.filter(uq => uq.status === 'completed').map((uq: any) => uq.quests?.category_id).filter(Boolean)
   )
 
-  // Strategy 1: Featured quests not yet accepted
+  // Strategy 1: Featured quests not yet accepted, appropriate for user's tier
   let featuredQuery = supabase
     .from('quests')
-    .select('id, title, category_id')
+    .select('id, title, category_id, difficulty')
     .eq('status', 'published')
     .eq('featured', true)
 
@@ -71,11 +112,15 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
 
   const { data: featuredQuestsData } = await featuredQuery.limit(10)
 
-  const featuredQuests = featuredQuestsData as Array<{ id: string; title: string; category_id: string }> | null
+  const featuredQuests = featuredQuestsData as Array<{ id: string; title: string; category_id: string; difficulty: QuestDifficulty | null }> | null
 
   if (featuredQuests && featuredQuests.length > 0) {
-    // Filter to only quests user can accept (not locked by prerequisites)
+    // Filter to only quests user can accept (not locked by prerequisites) AND appropriate for tier
     for (const quest of featuredQuests) {
+      // Skip quests above user's tier
+      if (!isQuestAppropriateForTier(quest.difficulty, userTierName)) {
+        continue
+      }
       const canAccept = await canAcceptQuest(supabase, userId, quest.id)
       if (canAccept) {
         const isFamiliar = completedCategories.has(quest.category_id)
@@ -91,12 +136,12 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
     }
   }
 
-  // Strategy 2: Quests in familiar categories
+  // Strategy 2: Quests in familiar categories, appropriate for tier
   if (completedCategories.size > 0) {
     const categoryIds = Array.from(completedCategories)
     let categoryQuery = supabase
       .from('quests')
-      .select('id, title')
+      .select('id, title, difficulty')
       .eq('status', 'published')
       .in('category_id', categoryIds)
 
@@ -106,10 +151,13 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
 
     const { data: categoryQuestsData } = await categoryQuery.limit(10)
 
-    const categoryQuests = categoryQuestsData as Array<{ id: string; title: string }> | null
+    const categoryQuests = categoryQuestsData as Array<{ id: string; title: string; difficulty: QuestDifficulty | null }> | null
 
     if (categoryQuests && categoryQuests.length > 0) {
       for (const quest of categoryQuests) {
+        if (!isQuestAppropriateForTier(quest.difficulty, userTierName)) {
+          continue
+        }
         const canAccept = await canAcceptQuest(supabase, userId, quest.id)
         if (canAccept) {
           return {
@@ -123,10 +171,10 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
     }
   }
 
-  // Strategy 3: Any available quests (not accepted, not locked)
+  // Strategy 3: Any available quests (not accepted, not locked, appropriate for tier)
   let availableQuery = supabase
     .from('quests')
-    .select('id, title')
+    .select('id, title, difficulty')
     .eq('status', 'published')
 
   if (acceptedQuestIds.length > 0) {
@@ -137,10 +185,13 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
     .order('created_at', { ascending: true }) // Older quests likely more popular
     .limit(10)
 
-  const availableQuests = availableQuestsData as Array<{ id: string; title: string }> | null
+  const availableQuests = availableQuestsData as Array<{ id: string; title: string; difficulty: QuestDifficulty | null }> | null
 
   if (availableQuests && availableQuests.length > 0) {
     for (const quest of availableQuests) {
+      if (!isQuestAppropriateForTier(quest.difficulty, userTierName)) {
+        continue
+      }
       const canAccept = await canAcceptQuest(supabase, userId, quest.id)
       if (canAccept) {
         return {
