@@ -14,6 +14,7 @@ const inter = Inter({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://guild-hall.agentics.nz';
+const ogImageUrl = `${siteUrl}/og-image.jpg`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     url: siteUrl,
     images: [
       {
-        url: '/og-image.jpg',
+        url: ogImageUrl,
         width: 1200,
         height: 630,
         alt: 'Guild Hall - Quest-based engagement platform',
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Guild Hall',
     description: 'Quest-based engagement platform',
-    images: ['/og-image.jpg'],
+    images: [ogImageUrl],
   },
 };
 
