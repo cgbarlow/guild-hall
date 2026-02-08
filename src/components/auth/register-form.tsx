@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
@@ -11,12 +12,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { OAuthButtons } from './oauth-buttons'
 import { registerSchema, type RegisterFormData } from './auth-form-schema'
 import { createClient } from '@/lib/supabase/client'
+import { validateReturnUrl } from '@/lib/auth/pending-action'
 
 export function RegisterForm() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  // Get and validate returnUrl from query params
+  const returnUrl = validateReturnUrl(searchParams.get('returnUrl'))
 
   const {
     register,
@@ -38,7 +44,7 @@ export function RegisterForm() {
           data: {
             full_name: data.displayName,
           },
-          emailRedirectTo: `${window.location.origin}/auth/confirm?type=signup`,
+          emailRedirectTo: `${window.location.origin}/auth/confirm?type=signup&returnUrl=${encodeURIComponent(returnUrl)}`,
         },
       })
 
@@ -62,7 +68,7 @@ export function RegisterForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link href="/login">
+          <Link href={returnUrl !== '/dashboard' ? `/login?returnUrl=${encodeURIComponent(returnUrl)}` : '/login'}>
             <Button variant="outline" className="w-full">
               Back to sign in
             </Button>
@@ -167,7 +173,10 @@ export function RegisterForm() {
 
         <div className="text-center text-sm text-foreground/80">
           Already have an account?{' '}
-          <Link href="/login" className="text-primary font-medium hover:underline">
+          <Link
+            href={returnUrl !== '/dashboard' ? `/login?returnUrl=${encodeURIComponent(returnUrl)}` : '/login'}
+            className="text-primary font-medium hover:underline"
+          >
             Sign in
           </Link>
         </div>

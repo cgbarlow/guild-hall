@@ -5,6 +5,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { NotificationProvider } from "@/providers/notification-provider";
+import { PendingActionProvider } from "@/providers/pending-action-provider";
 import { DynamicFavicon } from "@/components/dynamic-favicon";
 
 const inter = Inter({
@@ -29,7 +30,9 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="warm">
           <QueryProvider>
             <AuthProvider>
-              <NotificationProvider>{children}</NotificationProvider>
+              <PendingActionProvider>
+                <NotificationProvider>{children}</NotificationProvider>
+              </PendingActionProvider>
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>

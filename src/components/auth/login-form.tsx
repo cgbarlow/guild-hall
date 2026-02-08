@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
@@ -12,12 +12,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { OAuthButtons } from './oauth-buttons'
 import { loginSchema, type LoginFormData } from './auth-form-schema'
 import { createClient } from '@/lib/supabase/client'
+import { validateReturnUrl } from '@/lib/auth/pending-action'
 
 export function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  // Get and validate returnUrl from query params
+  const returnUrl = validateReturnUrl(searchParams.get('returnUrl'))
 
   const {
     register,
@@ -39,7 +44,7 @@ export function LoginForm() {
 
       if (error) throw error
 
-      router.push('/dashboard')
+      router.push(returnUrl)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -124,7 +129,10 @@ export function LoginForm() {
 
         <div className="text-center text-sm text-foreground/80">
           Don&#39;t have an account?{' '}
-          <Link href="/register" className="text-primary font-medium hover:underline">
+          <Link
+            href={returnUrl !== '/dashboard' ? `/register?returnUrl=${encodeURIComponent(returnUrl)}` : '/register'}
+            className="text-primary font-medium hover:underline"
+          >
             Sign up
           </Link>
         </div>

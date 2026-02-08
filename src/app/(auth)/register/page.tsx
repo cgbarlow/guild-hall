@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { RegisterForm } from '@/components/auth/register-form'
 
 export const metadata = {
@@ -6,5 +7,9 @@ export const metadata = {
 }
 
 export default function RegisterPage() {
-  return <RegisterForm />
+  return (
+    <Suspense fallback={<div className="w-full max-w-md animate-pulse" />}>
+      <RegisterForm />
+    </Suspense>
+  )
 }

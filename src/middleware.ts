@@ -25,17 +25,62 @@ export async function middleware(request: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession()
 
+  // Build returnUrl from current path
+  const returnUrl = encodeURIComponent(
+    request.nextUrl.pathname + request.nextUrl.search
+  )
+
   // Protect dashboard routes
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     if (!session) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      return NextResponse.redirect(
+        new URL(`/login?returnUrl=${returnUrl}`, request.url)
+      )
+    }
+  }
+
+  // Protect my-quests routes
+  if (request.nextUrl.pathname.startsWith('/my-quests')) {
+    if (!session) {
+      return NextResponse.redirect(
+        new URL(`/login?returnUrl=${returnUrl}`, request.url)
+      )
+    }
+  }
+
+  // Protect profile route
+  if (request.nextUrl.pathname === '/profile') {
+    if (!session) {
+      return NextResponse.redirect(
+        new URL(`/login?returnUrl=${returnUrl}`, request.url)
+      )
+    }
+  }
+
+  // Protect settings routes
+  if (request.nextUrl.pathname.startsWith('/settings')) {
+    if (!session) {
+      return NextResponse.redirect(
+        new URL(`/login?returnUrl=${returnUrl}`, request.url)
+      )
+    }
+  }
+
+  // Protect notifications route
+  if (request.nextUrl.pathname === '/notifications') {
+    if (!session) {
+      return NextResponse.redirect(
+        new URL(`/login?returnUrl=${returnUrl}`, request.url)
+      )
     }
   }
 
   // Protect GM routes
   if (request.nextUrl.pathname.startsWith('/gm')) {
     if (!session) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      return NextResponse.redirect(
+        new URL(`/login?returnUrl=${returnUrl}`, request.url)
+      )
     }
 
     // Check GM role using has_role function (bypasses RLS issues)
@@ -52,12 +97,26 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname === '/login' ||
     request.nextUrl.pathname === '/register'
   )) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    // Respect returnUrl if provided, otherwise default to dashboard
+    const requestedReturnUrl = request.nextUrl.searchParams.get('returnUrl')
+    const redirectTo = requestedReturnUrl?.startsWith('/')
+      ? requestedReturnUrl
+      : '/dashboard'
+    return NextResponse.redirect(new URL(redirectTo, request.url))
   }
 
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/gm/:path*', '/login', '/register'],
+  matcher: [
+    '/dashboard/:path*',
+    '/gm/:path*',
+    '/my-quests/:path*',
+    '/profile',
+    '/settings/:path*',
+    '/notifications',
+    '/login',
+    '/register',
+  ],
 }

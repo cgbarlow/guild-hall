@@ -18,6 +18,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAcceptQuest } from '@/lib/hooks/use-accept-quest'
+import { useRequireAuth } from '@/lib/hooks/use-require-auth'
+import { AuthRequiredModal } from '@/components/auth/auth-required-modal'
 import type { Quest } from '@/lib/types/quest'
 
 interface AcceptQuestModalProps {
@@ -36,6 +38,14 @@ export function AcceptQuestModal({
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [exclusiveCode, setExclusiveCode] = useState('')
+
+  // Auth check for unauthenticated users
+  const {
+    user,
+    showModal: showAuthModal,
+    setShowModal: setShowAuthModal,
+    returnUrl,
+  } = useRequireAuth({ returnUrl: `/quests/${quest.id}` })
 
   const { mutate: acceptQuest, isPending, error } = useAcceptQuest({
     onSuccess: (userQuest) => {
@@ -62,9 +72,35 @@ export function AcceptQuestModal({
     }
   }
 
+  // Handle trigger click - check auth before opening modal
+  const handleTriggerClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault()
+      // Store pending action for after login
+      import('@/lib/auth/pending-action').then(({ storePendingAction }) => {
+        storePendingAction({
+          type: 'accept_quest',
+          payload: { questId: quest.id },
+          returnUrl,
+        })
+      })
+      setShowAuthModal(true)
+    }
+  }
+
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      <AlertDialogTrigger asChild>
+    <>
+      {/* Auth Required Modal for unauthenticated users */}
+      <AuthRequiredModal
+        open={showAuthModal}
+        onOpenChange={setShowAuthModal}
+        title="Sign in to accept quest"
+        description="Sign in to start this quest and track your progress."
+        returnUrl={returnUrl}
+      />
+
+      <AlertDialog open={open} onOpenChange={handleOpenChange}>
+        <AlertDialogTrigger asChild onClick={handleTriggerClick}>
         {trigger || (
           <Button size="lg" disabled={disabled}>
             <Swords className="h-4 w-4 mr-2" />
@@ -196,5 +232,6 @@ export function AcceptQuestModal({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+    </>
   )
 }
