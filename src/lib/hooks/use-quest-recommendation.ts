@@ -100,12 +100,13 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
 
   // Strategy 1: Featured quests not yet accepted, appropriate for user's tier
   // Exclude side quests - they shouldn't be recommended in "Your Path"
+  // Use .or() to handle NULL values (is_side_quest can be NULL, false, or true)
   let featuredQuery = supabase
     .from('quests')
     .select('id, title, category_id, difficulty')
     .eq('status', 'published')
     .eq('featured', true)
-    .neq('is_side_quest', true)
+    .or('is_side_quest.is.null,is_side_quest.eq.false')
 
   // Only add NOT IN filter if there are quests to exclude
   if (acceptedQuestIds.length > 0) {
@@ -147,7 +148,7 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
       .select('id, title, difficulty')
       .eq('status', 'published')
       .in('category_id', categoryIds)
-      .neq('is_side_quest', true)
+      .or('is_side_quest.is.null,is_side_quest.eq.false')
 
     if (acceptedQuestIds.length > 0) {
       categoryQuery = categoryQuery.not('id', 'in', `(${acceptedQuestIds.join(',')})`)
@@ -181,7 +182,7 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
     .from('quests')
     .select('id, title, difficulty')
     .eq('status', 'published')
-    .neq('is_side_quest', true)
+    .or('is_side_quest.is.null,is_side_quest.eq.false')
 
   if (acceptedQuestIds.length > 0) {
     availableQuery = availableQuery.not('id', 'in', `(${acceptedQuestIds.join(',')})`)
