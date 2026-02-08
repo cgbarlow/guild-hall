@@ -58,7 +58,7 @@ export function ClaimRewardButton({
         if (badgeUrl) {
           // Short delay to show success message before redirecting
           setTimeout(() => {
-            router.push('/profile?newBadge=true')
+            router.push(`/profile?newBadge=${userQuestId}`)
           }, 1500)
         }
       } else if (claimResult.status === 'awaiting_final_approval') {

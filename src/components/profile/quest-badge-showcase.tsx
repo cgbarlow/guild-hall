@@ -16,13 +16,14 @@ import type { QuestBadge } from '@/lib/types/public-profile'
 interface QuestBadgeProps {
   badge: QuestBadge
   size?: 'sm' | 'md' | 'lg'
+  isHighlighted?: boolean
   onClick?: () => void
 }
 
 /**
  * Individual quest badge component displaying a badge image
  */
-function QuestBadgeItem({ badge, size = 'md', onClick }: QuestBadgeProps) {
+function QuestBadgeItem({ badge, size = 'md', isHighlighted = false, onClick }: QuestBadgeProps) {
   const sizeClasses = {
     sm: 'h-16 w-16',
     md: 'h-20 w-20',
@@ -32,8 +33,9 @@ function QuestBadgeItem({ badge, size = 'md', onClick }: QuestBadgeProps) {
   return (
     <div
       className={cn(
-        'group flex flex-col items-center gap-2',
-        onClick && 'cursor-pointer'
+        'group flex flex-col items-center gap-2 rounded-lg p-2 transition-all',
+        onClick && 'cursor-pointer',
+        isHighlighted && 'ring-2 ring-purple-500 ring-offset-2 bg-purple-50 dark:bg-purple-950/20 animate-pulse'
       )}
       onClick={onClick}
     >
@@ -53,7 +55,10 @@ function QuestBadgeItem({ badge, size = 'md', onClick }: QuestBadgeProps) {
         />
       </div>
       <div className="text-center">
-        <p className="text-sm font-medium text-foreground line-clamp-2">{badge.quest_title}</p>
+        <p className="text-sm font-medium text-foreground line-clamp-2">
+          {badge.quest_title}
+          {isHighlighted && <span className="ml-1 text-purple-600 dark:text-purple-400">✨ New!</span>}
+        </p>
         <p className="text-xs text-muted-foreground">{badge.formatted_date}</p>
       </div>
     </div>
@@ -64,6 +69,7 @@ interface QuestBadgeShowcaseProps {
   badges: QuestBadge[]
   size?: 'sm' | 'md' | 'lg'
   maxDisplay?: number
+  highlightBadgeId?: string | null
   className?: string
 }
 
@@ -76,6 +82,7 @@ export function QuestBadgeShowcase({
   badges,
   size = 'md',
   maxDisplay,
+  highlightBadgeId,
   className,
 }: QuestBadgeShowcaseProps) {
   const [selectedBadge, setSelectedBadge] = useState<QuestBadge | null>(null)
@@ -107,6 +114,7 @@ export function QuestBadgeShowcase({
             key={badge.id}
             badge={badge}
             size={size}
+            isHighlighted={highlightBadgeId === badge.id}
             onClick={() => setSelectedBadge(badge)}
           />
         ))}
