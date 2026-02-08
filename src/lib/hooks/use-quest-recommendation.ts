@@ -99,11 +99,13 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
   )
 
   // Strategy 1: Featured quests not yet accepted, appropriate for user's tier
+  // Exclude side quests - they shouldn't be recommended in "Your Path"
   let featuredQuery = supabase
     .from('quests')
     .select('id, title, category_id, difficulty')
     .eq('status', 'published')
     .eq('featured', true)
+    .neq('is_side_quest', true)
 
   // Only add NOT IN filter if there are quests to exclude
   if (acceptedQuestIds.length > 0) {
@@ -137,6 +139,7 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
   }
 
   // Strategy 2: Quests in familiar categories, appropriate for tier
+  // Exclude side quests
   if (completedCategories.size > 0) {
     const categoryIds = Array.from(completedCategories)
     let categoryQuery = supabase
@@ -144,6 +147,7 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
       .select('id, title, difficulty')
       .eq('status', 'published')
       .in('category_id', categoryIds)
+      .neq('is_side_quest', true)
 
     if (acceptedQuestIds.length > 0) {
       categoryQuery = categoryQuery.not('id', 'in', `(${acceptedQuestIds.join(',')})`)
@@ -172,10 +176,12 @@ async function fetchQuestRecommendation(userId: string): Promise<QuestRecommenda
   }
 
   // Strategy 3: Any available quests (not accepted, not locked, appropriate for tier)
+  // Exclude side quests
   let availableQuery = supabase
     .from('quests')
     .select('id, title, difficulty')
     .eq('status', 'published')
+    .neq('is_side_quest', true)
 
   if (acceptedQuestIds.length > 0) {
     availableQuery = availableQuery.not('id', 'in', `(${acceptedQuestIds.join(',')})`)
