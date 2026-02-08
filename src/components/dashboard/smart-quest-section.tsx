@@ -66,6 +66,7 @@ export function SmartQuestSection({ activeQuests, isLoading }: SmartQuestSection
     }
 
     // Fill with additional open quests that are NOT locked (sorted by difficulty - easiest first)
+    // Never include side quests unless they explicitly have featured flag (already in `featured` list)
     const featuredIds = new Set(featured.map(q => q.id))
     const additionalQuests = (allQuests ?? [])
       .filter(quest => {
@@ -74,7 +75,8 @@ export function SmartQuestSection({ activeQuests, isLoading }: SmartQuestSection
           !allUserQuestIds?.has(quest.id) && // Not already taken
           !featuredIds.has(quest.id) && // Not already in featured
           quest.status === 'published' && // Only published quests
-          !lockStatus?.isLocked // Only unlocked quests for fill slots
+          !lockStatus?.isLocked && // Only unlocked quests for fill slots
+          !quest.is_side_quest // Never auto-fill with side quests
         )
       })
       .sort((a, b) => getDifficultyOrder(a.difficulty) - getDifficultyOrder(b.difficulty)) // Easiest first

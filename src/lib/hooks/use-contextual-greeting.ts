@@ -38,7 +38,8 @@ function markCelebrationShown(userId: string): void {
 
 /**
  * Get cached greeting from session storage
- * Returns null if cache is invalid, from a different day, or for a different user
+ * Returns null if cache is invalid, from a different day, for a different user,
+ * or if the greeting is action-based (which can become stale quickly)
  */
 function getCachedGreeting(userId: string | undefined): CachedGreeting | null {
   if (typeof window === 'undefined' || !userId) return null
@@ -53,6 +54,9 @@ function getCachedGreeting(userId: string | undefined): CachedGreeting | null {
     if (parsed.date !== today) return null
     // Invalidate if for a different user (prevents cross-user cache leakage)
     if (parsed.userId !== userId) return null
+    // Don't cache action-priority greetings as they can become stale quickly
+    // (e.g., "5 objectives ready" becomes wrong after completing objectives)
+    if (parsed.priority === 'action') return null
     return parsed
   } catch {
     return null
@@ -249,11 +253,13 @@ export function useContextualGreeting(
   const cached = typeof window !== 'undefined' ? getCachedGreeting(userId) : null
 
   // Fetch greeting data from database
+  // Short staleTime ensures data is fresh when user returns to dashboard
   const { data: greetingData, isLoading: isLoadingData } = useQuery({
     queryKey: ['greeting-data', userId],
     queryFn: () => fetchGreetingData(userId!),
     enabled: !!userId && !cached,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds - keep fresh for quest state changes
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
   })
 
   // Get tier info
