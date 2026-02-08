@@ -170,7 +170,7 @@ See [Architecture Decision Records](docs/adrs/) for detailed rationale.
 | [ADR-012](docs/adrs/ADR-012-Engagement-Improvements.md) | Skill tiers, streaks, greetings, quotes |
 | [ADR-013](docs/adrs/ADR-013-Mixed-Access-Authentication.md) | Public browsing with contextual auth prompts |
 
-### Technical Specifications (18 Specs)
+### Technical Specifications (19 Specs)
 | Spec | Description |
 |------|-------------|
 | [SPEC-000](docs/specs/SPEC-000-ADR-Template.md) | ADR/Spec templates, naming, and guidelines |
@@ -191,6 +191,7 @@ See [Architecture Decision Records](docs/adrs/) for detailed rationale.
 | [SPEC-012-E](docs/specs/SPEC-012-E-GM-Digest-Email.md) | GM daily digest emails |
 | [SPEC-012-F](docs/specs/SPEC-012-F-User-Weekly-Email.md) | User weekly progress emails |
 | [SPEC-013](docs/specs/SPEC-013-Auth-Required-Actions.md) | Pending action storage and auth prompts |
+| [SPEC-016](docs/specs/SPEC-016-Social-Media-Previews.md) | Open Graph and social media link previews |
 
 ---
 

@@ -13,9 +13,36 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://guild-hall.agentics.nz';
+
 export const metadata: Metadata = {
-  title: "Guild Hall",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Guild Hall",
+    template: "%s | Guild Hall",
+  },
   description: "Quest-based engagement platform",
+  openGraph: {
+    type: 'website',
+    siteName: 'Guild Hall',
+    title: 'Guild Hall',
+    description: 'Quest-based engagement platform',
+    url: siteUrl,
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Guild Hall - Quest-based engagement platform',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Guild Hall',
+    description: 'Quest-based engagement platform',
+    images: ['/og-image.jpg'],
+  },
 };
 
 export default function RootLayout({

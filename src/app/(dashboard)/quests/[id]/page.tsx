@@ -1,81 +1,60 @@
-'use client'
+import { Metadata } from 'next'
+import { getQuestById } from '@/lib/actions/quests'
+import { QuestDetailClient } from './quest-detail-client'
 
-import { useParams, useRouter } from 'next/navigation'
-import { QuestDetail } from '@/components/quests/quest-detail'
-import { useQuest } from '@/lib/hooks/use-quest'
-import { useAcceptQuest } from '@/lib/hooks/use-accept-quest'
-
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="h-10 w-32 bg-muted rounded animate-pulse" />
-      <div className="rounded-lg border bg-card p-6 space-y-6 animate-pulse">
-        <div className="space-y-4">
-          <div className="h-4 w-20 bg-muted rounded" />
-          <div className="h-8 w-3/4 bg-muted rounded" />
-          <div className="h-4 w-48 bg-muted rounded" />
-        </div>
-        <div className="flex gap-6">
-          <div className="h-16 w-24 bg-muted rounded" />
-          <div className="h-16 w-24 bg-muted rounded" />
-        </div>
-        <div className="space-y-2">
-          <div className="h-6 w-32 bg-muted rounded" />
-          <div className="h-20 w-full bg-muted rounded" />
-        </div>
-      </div>
-    </div>
-  )
+interface PageProps {
+  params: Promise<{ id: string }>
 }
 
-function ErrorState({ message }: { message: string }) {
-  return (
-    <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center">
-      <h2 className="text-lg font-semibold text-destructive mb-2">
-        Quest Not Found
-      </h2>
-      <p className="text-sm text-muted-foreground">{message}</p>
-    </div>
-  )
-}
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://guild-hall.agentics.nz'
+const defaultOgImage = `${siteUrl}/og-image.jpg`
 
-export default function QuestDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const questId = params.id as string
-
-  const { data: quest, isLoading, error } = useQuest(questId)
-  const acceptQuestMutation = useAcceptQuest({
-    onSuccess: () => {
-      // Navigate to my-quests to see the active quest
-      router.push('/my-quests')
-    },
-  })
-
-  const handleAcceptQuest = async (id: string) => {
-    await acceptQuestMutation.mutateAsync(id)
-  }
-
-  if (isLoading) {
-    return <LoadingSkeleton />
-  }
-
-  if (error) {
-    return <ErrorState message="This quest could not be loaded. It may have been removed." />
-  }
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
+  const quest = await getQuestById(id)
 
   if (!quest) {
-    return <ErrorState message="This quest does not exist." />
+    return {
+      title: 'Quest Not Found',
+      description: 'This quest could not be found.',
+    }
   }
 
-  // Quest is available if it's published and user hasn't already accepted it
-  const canAccept = quest.status === 'published'
+  // Use quest featured image if available, otherwise default
+  const ogImage = quest.featured_image_url || defaultOgImage
 
-  return (
-    <QuestDetail
-      quest={quest}
-      onAccept={handleAcceptQuest}
-      canAccept={canAccept}
-    />
-  )
+  const description = quest.short_description || quest.description || 'Embark on this quest!'
+  const truncatedDescription = description.length > 200
+    ? description.substring(0, 197) + '...'
+    : description
+
+  return {
+    title: quest.title,
+    description: truncatedDescription,
+    openGraph: {
+      type: 'article',
+      title: quest.title,
+      description: truncatedDescription,
+      url: `${siteUrl}/quests/${id}`,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `${quest.title} - Quest on Guild Hall`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: quest.title,
+      description: truncatedDescription,
+      images: [ogImage],
+    },
+  }
+}
+
+export default async function QuestDetailPage({ params }: PageProps) {
+  const { id } = await params
+  return <QuestDetailClient questId={id} />
 }

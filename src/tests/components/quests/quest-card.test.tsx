@@ -36,6 +36,7 @@ describe('QuestCard', () => {
     design_notes: null,
     featured: false,
     badge_url: null,
+    featured_image_url: null,
     is_exclusive: false,
     exclusive_code: null,
     is_side_quest: false,
